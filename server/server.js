@@ -32,6 +32,7 @@ app.use(
 // Middleware
 const allowedOrigins = [
   "https://bracumatrimony.vercel.app",
+  "https://bracumatrimony2.vercel.app",
   "https://bracu-matrimony-backend.vercel.app",
   "http://localhost:5173",
   "http://localhost:3000",
