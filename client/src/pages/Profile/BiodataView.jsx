@@ -87,6 +87,23 @@ export default function BiodataView() {
       : []),
   ];
 
+  // Check if current user can view contact information
+  const canViewContactInfo = useMemo(() => {
+    if (!currentUser) return false;
+    // Allow if user has BRACU email domains
+    if (
+      currentUser.email?.endsWith("@g.bracu.ac.bd") ||
+      currentUser.email?.endsWith("@bracu.ac.bd")
+    ) {
+      return true;
+    }
+    // Allow if user is alumni verified
+    if (currentUser.alumniVerified) {
+      return true;
+    }
+    return false;
+  }, [currentUser]);
+
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -384,6 +401,29 @@ export default function BiodataView() {
       );
     } finally {
       setIsUnlockingContact(false);
+    }
+  };
+
+  // Handle alumni verification request
+  const handleRequestVerification = async () => {
+    try {
+      const response = await profileService.requestVerification();
+      if (response.success) {
+        showNotification(
+          "Verification request submitted successfully. Please send your proof to our Facebook page.",
+          "success"
+        );
+        // Update user in auth context to reflect verificationRequest: true
+        const updatedUser = { ...authUser, verificationRequest: true };
+        updateUser(updatedUser);
+      }
+    } catch (error) {
+      console.error("Error requesting verification:", error);
+      showNotification(
+        error.response?.data?.message ||
+          "Failed to submit verification request. Please try again.",
+        "error"
+      );
     }
   };
 
@@ -1236,6 +1276,46 @@ export default function BiodataView() {
                         {profile?.contactInformation ||
                           "No contact information provided by the user."}
                       </p>
+                    </div>
+                  </div>
+                ) : !canViewContactInfo ? (
+                  /* Restriction for non-BRACU/non-alumni users */
+                  <div className="text-center py-6">
+                    <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-lg p-6 border border-rose-200">
+                      <Lock className="w-8 h-8 text-rose-500 mx-auto mb-3" />
+                      <h3 className="text-lg font-semibold text-rose-800 mb-3">
+                        Contact Information Restricted
+                      </h3>
+                      <p className="text-base text-rose-700 mb-4 leading-relaxed">
+                        You cannot see the contact information without
+                        (g.bracu.ac.bd) or (bracu.ac.bd). If you are alumni,
+                        make a request for verification.
+                      </p>
+                      {!currentUser?.verificationRequest ? (
+                        <button
+                          onClick={handleRequestVerification}
+                          className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer mr-3"
+                        >
+                          <Shield className="w-4 h-4" />
+                          Request Alumni Verification
+                        </button>
+                      ) : (
+                        <div className="text-center mb-4">
+                          <span className="text-lg font-bold text-green-800 block mb-2">
+                            Verification Request Submitted
+                          </span>
+                          <p className="text-base text-green-700 font-medium">
+                            Please send your proof to our Facebook page.
+                          </p>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => navigate("/profile")}
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
+                      >
+                        <User className="w-4 h-4" />
+                        Go to Profile
+                      </button>
                     </div>
                   </div>
                 ) : monetizationEnabled ? (
