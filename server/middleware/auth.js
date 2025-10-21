@@ -40,7 +40,9 @@ const auth = async (req, res, next) => {
 
     // Get user from database with only essential fields
     const user = await User.findById(decoded.userId)
-      .select("name email profileId isActive role credits")
+      .select(
+        "name email profileId isActive role credits alumniVerified verificationRequest"
+      )
       .lean();
 
     console.log("Auth middleware: User lookup result", {
