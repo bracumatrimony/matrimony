@@ -12,6 +12,22 @@ const { sendEmail } = require("../services/emailService");
 
 const router = express.Router();
 
+// Helper function to check if user can access contact information
+const canAccessContactInfo = (user) => {
+  // Allow if user has BRACU email domains
+  if (
+    user.email?.endsWith("@g.bracu.ac.bd") ||
+    user.email?.endsWith("@bracu.ac.bd")
+  ) {
+    return true;
+  }
+  // Allow if user is alumni verified
+  if (user.alumniVerified) {
+    return true;
+  }
+  return false;
+};
+
 // @route   POST /api/profiles
 // @desc    Create user profile
 // @access  Private
@@ -581,6 +597,15 @@ router.post(
       });
     }
 
+    // Check if user can access contact information (BRACU email or alumni verified)
+    if (!canAccessContactInfo(user)) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Access denied. Only BRACU students and verified alumni can unlock contact information.",
+      });
+    }
+
     // Check if user is trying to unlock their own profile
     if (profile.userId._id.toString() === userId) {
       return res.status(400).json({
@@ -680,6 +705,15 @@ router.get(
         isUnlocked: false,
         isOwnProfile: true,
         message: "This is your own profile",
+      });
+    }
+
+    // Check if user can access contact information (BRACU email or alumni verified)
+    if (!canAccessContactInfo(req.user)) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Access denied. Only BRACU students and verified alumni can view contact information.",
       });
     }
 
