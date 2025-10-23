@@ -278,30 +278,30 @@ export default function UserProfile() {
         {/* Profile Header */}
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden mb-6">
           {/* Top Section */}
-          <div className="px-8 py-6 bg-gray-50 border-b">
-            <div className="flex items-center justify-between">
-              <div className="flex items-start space-x-6">
+          <div className="px-4 sm:px-8 py-6 bg-gray-50 border-b">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start space-x-4 sm:space-x-6 w-full sm:w-auto">
                 {/* Profile Picture */}
-                <div className="w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center flex-shrink-0">
                   {user?.avatar || user?.picture ? (
                     <img
                       src={user.avatar || user.picture}
                       alt={user?.name || "User"}
-                      className="w-20 h-20 rounded-full object-cover"
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
-                      <User className="h-10 w-10 text-gray-500" />
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-full flex items-center justify-center">
+                      <User className="h-8 w-8 sm:h-10 sm:w-10 text-gray-500" />
                     </div>
                   )}
                 </div>
 
                 {/* Basic Info */}
-                <div className="flex-1 text-left pt-2">
-                  <h1 className="text-2xl font-semibold text-gray-900 mb-1 leading-tight text-left">
+                <div className="flex-1 text-left pt-2 min-w-0">
+                  <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1 leading-tight text-left">
                     {user.name}
                   </h1>
-                  <p className="text-sm text-gray-500 mb-2 leading-tight text-left pl-0 ml-0">
+                  <p className="text-sm text-gray-500 mb-2 leading-tight text-left pl-0 ml-0 break-words">
                     {user.email}
                   </p>
                   <div className="flex items-center space-x-4 text-gray-600">
@@ -317,18 +317,18 @@ export default function UserProfile() {
 
               {/* Credits Badge - Show only when monetization is enabled */}
               {monetizationEnabled && (
-                <div className="text-right">
-                  <div className="bg-gray-900 text-white px-4 py-2 rounded-md">
-                    <div className="flex items-center space-x-2">
+                <div className="text-left sm:text-right w-full sm:w-auto">
+                  <div className="bg-gray-900 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md w-full sm:w-auto">
+                    <div className="flex items-center justify-center space-x-2">
                       <CreditCard className="h-4 w-4" />
-                      <span className="font-medium">
+                      <span className="font-medium text-sm sm:text-base">
                         {user.credits || 0} Credits
                       </span>
                     </div>
                   </div>
                   <button
                     onClick={() => navigate("/credits")}
-                    className="mt-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer font-medium"
+                    className="mt-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md transition-colors cursor-pointer font-medium text-sm sm:text-base w-full sm:w-auto"
                   >
                     Buy more credits
                   </button>
