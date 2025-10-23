@@ -11,6 +11,7 @@ import {
   Bookmark,
   Shield,
   LogOut,
+  Package,
 } from "lucide-react";
 
 export default function Header() {
@@ -128,17 +129,28 @@ export default function Header() {
                         <span>Bookmarks</span>
                       </div>
                     </Link>
-                    {/* Conditionally show transactions link based on monetization config */}
+                    {/* Conditionally show transactions and orders links based on monetization config */}
                     {isMonetizationEnabled && (
-                      <Link
-                        to="/transactions"
-                        className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors no-underline"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <CreditCard className="h-4 w-4" />
-                          <span>Transactions</span>
-                        </div>
-                      </Link>
+                      <>
+                        <Link
+                          to="/transactions"
+                          className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors no-underline"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <CreditCard className="h-4 w-4" />
+                            <span>Transactions</span>
+                          </div>
+                        </Link>
+                        <Link
+                          to="/orders"
+                          className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors no-underline"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <Package className="h-4 w-4" />
+                            <span>All Orders</span>
+                          </div>
+                        </Link>
+                      </>
                     )}
                     {user?.role === "admin" && (
                       <Link
@@ -231,16 +243,26 @@ export default function Header() {
                     <Bookmark className="h-4 w-4" />
                     <span>Bookmarks</span>
                   </Link>
-                  {/* Conditionally show transactions link based on monetization config */}
+                  {/* Conditionally show transactions and orders links based on monetization config */}
                   {monetizationEnabled && (
-                    <Link
-                      to="/transactions"
-                      className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-white transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <CreditCard className="h-4 w-4" />
-                      <span>Transactions</span>
-                    </Link>
+                    <>
+                      <Link
+                        to="/transactions"
+                        className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-white transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        <span>Transactions</span>
+                      </Link>
+                      <Link
+                        to="/orders"
+                        className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-white transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <Package className="h-4 w-4" />
+                        <span>All Orders</span>
+                      </Link>
+                    </>
                   )}
                   {user?.role === "admin" && (
                     <Link

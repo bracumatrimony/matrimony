@@ -4,9 +4,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Profile = require("../models/Profile");
 
-const MONGO_URI =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://aditto:none@matrimonycluster.pafedm3.mongodb.net/bracu_matrimony?retryWrites=true&w=majority";
+const MONGO_URI = process.env.MONGODB_URI;
 
 // Professional disclaimer for demo profiles
 const DEMO_CONTACT_DISCLAIMER = `

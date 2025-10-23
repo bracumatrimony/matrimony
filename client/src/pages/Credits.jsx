@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { ButtonSpinner } from "../components/LoadingSpinner";
 import profileService from "../services/profileService";
 
@@ -17,7 +18,21 @@ export default function Credits() {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [openFAQ, setOpenFAQ] = useState({});
+  const [transactionId, setTransactionId] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const navigate = useNavigate();
+
+  // Handle success animation navigation
+  useEffect(() => {
+    if (showSuccessAnimation) {
+      const timer = setTimeout(() => {
+        navigate("/orders");
+      }, 3000); // Navigate after 3 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessAnimation, navigate]);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -85,30 +100,37 @@ export default function Credits() {
   };
 
   const handlePurchase = async (packageData) => {
+    if (!transactionId.trim() || !phoneNumber.trim()) {
+      alert("Please enter both transaction ID and phone number");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Simulate payment processing
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Call backend to add credits and record transaction
-      const res = await profileService.makeRequest("/users/credits", {
-        method: "PUT",
+      // Submit purchase order for manual verification
+      const res = await profileService.makeRequest("/transactions/purchase", {
+        method: "POST",
         body: JSON.stringify({
           credits: packageData.credits,
-          operation: "add",
+          price: calculateDiscountedPrice(packageData.price),
+          transactionId: transactionId.trim(),
+          phoneNumber: phoneNumber.trim(),
         }),
       });
 
       if (res.success) {
-        // Update user credits in state
-        setUser((prev) => ({ ...prev, credits: res.credits }));
-        alert(`Successfully purchased ${packageData.credits} credits!`);
+        // Show success animation before navigating
+        setShowSuccessAnimation(true);
         setSelectedPackage(null);
+        setTransactionId("");
+        setPhoneNumber("");
       } else {
-        alert(res.message || "Payment failed. Please try again.");
+        alert(
+          res.message || "Failed to submit purchase order. Please try again."
+        );
       }
     } catch (error) {
-      alert("Payment failed. Please try again.");
+      alert("Failed to submit purchase order. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -429,22 +451,49 @@ export default function Credits() {
 
       {/* Purchase Modal */}
       {selectedPackage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-8">
-            <div className="text-center mb-6">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ShoppingCart className="h-6 w-6 text-gray-600" />
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="text-center mb-3">
+              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <ShoppingCart className="h-5 w-5 text-gray-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Confirm Purchase
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                Purchase Credits
               </h3>
-              <p className="text-gray-600">
-                Review your order details before proceeding
+              <p className="text-gray-600 text-sm">
+                Complete your payment to get credits
               </p>
             </div>
 
-            <div className="mb-6">
-              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+            {/* Payment Instructions */}
+            <div className="mb-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                <h4 className="font-semibold text-blue-900 mb-2">
+                  Payment Instructions
+                </h4>
+                <div className="text-sm text-blue-800 space-y-1">
+                  <p>
+                    1. Send{" "}
+                    <strong>
+                      ৳{calculateDiscountedPrice(selectedPackage.price)}
+                    </strong>{" "}
+                    to the following bKash number:
+                  </p>
+                  <p className="font-mono text-lg font-bold text-blue-900">
+                    01712-345678
+                  </p>
+                  <p>2. Note down the Transaction ID from bKash</p>
+                  <p>3. Fill in your details below and submit</p>
+                  <p>
+                    4. Wait for admin verification (usually within 24 hours)
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Order Details */}
+            <div className="mb-3">
+              <div className="bg-gray-50 rounded-lg p-3 space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-700 font-medium">Package:</span>
                   <span className="font-semibold text-gray-900">
@@ -482,31 +531,137 @@ export default function Credits() {
               </div>
             </div>
 
+            {/* Transaction Details Form */}
+            <div className="mb-4">
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Your Phone Number (bKash)
+                  </label>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="01XXXXXXXXX"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    bKash Transaction ID
+                  </label>
+                  <input
+                    type="text"
+                    value={transactionId}
+                    onChange={(e) => setTransactionId(e.target.value)}
+                    placeholder="e.g., BKH123456789"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <button
-                onClick={() => setSelectedPackage(null)}
+                onClick={() => {
+                  setSelectedPackage(null);
+                  setTransactionId("");
+                  setPhoneNumber("");
+                }}
                 disabled={isLoading}
-                className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-md transition-colors cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handlePurchase(selectedPackage)}
-                disabled={isLoading}
+                disabled={
+                  isLoading || !transactionId.trim() || !phoneNumber.trim()
+                }
                 className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer disabled:opacity-50"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center space-x-2">
                     <ButtonSpinner />
-                    <span>Processing...</span>
+                    <span>Submitting...</span>
                   </div>
                 ) : (
-                  "Confirm Payment"
+                  "Submit Order"
                 )}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Success Animation Overlay */}
+      {showSuccessAnimation && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        >
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{
+              duration: 0.6,
+              ease: "easeOut",
+              type: "spring",
+              bounce: 0.4,
+            }}
+            className="relative bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 rounded-3xl shadow-2xl p-6 max-w-sm mx-4 text-center overflow-hidden"
+          >
+            {/* Success icon with pulse */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{
+                delay: 0.3,
+                type: "spring",
+                bounce: 0.6,
+              }}
+              className="relative z-10 mb-6"
+            >
+              <motion.div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <Check className="w-10 h-10 text-green-600" />
+              </motion.div>
+            </motion.div>
+
+            {/* Success message */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="relative z-10"
+            >
+              <motion.h2
+                animate={{
+                  color: ["#ffffff", "#f0f9ff", "#ffffff"],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="text-2xl font-bold text-white mb-2"
+              >
+                Order Submitted Successfully!
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+                className="text-white/90 text-sm"
+              >
+                Your purchase order has been submitted for verification.
+              </motion.p>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       )}
     </div>
   );

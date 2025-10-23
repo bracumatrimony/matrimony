@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Filter, X, Plus } from "lucide-react";
 import ProfileCard from "../components/Profile/ProfileCard";
-import Header from "../components/Layout/Header";
 import profileService from "../services/profileService";
 import authService from "../services/authService";
 import { SectionSpinner } from "../components/LoadingSpinner";
@@ -169,8 +168,6 @@ export default function SearchProfiles() {
         keywords="search profiles, find matches, BRACU matrimony search, biodata search"
       />
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <Header />
-
         {/* Mobile Search Bar */}
         <div className="block lg:hidden px-4 py-3 bg-white border-b border-gray-200">
           <div className="flex gap-2">

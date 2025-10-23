@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   Users,
   CreditCard,
@@ -21,7 +22,6 @@ import {
   Activity,
   User,
 } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
 import adminService from "../../services/adminService";
 import { SectionSpinner, InlineSpinner } from "../../components/LoadingSpinner";
 import PendingBiodata from "./PendingBiodata";
@@ -33,6 +33,7 @@ import "../../styles/admin.css";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
   const [stats, setStats] = useState({
     totalProfiles: 0,
     approvedProfiles: 0,
@@ -40,15 +41,20 @@ export default function AdminDashboard() {
     totalRevenue: 0,
     activeUsers: 0,
     verificationRequests: 0,
+    pendingTransactions: 0,
   });
   const [pendingProfiles, setPendingProfiles] = useState([]);
   const [reports, setReports] = useState([]);
+  const [pendingTransactions, setPendingTransactions] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
   const [reportsLoaded, setReportsLoaded] = useState(false);
+  const [transactionsLoaded, setTransactionsLoaded] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -60,6 +66,13 @@ export default function AdminDashboard() {
       loadReports();
     }
   }, [activeTab, reportsLoaded]);
+
+  // Load transactions when transactions tab becomes active
+  useEffect(() => {
+    if (activeTab === "transactions" && !transactionsLoaded) {
+      loadPendingTransactions();
+    }
+  }, [activeTab, transactionsLoaded]);
 
   const loadDashboardData = async () => {
     try {
@@ -76,6 +89,7 @@ export default function AdminDashboard() {
           totalRevenue: dashboardData.stats.totalRevenue,
           activeUsers: dashboardData.stats.activeUsers,
           verificationRequests: dashboardData.stats.verificationRequests,
+          pendingTransactions: dashboardData.stats.pendingTransactions || 0,
         });
         setPendingProfiles(dashboardData.recentPending || []);
       }
@@ -109,6 +123,19 @@ export default function AdminDashboard() {
     }
   };
 
+  const loadPendingTransactions = async () => {
+    try {
+      const transactionsData = await adminService.getPendingTransactions();
+      if (transactionsData.success) {
+        setPendingTransactions(transactionsData.transactions);
+        setTransactionsLoaded(true);
+      }
+    } catch (error) {
+      console.error("Failed to load pending transactions:", error);
+      showNotification?.("Failed to load pending transactions.", "error");
+    }
+  };
+
   // Local stat update functions
   const updatePendingApprovals = (change) => {
     setStats((prev) => ({
@@ -135,6 +162,13 @@ export default function AdminDashboard() {
     }));
   };
 
+  const updatePendingTransactions = (change) => {
+    setStats((prev) => ({
+      ...prev,
+      pendingTransactions: Math.max(0, prev.pendingTransactions + change),
+    }));
+  };
+
   const handleViewProfile = (profileId) => {
     // Open biodata in a new tab with admin parameter
     const url = `/profile/view/${profileId}?admin=true`;
@@ -144,6 +178,46 @@ export default function AdminDashboard() {
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
+  };
+
+  const handleApproveTransaction = async (transactionId) => {
+    try {
+      const result = await adminService.approveTransaction(transactionId);
+      if (result.success) {
+        // Remove from pending transactions list
+        setPendingTransactions((prev) =>
+          prev.filter((t) => t._id !== transactionId)
+        );
+        updatePendingTransactions(-1);
+        // Refresh user data in case the admin approved their own transaction
+        await refreshUser();
+        showNotification("Transaction approved successfully!", "success");
+      } else {
+        showNotification("Failed to approve transaction", "error");
+      }
+    } catch (error) {
+      console.error("Error approving transaction:", error);
+      showNotification("Failed to approve transaction", "error");
+    }
+  };
+
+  const handleRejectTransaction = async (transactionId) => {
+    try {
+      const result = await adminService.rejectTransaction(transactionId);
+      if (result.success) {
+        // Remove from pending transactions list
+        setPendingTransactions((prev) =>
+          prev.filter((t) => t._id !== transactionId)
+        );
+        updatePendingTransactions(-1);
+        showNotification("Transaction rejected successfully!", "success");
+      } else {
+        showNotification("Failed to reject transaction", "error");
+      }
+    } catch (error) {
+      console.error("Error rejecting transaction:", error);
+      showNotification("Failed to reject transaction", "error");
+    }
   };
 
   const formatDate = (dateString) => {
@@ -411,6 +485,37 @@ export default function AdminDashboard() {
 
             <button
               onClick={() => {
+                setActiveTab("transactions");
+                setCurrentPage(1);
+                if (window.innerWidth < 1024) setSidebarOpen(false);
+              }}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer group ${
+                activeTab === "transactions"
+                  ? "bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-lg"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <CreditCard
+                className={`h-5 w-5 ${
+                  activeTab === "transactions"
+                    ? "text-white"
+                    : "text-gray-500 group-hover:text-gray-700"
+                }`}
+              />
+              {sidebarOpen && (
+                <div className="flex-1 flex items-center justify-between lg:flex">
+                  <span className="font-medium">Pending Transactions</span>
+                  {stats.pendingTransactions > 0 && (
+                    <span className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs rounded-full px-2 py-1 font-medium shadow-sm">
+                      {stats.pendingTransactions}
+                    </span>
+                  )}
+                </div>
+              )}
+            </button>
+
+            <button
+              onClick={() => {
                 setActiveTab("reports");
                 if (window.innerWidth < 1024) setSidebarOpen(false);
               }}
@@ -659,6 +764,178 @@ export default function AdminDashboard() {
                 showNotification={showNotification}
               />
             )}
+            {activeTab === "transactions" &&
+              (() => {
+                const totalPages = Math.ceil(
+                  pendingTransactions.length / itemsPerPage
+                );
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const currentTransactions = pendingTransactions.slice(
+                  startIndex,
+                  endIndex
+                );
+
+                return (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h1 className="text-3xl font-bold text-gray-900">
+                        Pending Transactions
+                      </h1>
+                      <div className="text-sm text-gray-600">
+                        {pendingTransactions.length} pending transaction
+                        {pendingTransactions.length !== 1 ? "s" : ""}
+                      </div>
+                    </div>
+
+                    {pendingTransactions.length === 0 ? (
+                      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                        <CreditCard className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                          No Pending Transactions
+                        </h3>
+                        <p className="text-gray-600">
+                          All transactions have been processed.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                          <h2 className="text-lg font-semibold text-gray-900">
+                            Transaction Queue
+                          </h2>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Review and process pending credit purchase requests
+                          </p>
+                        </div>
+                        <div className="divide-y divide-gray-200">
+                          {currentTransactions.map((transaction) => (
+                            <div
+                              key={transaction._id}
+                              className="p-4 hover:bg-gray-50 transition-colors"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-4 flex-1">
+                                  <div className="flex-shrink-0">
+                                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                      <CreditCard className="h-5 w-5 text-blue-600" />
+                                    </div>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center space-x-2 mb-1">
+                                      <h3 className="text-sm font-medium text-gray-900 truncate">
+                                        {transaction.user?.name ||
+                                          "Unknown User"}
+                                      </h3>
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Pending
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center space-x-6 text-sm text-gray-700">
+                                      <div className="flex items-center space-x-1">
+                                        <span className="text-xs text-gray-500">
+                                          amount
+                                        </span>
+                                        <span className="font-semibold text-green-600">
+                                          ৳{transaction.price || "N/A"}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center space-x-1">
+                                        <span className="text-xs text-gray-500">
+                                          credits
+                                        </span>
+                                        <span className="font-semibold text-blue-600">
+                                          {transaction.credits || "N/A"}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center space-x-1">
+                                        <span className="text-xs text-gray-500">
+                                          phone
+                                        </span>
+                                        <span className="font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                                          {transaction.phoneNumber || "N/A"}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center space-x-1">
+                                        <span className="text-xs text-gray-500">
+                                          txn ID
+                                        </span>
+                                        <span className="font-mono font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                                          {transaction.transactionId.slice(
+                                            -8
+                                          ) || "N/A"}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <button
+                                    onClick={() =>
+                                      handleApproveTransaction(transaction._id)
+                                    }
+                                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                                  >
+                                    <Check className="h-3 w-3 mr-1" />
+                                    Approve
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleRejectTransaction(transaction._id)
+                                    }
+                                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                                  >
+                                    <X className="h-3 w-3 mr-1" />
+                                    Reject
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Pagination */}
+                        {pendingTransactions.length > itemsPerPage && (
+                          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                            <div className="flex items-center justify-between">
+                              <div className="text-sm text-gray-700">
+                                Showing {startIndex + 1} to{" "}
+                                {Math.min(endIndex, pendingTransactions.length)}{" "}
+                                of {pendingTransactions.length} transactions
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() =>
+                                    setCurrentPage(Math.max(1, currentPage - 1))
+                                  }
+                                  disabled={currentPage === 1}
+                                  className="relative inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  Previous
+                                </button>
+                                <span className="relative inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md">
+                                  Page {currentPage} of {totalPages}
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    setCurrentPage(
+                                      Math.min(totalPages, currentPage + 1)
+                                    )
+                                  }
+                                  disabled={currentPage === totalPages}
+                                  className="relative inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  Next
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
           </>
         )}
       </div>

@@ -31,6 +31,7 @@ const CreditsWrapper = lazy(() => import("./components/CreditsWrapper"));
 const TransactionsWrapper = lazy(() =>
   import("./components/TransactionsWrapper")
 );
+const AllOrdersWrapper = lazy(() => import("./components/AllOrdersWrapper"));
 
 // Admin Protected Route Component
 function AdminProtectedRoute({ children }) {
@@ -130,25 +131,22 @@ function App() {
               element={<Navigate to="/login" replace />}
             />
 
-            {/* Credits route - shows 404 when monetization is disabled */}
-            <Route
-              path="/credits"
-              element={
-                <ProtectedRoute>
-                  <CreditsWrapper />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route path="/search" element={<SearchProfiles />} />
-
-            {/* Routes with Layout */}
             <Route
               path="/*"
               element={
                 <Layout>
                   <Routes>
                     <Route path="/" element={<Home />} />
+                    {/* Credits route - shows 404 when monetization is disabled */}
+                    <Route
+                      path="/credits"
+                      element={
+                        <ProtectedRoute>
+                          <CreditsWrapper />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route path="/search" element={<SearchProfiles />} />
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/privacy" element={<Privacy />} />
                     <Route
@@ -173,6 +171,15 @@ function App() {
                       element={
                         <ProtectedRoute>
                           <TransactionsWrapper />
+                        </ProtectedRoute>
+                      }
+                    />
+                    {/* Orders route - shows 404 when monetization is disabled */}
+                    <Route
+                      path="/orders"
+                      element={
+                        <ProtectedRoute>
+                          <AllOrdersWrapper />
                         </ProtectedRoute>
                       }
                     />

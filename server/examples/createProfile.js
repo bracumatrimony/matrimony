@@ -5,8 +5,7 @@ const User = require("../models/User");
 const Draft = require("../models/Draft");
 
 const MONGO_URI =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://aditto:none@matrimonycluster.pafedm3.mongodb.net/bracu_matrimony?retryWrites=true&w=majority";
+  process.env.MONGODB_URI
 
 // Complete biodata data for testing
 const testPersonalBiodata = {

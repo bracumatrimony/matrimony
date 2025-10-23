@@ -148,6 +148,9 @@ app.use("/api/admin", require("./routes/admin"));
 app.use("/api/drafts", require("./routes/drafts"));
 app.use("/api/bookmarks", require("./routes/bookmarks"));
 app.use("/api/config", require("./routes/config"));
+app.use("/api/transactions", require("./routes/transactions"));
+app.use("/api/transactions", require("./routes/transactions"));
+app.use("/api/transactions", require("./routes/transactions"));
 
 // Serve sitemap.xml with correct XML headers
 app.get("/sitemap.xml", (req, res) => {

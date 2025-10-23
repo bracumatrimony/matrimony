@@ -46,6 +46,11 @@ const Transaction = () => {
             </tr>
           ) : (
             (Array.isArray(transactions) ? transactions : []).map((tx) => {
+              // Skip purchase transactions (only show actual credit additions/deductions)
+              if (tx.type === "purchase") {
+                return null;
+              }
+
               let displayType = tx.type.replace("_", " ");
               let displayDescription = tx.description;
               // Credits Purchased

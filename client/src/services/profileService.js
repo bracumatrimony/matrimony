@@ -209,6 +209,20 @@ class ProfileService {
       throw error;
     }
   }
+
+  // Fetch user's orders (purchase transactions)
+  async getUserOrders() {
+    try {
+      const response = await this.makeRequest("/transactions/orders", {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("Fetch user orders error:", error);
+      throw error;
+    }
+  }
+
   // Calculate age from date of birth
   calculateAge(dateOfBirth) {
     const today = new Date();

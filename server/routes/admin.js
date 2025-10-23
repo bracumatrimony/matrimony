@@ -3,6 +3,7 @@ const Profile = require("../models/Profile");
 const User = require("../models/User");
 const Report = require("../models/Report");
 const Bookmark = require("../models/Bookmark");
+const Transaction = require("../models/Transaction");
 const auth = require("../middleware/auth");
 const adminAuth = require("../middleware/adminAuth");
 const { sendEmail } = require("../services/emailService");
@@ -43,6 +44,11 @@ router.get("/dashboard", [auth, adminAuth], async (req, res) => {
       alumniVerified: false,
     });
 
+    // Get pending transactions count
+    const pendingTransactions = await Transaction.countDocuments({
+      status: "pending",
+    });
+
     res.json({
       success: true,
       stats: {
@@ -54,6 +60,7 @@ router.get("/dashboard", [auth, adminAuth], async (req, res) => {
         totalReports,
         pendingReports,
         verificationRequests,
+        pendingTransactions,
       },
       recentPending,
     });

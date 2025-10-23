@@ -150,6 +150,25 @@ class AdminService {
       method: "PUT",
     });
   }
+
+  // Get pending transactions
+  async getPendingTransactions() {
+    return this.makeRequest("/transactions/pending");
+  }
+
+  // Approve transaction
+  async approveTransaction(transactionId) {
+    return this.makeRequest(`/transactions/${transactionId}/approve`, {
+      method: "PUT",
+    });
+  }
+
+  // Reject transaction
+  async rejectTransaction(transactionId) {
+    return this.makeRequest(`/transactions/${transactionId}/reject`, {
+      method: "PUT",
+    });
+  }
 }
 
 export default new AdminService();
