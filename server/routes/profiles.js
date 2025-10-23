@@ -360,19 +360,6 @@ router.get("/:profileId", async (req, res) => {
     ) {
       // Simple increment without complex tracking (fire and forget)
       Profile.findByIdAndUpdate(profile._id, { $inc: { viewCount: 1 } }).exec();
-
-      // Send view notification email to profile owner
-      try {
-        await sendEmail(
-          profile.userId.email,
-          "biodataViewed",
-          profile.userId.name
-        );
-        console.log(`View notification email sent to ${profile.userId.email}`);
-      } catch (emailError) {
-        console.error("Failed to send view notification email:", emailError);
-        // Don't fail the view if email fails
-      }
     }
 
     res.json({

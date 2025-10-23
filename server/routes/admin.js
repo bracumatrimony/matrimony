@@ -267,6 +267,20 @@ router.put(
       profile.hasEditPending = false;
       await profile.save();
 
+      // Send rejection email to the user
+      try {
+        await sendEmail(
+          profile.userId.email,
+          "biodataRejected",
+          profile.userId.name,
+          reason
+        );
+        console.log(`Rejection email sent to ${profile.userId.email}`);
+      } catch (emailError) {
+        console.error("Failed to send rejection email:", emailError);
+        // Don't fail the rejection if email fails
+      }
+
       res.json({
         success: true,
         message: "Profile rejected successfully",

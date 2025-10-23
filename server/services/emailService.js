@@ -239,15 +239,15 @@ const emailTemplates = {
     `,
   }),
 
-  biodataViewed: (userName) => ({
-    subject: "Profile View Notification - BRACU Matrimony",
+  biodataRejected: (userName, reason) => ({
+    subject: "Your BRACU Matrimony Profile Has Been Rejected",
     html: `
       <!DOCTYPE html>
       <html lang="en">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Profile Viewed</title>
+        <title>Profile Rejected</title>
         <style>
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -308,8 +308,8 @@ const emailTemplates = {
           }
 
           .status-card {
-            background: #fefce8;
-            border: 1px solid #eab308;
+            background: #fef2f2;
+            border: 1px solid #dc2626;
             border-radius: 6px;
             padding: 20px;
             margin: 20px 0;
@@ -319,12 +319,12 @@ const emailTemplates = {
           .status-title {
             font-size: 16px;
             font-weight: 600;
-            color: #92400e;
+            color: #991b1b;
             margin-bottom: 6px;
           }
 
           .status-text {
-            color: #78350f;
+            color: #dc2626;
             font-size: 14px;
             line-height: 1.5;
           }
@@ -434,26 +434,32 @@ const emailTemplates = {
             <div class="greeting">Dear ${userName},</div>
 
             <div class="status-card">
-              <div class="status-title">Profile View Notification</div>
-              <div class="status-text">Someone has viewed your biodata profile. This indicates interest from another member.</div>
+              <div class="status-title">Profile Rejected</div>
+              <div class="status-text">Your biodata has been reviewed and rejected for the following reason: ${
+                reason || "No specific reason provided"
+              }</div>
             </div>
 
             <div class="message">
-              Make sure your profile information is up to date and accurate. Also, be aware that you may receive messages from interested members through the contact information you have provided.
+              We regret to inform you that your profile could not be approved at this time. Please review the rejection reason above and make the necessary corrections to your biodata.
+            </div>
+
+            <div class="message">
+              You can edit your profile and resubmit it for approval. Make sure all information is accurate and complete before resubmitting.
             </div>
 
             <div style="text-align: center;">
               <a href="${
                 process.env.FRONTEND_URL || "https://bracu-matrimony.vercel.app"
-              }/profile" class="cta-button" style="color: white !important;">
-                View My Profile
+              }/profile/edit" class="cta-button" style="color: white !important;">
+                Edit My Profile
               </a>
             </div>
           </div>
 
           <div class="footer">
             <div class="footer-text">
-              <p>Remember that building meaningful connections takes time and patience.</p>
+              <p>If you have any questions, please don't hesitate to contact our support team.</p>
               <p class="footer-copyright">© ${new Date().getFullYear()} BRACU Matrimony. All rights reserved.</p>
             </div>
           </div>
@@ -465,14 +471,14 @@ const emailTemplates = {
 };
 
 // Send email function
-const sendEmail = async (to, templateName, userName) => {
+const sendEmail = async (to, templateName, userName, ...additionalParams) => {
   try {
     const template = emailTemplates[templateName];
     if (!template) {
       throw new Error(`Email template '${templateName}' not found`);
     }
 
-    const emailContent = template(userName);
+    const emailContent = template(userName, ...additionalParams);
 
     const mailOptions = {
       from: `"BRACU Matrimony" <${process.env.GMAIL_USER}>`,
