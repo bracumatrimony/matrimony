@@ -453,79 +453,79 @@ export default function Credits() {
 
       {/* Purchase Modal */}
       {selectedPackage && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-4 sm:p-6">
             <div className="text-center mb-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <ShoppingCart className="h-5 w-5 text-gray-600" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
                 Purchase Credits
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-xs sm:text-sm">
                 Complete your payment to get credits
               </p>
             </div>
 
             {/* Payment Instructions */}
             <div className="mb-3">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                <h4 className="font-semibold text-blue-900 mb-2">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 sm:p-3 mb-3">
+                <h4 className="font-semibold text-blue-900 mb-1 sm:mb-2 text-sm sm:text-base">
                   Payment Instructions
                 </h4>
-                <div className="text-sm text-blue-800 space-y-1">
+                <div className="text-xs sm:text-sm text-blue-800 space-y-1">
                   <p>
                     1. Send{" "}
                     <strong>
                       ৳{calculateDiscountedPrice(selectedPackage.price)}
                     </strong>{" "}
-                    to the following bKash number:
+                    to:{" "}
+                    <span className="font-mono font-bold text-blue-900">
+                      01712-345678
+                    </span>
                   </p>
-                  <p className="font-mono text-lg font-bold text-blue-900">
-                    01712-345678
-                  </p>
-                  <p>2. Note down the Transaction ID from bKash</p>
-                  <p>3. Fill in your details below and submit</p>
-                  <p>
-                    4. Wait for admin verification (usually within 24 hours)
-                  </p>
+                  <p>2. Note the Transaction ID from bKash</p>
+                  <p>3. Fill details below and submit</p>
+                  <p>4. Admin verification within 24 hours</p>
                 </div>
               </div>
             </div>
 
             {/* Order Details */}
             <div className="mb-3">
-              <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+              <div className="bg-gray-50 rounded-lg p-2 sm:p-3 space-y-1 sm:space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700 font-medium">Package:</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-gray-700 font-medium text-sm sm:text-base">
+                    Package:
+                  </span>
+                  <span className="font-semibold text-gray-900 text-sm sm:text-base">
                     {selectedPackage.credits} Credits
                   </span>
                 </div>
                 {hasProfileDiscount && (
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-700 font-medium">
-                      Original Price:
+                    <span className="text-gray-700 font-medium text-sm">
+                      Original:
                     </span>
-                    <span className="line-through text-gray-500">
+                    <span className="line-through text-gray-500 text-sm">
                       ৳{selectedPackage.price}
                     </span>
                   </div>
                 )}
-                <div className="flex justify-between items-center pt-3 border-t border-gray-200">
-                  <span className="text-gray-700 font-medium">
-                    {hasProfileDiscount ? "Discounted Price:" : "Total Price:"}
+                <div className="flex justify-between items-center pt-2 sm:pt-3 border-t border-gray-200">
+                  <span className="text-gray-700 font-medium text-sm sm:text-base">
+                    {hasProfileDiscount ? "Discounted Price:" : "Total:"}
                   </span>
-                  <span className="text-xl font-bold text-gray-900">
+                  <span className="text-lg sm:text-xl font-bold text-gray-900">
                     ৳{calculateDiscountedPrice(selectedPackage.price)}
                   </span>
                 </div>
                 {hasProfileDiscount && (
                   <div className="flex justify-between items-center">
-                    <span className="text-green-600 font-medium">
-                      Profile Holder Discount:
+                    <span className="text-green-600 font-medium text-sm">
+                      Discount:
                     </span>
-                    <span className="text-green-600 font-semibold">
+                    <span className="text-green-600 font-semibold text-sm">
                       50% OFF
                     </span>
                   </div>
@@ -545,7 +545,7 @@ export default function Credits() {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="01XXXXXXXXX"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                     required
                   />
                 </div>
@@ -558,14 +558,14 @@ export default function Credits() {
                     value={transactionId}
                     onChange={(e) => setTransactionId(e.target.value)}
                     placeholder="e.g., BKH123456789"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                     required
                   />
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <button
                 onClick={() => {
                   setSelectedPackage(null);
@@ -573,7 +573,7 @@ export default function Credits() {
                   setPhoneNumber("");
                 }}
                 disabled={isLoading}
-                className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md transition-colors cursor-pointer disabled:opacity-50 text-sm sm:text-base"
               >
                 Cancel
               </button>
@@ -582,7 +582,7 @@ export default function Credits() {
                 disabled={
                   isLoading || !transactionId.trim() || !phoneNumber.trim()
                 }
-                className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md transition-colors cursor-pointer disabled:opacity-50 text-sm sm:text-base"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center space-x-2">
