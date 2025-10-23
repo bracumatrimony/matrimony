@@ -142,11 +142,11 @@ export default function Credits() {
         {/* Create Biodata for Discount Message - Show only if user doesn't have approved profile */}
         {!hasProfileDiscount && user && (!user.hasProfile || !userProfile) && (
           <div className="bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg p-4 mb-6 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="relative">
-                <CreditCard className="h-8 w-8 flex-shrink-0 absolute left-0 top-1/2 -translate-y-1/2" />
-                <div className="pl-10 text-left">
-                  <h3 className="font-semibold text-lg text-left">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="relative flex-1 min-w-0">
+                <CreditCard className="h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0 absolute left-0 top-1/2 -translate-y-1/2" />
+                <div className="pl-8 sm:pl-10 text-left">
+                  <h3 className="font-semibold text-base sm:text-lg text-left">
                     Create Biodata & Save 50%!
                   </h3>
                   <p className="text-rose-100 text-sm text-left">
@@ -154,15 +154,17 @@ export default function Credits() {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => navigate("/profile/create")}
-                className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap"
-              >
-                <span>Create Now</span>
-                <span className="bg-white text-rose-600 text-xs px-2 py-1 rounded-full font-medium">
-                  50% OFF
-                </span>
-              </button>
+              <div className="flex-shrink-0">
+                <button
+                  onClick={() => navigate("/profile/create")}
+                  className="bg-white text-rose-600 hover:bg-gray-50 px-4 sm:px-6 py-2 sm:py-3 rounded-md transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap font-medium w-full sm:w-auto justify-center"
+                >
+                  <span>Create Now</span>
+                  <span className="bg-rose-600 text-white text-xs px-2 py-1 rounded-full font-medium">
+                    50% OFF
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         )}
