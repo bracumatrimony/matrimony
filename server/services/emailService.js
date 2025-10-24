@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 // Email templates
 const emailTemplates = {
   biodataApproved: (userName) => ({
-    subject: "Your BRACU Matrimony Profile Has Been Approved",
+    subject: "Your BRACU Matrimony Biodata Has Been Approved",
     html: `
       <!DOCTYPE html>
       <html lang="en">
@@ -240,7 +240,7 @@ const emailTemplates = {
   }),
 
   biodataRejected: (userName, reason) => ({
-    subject: "Your BRACU Matrimony Profile Has Been Rejected",
+    subject: "Your BRACU Matrimony Biodata Has Been Rejected",
     html: `
       <!DOCTYPE html>
       <html lang="en">
@@ -444,14 +444,8 @@ const emailTemplates = {
               We regret to inform you that your profile could not be approved at this time. Please review the rejection reason above and make the necessary corrections to your biodata.
             </div>
 
-            <div class="message">
-              You can edit your profile and resubmit it for approval. Make sure all information is accurate and complete before resubmitting.
-            </div>
-
             <div style="text-align: center;">
-              <a href="${
-                process.env.FRONTEND_URL || "https://bracu-matrimony.vercel.app"
-              }/profile/edit" class="cta-button" style="color: white !important;">
+              <a href="https://bracumatrimony.vercel.app/profile/edit" class="cta-button" style="color: white !important;">
                 Edit My Profile
               </a>
             </div>

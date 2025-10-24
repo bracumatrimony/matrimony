@@ -252,7 +252,7 @@ router.put(
 
       const profile = await Profile.findOne({
         profileId: req.params.profileId,
-      });
+      }).populate("userId", "name email");
 
       if (!profile) {
         return res.status(404).json({

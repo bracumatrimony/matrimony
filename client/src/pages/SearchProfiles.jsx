@@ -26,6 +26,7 @@ export default function SearchProfiles() {
   const [limit, setLimit] = useState(12); // Show 12 per page
   const [totalPages, setTotalPages] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const abortControllerRef = useRef(null);
 
   const isInitialLoadRef = useRef(true);
 
@@ -67,12 +68,21 @@ export default function SearchProfiles() {
     const timeoutId = setTimeout(() => {
       setPage(1);
       loadProfiles(memoizedFilters, 1, limit);
-    }, 500); // Increased to 500ms for better debouncing
+    }, 800); // Increased to 800ms for better debouncing
 
     return () => clearTimeout(timeoutId);
   }, [memoizedFilters, limit]);
   const loadProfiles = useCallback(
     async (searchFilters = {}, pageNum = page, lim = limit) => {
+      // Cancel previous request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      // Create new abort controller
+      abortControllerRef.current = new AbortController();
+      const signal = abortControllerRef.current.signal;
+
       try {
         setLoading(true);
         setError(null);
@@ -93,7 +103,9 @@ export default function SearchProfiles() {
         if (searchFilters.religion)
           backendFilters.religion = searchFilters.religion;
 
-        const response = await profileService.searchProfiles(backendFilters);
+        const response = await profileService.searchProfiles(backendFilters, {
+          signal,
+        });
 
         if (response.success) {
           // Profiles are already formatted by the service
@@ -103,6 +115,10 @@ export default function SearchProfiles() {
           setError("Failed to load profiles");
         }
       } catch (error) {
+        if (error.name === "AbortError") {
+          // Request was cancelled, ignore
+          return;
+        }
         console.error("Error loading profiles:", error);
         setError(error.message || "Failed to load profiles");
       } finally {

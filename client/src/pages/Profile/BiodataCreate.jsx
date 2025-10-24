@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Save,
   ArrowLeft,
@@ -35,6 +35,7 @@ export default function BiodataCreate() {
   const [searchParams] = useSearchParams();
   const [currentStep, setCurrentStep] = useState(1);
   const [componentLoading, setComponentLoading] = useState(true);
+  const shouldReduceMotion = useReducedMotion();
   const [formData, setFormData] = useState({
     // Segment 1: Family Background
     fatherAlive: "",
@@ -195,7 +196,7 @@ export default function BiodataCreate() {
   useEffect(() => {
     // Save progress when user navigates away or closes browser
     const handleBeforeUnload = async (event) => {
-      // Final save to both server and localStorage before leaving
+      // Only save if there are significant changes (not on every keystroke)
       try {
         await draftService.saveDraft(currentStep, formData);
       } catch (error) {
@@ -217,39 +218,42 @@ export default function BiodataCreate() {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [currentStep, formData]);
+  }, []); // Remove currentStep and formData dependencies to avoid frequent saves
 
   const showNotification = (message, type = "error") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const updatedFormData = {
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    };
+  const handleChange = useCallback(
+    (e) => {
+      const { name, value, type, checked } = e.target;
+      const updatedFormData = {
+        ...formData,
+        [name]: type === "checkbox" ? checked : value,
+      };
 
-    setFormData(updatedFormData);
+      setFormData(updatedFormData);
 
-    // Auto-save to server with debouncing (saves after 2 seconds of no changes)
-    draftService.saveDraftDebounced(currentStep, updatedFormData);
+      // Auto-save to server with debouncing (saves after 3 seconds of no changes)
+      draftService.saveDraftDebounced(currentStep, updatedFormData, 3000);
 
-    // Also save to localStorage as backup
-    localStorage.setItem(
-      "createProfile_formData",
-      JSON.stringify(updatedFormData)
-    );
+      // Also save to localStorage as backup
+      localStorage.setItem(
+        "createProfile_formData",
+        JSON.stringify(updatedFormData)
+      );
 
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
-  };
+      // Clear error when user starts typing
+      if (errors[name]) {
+        setErrors((prev) => ({
+          ...prev,
+          [name]: "",
+        }));
+      }
+    },
+    [formData, currentStep, errors]
+  );
 
   const validateCurrentStep = (step) => {
     const stepErrors = validateStep(step, formData);
@@ -266,37 +270,29 @@ export default function BiodataCreate() {
     return true;
   };
 
-  const handleNext = async () => {
+  const handleNext = useCallback(async () => {
     if (validateCurrentStep(currentStep)) {
       const nextStep = Math.min(currentStep + 1, totalSteps);
       setCurrentStep(nextStep);
 
-      try {
-        // Save to server when moving to next step
-        await draftService.saveDraft(nextStep, formData);
-      } catch (error) {
-        console.error("Error saving draft on next step:", error);
-      }
-
       // Save current step to localStorage as backup
       localStorage.setItem("createProfile_currentStep", nextStep.toString());
-    }
-  };
 
-  const handlePrevious = async () => {
+      // Trigger debounced save with updated step
+      draftService.saveDraftDebounced(nextStep, formData, 1000); // Shorter delay for step changes
+    }
+  }, [currentStep, formData, totalSteps]);
+
+  const handlePrevious = useCallback(async () => {
     const prevStep = Math.max(currentStep - 1, 1);
     setCurrentStep(prevStep);
 
-    try {
-      // Save to server when moving to previous step
-      await draftService.saveDraft(prevStep, formData);
-    } catch (error) {
-      console.error("Error saving draft on previous step:", error);
-    }
-
     // Save current step to localStorage as backup
     localStorage.setItem("createProfile_currentStep", prevStep.toString());
-  };
+
+    // Trigger debounced save with updated step
+    draftService.saveDraftDebounced(prevStep, formData, 1000); // Shorter delay for step changes
+  }, [currentStep, formData]);
 
   const handleCreateBiodataClick = async () => {
     // Validate all steps before allowing submission
@@ -2380,21 +2376,33 @@ export default function BiodataCreate() {
                             {/* Circle */}
                             <div className="flex flex-col items-center">
                               <motion.div
-                                initial={{ scale: 0, rotate: -180 }}
-                                animate={{
-                                  scale: 1,
-                                  rotate: 0,
-                                  boxShadow:
-                                    isCompleted || isCurrent
-                                      ? "0 0 20px rgba(244, 114, 182, 0.5)"
-                                      : "0 0 0px rgba(0, 0, 0, 0)",
-                                }}
-                                transition={{
-                                  delay: step * 0.15,
-                                  type: "spring",
-                                  stiffness: 300,
-                                  damping: 20,
-                                }}
+                                initial={
+                                  shouldReduceMotion
+                                    ? {}
+                                    : { scale: 0, rotate: -180 }
+                                }
+                                animate={
+                                  shouldReduceMotion
+                                    ? {}
+                                    : {
+                                        scale: 1,
+                                        rotate: 0,
+                                        boxShadow:
+                                          isCompleted || isCurrent
+                                            ? "0 0 20px rgba(244, 114, 182, 0.5)"
+                                            : "0 0 0px rgba(0, 0, 0, 0)",
+                                      }
+                                }
+                                transition={
+                                  shouldReduceMotion
+                                    ? {}
+                                    : {
+                                        delay: step * 0.15,
+                                        type: "spring",
+                                        stiffness: 300,
+                                        damping: 20,
+                                      }
+                                }
                                 className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-500 ${
                                   isCompleted || isCurrent
                                     ? "bg-gradient-to-br from-rose-400 via-pink-500 to-purple-600 text-white shadow-2xl"

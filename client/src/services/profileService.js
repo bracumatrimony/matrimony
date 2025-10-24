@@ -126,7 +126,7 @@ class ProfileService {
   }
 
   // Search profiles with filters
-  async searchProfiles(filters = {}) {
+  async searchProfiles(filters = {}, options = {}) {
     try {
       const queryParams = new URLSearchParams();
 
@@ -146,7 +146,7 @@ class ProfileService {
       }`;
 
       // Use public request since search is now public for approved profiles
-      const response = await this.makePublicRequest(endpoint);
+      const response = await this.makePublicRequest(endpoint, options);
       return response;
     } catch (error) {
       console.error("Search profiles error:", error);

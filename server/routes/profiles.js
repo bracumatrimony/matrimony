@@ -219,27 +219,24 @@ router.get("/search", async (req, res) => {
 
     let profiles;
 
-    if (total <= requestedSize) {
-      // If we need all or more than total, just get all and shuffle
+    // For small datasets or when we need exact pagination, use skip/limit
+    if (total <= 1000 || requestedSize <= 100) {
       profiles = await Profile.find(filters)
         .select("-privacy -contactInformation -__v")
+        .sort({ createdAt: -1 }) // Sort by creation date for consistency
+        .skip(skip)
+        .limit(parseInt(limit))
         .lean();
-
-      // Shuffle the array
-      for (let i = profiles.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [profiles[i], profiles[j]] = [profiles[j], profiles[i]];
-      }
-
-      // Apply pagination
-      profiles = profiles.slice(skip, skip + parseInt(limit));
     } else {
-      // For larger datasets, sample more than needed and paginate
-      const sampleSize = Math.min(requestedSize * 2, total); // Sample 2x what we need, capped at total
+      // For larger datasets, use a more efficient approach
+      // Get a random sample but maintain some ordering
+      const sampleSize = Math.min(requestedSize * 1.5, total); // Sample 1.5x what we need
 
       profiles = await Profile.aggregate([
         { $match: filters },
-        { $sample: { size: sampleSize } },
+        { $sort: { createdAt: -1 } }, // Sort first for consistency
+        { $skip: Math.max(0, skip - 10) }, // Start a bit earlier
+        { $limit: sampleSize },
         {
           $project: {
             privacy: 0,
@@ -249,13 +246,10 @@ router.get("/search", async (req, res) => {
         },
       ]);
 
-      // Shuffle again for extra randomness and paginate
-      for (let i = profiles.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [profiles[i], profiles[j]] = [profiles[j], profiles[i]];
-      }
-
-      profiles = profiles.slice(skip, skip + parseInt(limit));
+      // Shuffle only the required portion
+      const startIdx = Math.min(10, profiles.length - parseInt(limit));
+      const endIdx = startIdx + parseInt(limit);
+      profiles = profiles.slice(startIdx, endIdx);
     }
 
     res.json({
@@ -358,8 +352,10 @@ router.get("/:profileId", async (req, res) => {
       currentUser &&
       profile.userId._id.toString() !== currentUser._id.toString()
     ) {
-      // Simple increment without complex tracking (fire and forget)
-      Profile.findByIdAndUpdate(profile._id, { $inc: { viewCount: 1 } }).exec();
+      // Fire and forget - don't wait for the update
+      Profile.findByIdAndUpdate(profile._id, { $inc: { viewCount: 1 } })
+        .exec()
+        .catch((err) => console.log("View count update failed:", err));
     }
 
     res.json({

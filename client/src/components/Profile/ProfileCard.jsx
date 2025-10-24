@@ -9,8 +9,9 @@ import {
 } from "lucide-react";
 import BookmarkButton from "../BookmarkButton";
 import { InlineSpinner } from "../LoadingSpinner";
+import { memo } from "react";
 
-export default function ProfileCard({
+const ProfileCard = memo(function ProfileCard({
   profile,
   onViewProfile,
   onRemoveBookmark,
@@ -122,4 +123,6 @@ export default function ProfileCard({
       )}
     </div>
   );
-}
+});
+
+export default ProfileCard;
