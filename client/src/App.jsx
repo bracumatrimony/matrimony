@@ -14,7 +14,7 @@ import { useAuth } from "./contexts/AuthContext";
 import { PageSpinner } from "./components/LoadingSpinner";
 import { monetizationConfig } from "./config/monetization";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 // Lazy load all page components for code splitting
 const Home = lazy(() => import("./pages/Home"));
