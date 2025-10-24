@@ -63,7 +63,8 @@ export default function AdminDashboard() {
   // Load reports when reports tab becomes active
   useEffect(() => {
     if (activeTab === "reports" && !reportsLoaded) {
-      loadReports();
+      // Reports component will handle loading
+      setReportsLoaded(true);
     }
   }, [activeTab, reportsLoaded]);
 
@@ -99,19 +100,6 @@ export default function AdminDashboard() {
       setError("Failed to load dashboard data. Please refresh the page.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadReports = async () => {
-    try {
-      const reportsData = await adminService.getReports();
-      if (reportsData.success) {
-        setReports(reportsData.reports);
-        setReportsLoaded(true);
-      }
-    } catch (error) {
-      console.error("Failed to load reports:", error);
-      showNotification?.("Failed to load reports.", "error");
     }
   };
 
@@ -745,6 +733,8 @@ export default function AdminDashboard() {
             )}
             {activeTab === "reports" && (
               <Reports
+                reports={reports}
+                onReportsUpdate={setReports}
                 onViewProfile={handleViewProfile}
                 onReportActionComplete={() => updateReports(-1)}
                 showNotification={showNotification}

@@ -3,17 +3,30 @@ import { Flag, Mail, Calendar, Eye, Shield, Check, X } from "lucide-react";
 import adminService from "../../services/adminService";
 
 export default function Reports({
+  reports: initialReports,
+  onReportsUpdate,
   onViewProfile,
   onReportActionComplete,
   showNotification,
 }) {
-  const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [reports, setReports] = useState(initialReports || []);
+  const [loading, setLoading] = useState(
+    !initialReports || initialReports.length === 0
+  );
   const [actionLoading, setActionLoading] = useState({});
 
   useEffect(() => {
-    loadReports();
+    if (!initialReports || initialReports.length === 0) {
+      loadReports();
+    }
   }, []);
+
+  useEffect(() => {
+    if (initialReports) {
+      setReports(initialReports);
+      setLoading(false);
+    }
+  }, [initialReports]);
 
   const loadReports = async () => {
     try {
@@ -45,16 +58,18 @@ export default function Reports({
         await adminService.takeReportAction(reportId, action, notes);
 
         // Update report status locally instead of reloading
-        setReports((prevReports) =>
-          prevReports.map((report) =>
+        setReports((prevReports) => {
+          const updatedReports = prevReports.map((report) =>
             report.id === reportId
               ? {
                   ...report,
                   status: action === "dismiss" ? "dismissed" : "resolved",
                 }
               : report
-          )
-        );
+          );
+          onReportsUpdate?.(updatedReports);
+          return updatedReports;
+        });
 
         showNotification?.(`Report ${action} successfully!`, "success");
         onReportActionComplete?.(reportId, action);

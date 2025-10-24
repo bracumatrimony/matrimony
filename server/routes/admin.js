@@ -81,8 +81,7 @@ router.get("/dashboard", [auth, adminAuth], async (req, res) => {
         path: "reportedProfileId",
         populate: { path: "userId", select: "name email" },
       })
-      .sort({ createdAt: -1 })
-      .limit(3);
+      .sort({ createdAt: -1 });
 
     res.json({
       success: true,
