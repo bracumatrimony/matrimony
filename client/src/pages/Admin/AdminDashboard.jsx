@@ -92,19 +92,11 @@ export default function AdminDashboard() {
           pendingTransactions: dashboardData.stats.pendingTransactions || 0,
         });
         setPendingProfiles(dashboardData.recentPending || []);
+        setReports(dashboardData.recentReports || []);
       }
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
       setError("Failed to load dashboard data. Please refresh the page.");
-      // Fallback to mock data if API fails
-      setStats({
-        totalProfiles: 156,
-        approvedProfiles: 120,
-        pendingApprovals: 8,
-        totalRevenue: 45600,
-        activeUsers: 98,
-        verificationRequests: 5,
-      });
     } finally {
       setLoading(false);
     }

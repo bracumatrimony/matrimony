@@ -122,18 +122,45 @@ router.get(
       userId: req.user.id,
     });
 
-    // Get paginated bookmarks
-    const bookmarks = await Bookmark.find({ userId: req.user.id })
-      .populate({
-        path: "profile",
-        populate: {
-          path: "userId",
-          select: "name email picture",
+    // Get paginated bookmarks using aggregation
+    const bookmarks = await Bookmark.aggregate([
+      { $match: { userId: req.user.id } },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: "profiles",
+          localField: "profileId",
+          foreignField: "_id",
+          as: "profile",
         },
-      })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+      },
+      { $unwind: "$profile" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "profile.userId",
+          foreignField: "_id",
+          as: "profile.userId",
+        },
+      },
+      { $unwind: "$profile.userId" },
+      {
+        $project: {
+          _id: 1,
+          profileId: 1,
+          userId: 1,
+          createdAt: 1,
+          "profile._id": 1,
+          "profile.profileId": 1,
+          "profile.userId._id": 1,
+          "profile.userId.name": 1,
+          "profile.userId.email": 1,
+          "profile.userId.picture": 1,
+        },
+      },
+    ]);
 
     const totalPages = Math.max(1, Math.ceil(totalBookmarks / limit));
 

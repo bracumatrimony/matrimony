@@ -53,8 +53,23 @@ router.post("/", auth, async (req, res) => {
       });
     }
 
-    // Find existing draft or create new one
+    // Find existing draft
     let draft = await Draft.findOne({ userId: req.user.id });
+
+    // Throttle: don't save if updated within last 5 seconds
+    if (draft && draft.lastModified) {
+      const timeSinceLastUpdate = Date.now() - draft.lastModified.getTime();
+      if (timeSinceLastUpdate < 5000) {
+        return res.json({
+          success: true,
+          message: "Draft saved (throttled)",
+          draft: {
+            currentStep: draft.currentStep,
+            lastModified: draft.lastModified,
+          },
+        });
+      }
+    }
 
     if (draft) {
       // Update existing draft

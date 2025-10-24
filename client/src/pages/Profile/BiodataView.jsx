@@ -25,7 +25,6 @@ import {
 import profileService from "../../services/profileService";
 import adminService from "../../services/adminService";
 import authService from "../../services/authService";
-import userService from "../../services/userService";
 import { useAuth } from "../../contexts/AuthContext";
 import { monetizationConfig } from "../../config/monetization";
 import SEO from "../../components/SEO";

@@ -15,18 +15,33 @@ const router = express.Router();
 // @access  Private (Admin only)
 router.get("/dashboard", [auth, adminAuth], async (req, res) => {
   try {
-    // Get statistics
-    const totalProfiles = await Profile.countDocuments();
-    const pendingApprovals = await Profile.countDocuments({
-      status: "pending_approval",
-    });
-    const approvedProfiles = await Profile.countDocuments({
-      status: "approved",
-    });
+    // Get profile statistics using aggregation
+    const profileStats = await Profile.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const totalProfiles = profileStats.reduce(
+      (sum, stat) => sum + stat.count,
+      0
+    );
+    const pendingApprovals =
+      profileStats.find((stat) => stat._id === "pending_approval")?.count || 0;
+    const approvedProfiles =
+      profileStats.find((stat) => stat._id === "approved")?.count || 0;
+
     const activeUsers = await User.countDocuments({ isActive: true });
 
-    // Calculate total revenue (mock calculation - you'd have a Transaction model)
-    const totalRevenue = activeUsers * 100; // Mock calculation
+    // Calculate total revenue from transactions
+    const revenueResult = await Transaction.aggregate([
+      { $match: { status: "completed" } },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+    const totalRevenue = revenueResult.length > 0 ? revenueResult[0].total : 0;
 
     // Get recent pending profiles
     const recentPending = await Profile.find({ status: "pending_approval" })
@@ -34,9 +49,19 @@ router.get("/dashboard", [auth, adminAuth], async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(10);
 
-    // Get report statistics
-    const totalReports = await Report.countDocuments();
-    const pendingReports = await Report.countDocuments({ status: "pending" });
+    // Get report statistics using aggregation
+    const reportStats = await Report.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const totalReports = reportStats.reduce((sum, stat) => sum + stat.count, 0);
+    const pendingReports =
+      reportStats.find((stat) => stat._id === "pending")?.count || 0;
 
     // Get verification requests count
     const verificationRequests = await User.countDocuments({
@@ -48,6 +73,16 @@ router.get("/dashboard", [auth, adminAuth], async (req, res) => {
     const pendingTransactions = await Transaction.countDocuments({
       status: "pending",
     });
+
+    // Get recent reports
+    const recentReports = await Report.find()
+      .populate("reportedBy", "name email")
+      .populate({
+        path: "reportedProfileId",
+        populate: { path: "userId", select: "name email" },
+      })
+      .sort({ createdAt: -1 })
+      .limit(3);
 
     res.json({
       success: true,
@@ -63,6 +98,7 @@ router.get("/dashboard", [auth, adminAuth], async (req, res) => {
         pendingTransactions,
       },
       recentPending,
+      recentReports,
     });
   } catch (error) {
     console.error("Admin dashboard error:", error);

@@ -11,41 +11,15 @@ export default function Home() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const cacheKey = "home_stats_cache";
-      const cacheExpiryKey = "home_stats_cache_expiry";
-      const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
       try {
-        // Check if we have cached data
-        const cachedStats = localStorage.getItem(cacheKey);
-        const cacheExpiry = localStorage.getItem(cacheExpiryKey);
-        const now = Date.now();
-
-        if (cachedStats && cacheExpiry && now < parseInt(cacheExpiry)) {
-          // Use cached data
-          setStats(JSON.parse(cachedStats));
-          setLoading(false);
-          return;
-        }
-
+        setLoading(true);
         // Fetch fresh data
         const response = await profileService.getStats();
         if (response.success) {
           setStats(response.data);
-          // Cache the data
-          localStorage.setItem(cacheKey, JSON.stringify(response.data));
-          localStorage.setItem(
-            cacheExpiryKey,
-            (now + CACHE_DURATION).toString()
-          );
         }
       } catch (error) {
         console.error("Failed to fetch stats:", error);
-        // Try to use cached data even if expired
-        const cachedStats = localStorage.getItem(cacheKey);
-        if (cachedStats) {
-          setStats(JSON.parse(cachedStats));
-        }
       } finally {
         setLoading(false);
       }

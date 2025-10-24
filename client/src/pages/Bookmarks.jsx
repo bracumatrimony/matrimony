@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Heart,
@@ -282,49 +282,48 @@ export default function Bookmarks() {
                 <ChevronLeft className="h-4 w-4 mr-1" />
               </button>
 
-              {/* Page number buttons */}
-              {Array.from(
-                { length: pagination.totalPages },
-                (_, i) => i + 1
-              ).map((num) => {
-                // Show first, last, current, and neighbors; ellipsis for gaps
-                if (
-                  num === 1 ||
-                  num === pagination.totalPages ||
-                  Math.abs(num - pagination.currentPage) <= 1
-                ) {
-                  return (
-                    <button
-                      key={num}
-                      onClick={() => {
-                        if (num !== pagination.currentPage) {
-                          loadBookmarks(num);
-                        }
-                      }}
-                      className={`px-3 py-2 rounded-full font-semibold transition-colors shadow-sm border text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 ${
-                        num === pagination.currentPage
-                          ? "bg-gradient-to-r from-rose-500 to-pink-500 text-white border-rose-500"
-                          : "bg-white text-gray-700 border-gray-300 hover:bg-rose-50 hover:border-rose-400 cursor-pointer"
-                      }`}
-                      disabled={num === pagination.currentPage}
-                    >
-                      {num}
-                    </button>
-                  );
-                } else if (
-                  num === pagination.currentPage - 2 ||
-                  num === pagination.currentPage + 2
-                ) {
-                  return (
-                    <span key={num} className="px-2 text-gray-400 select-none">
-                      ...
-                    </span>
-                  );
-                }
-                return null;
-              })}
-
-              <button
+  const pageButtons = useMemo(() => {
+    return Array.from(
+      { length: pagination.totalPages },
+      (_, i) => i + 1
+    ).map((num) => {
+      // Show first, last, current, and neighbors; ellipsis for gaps
+      if (
+        num === 1 ||
+        num === pagination.totalPages ||
+        Math.abs(num - pagination.currentPage) <= 1
+      ) {
+        return (
+          <button
+            key={num}
+            onClick={() => {
+              if (num !== pagination.currentPage) {
+                loadBookmarks(num);
+              }
+            }}
+            className={`px-3 py-2 rounded-full font-semibold transition-colors shadow-sm border text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 ${
+              num === pagination.currentPage
+                ? "bg-gradient-to-r from-rose-500 to-pink-500 text-white border-rose-500"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-rose-50 hover:border-rose-400 cursor-pointer"
+            }`}
+            disabled={num === pagination.currentPage}
+          >
+            {num}
+          </button>
+        );
+      } else if (
+        num === pagination.currentPage - 2 ||
+        num === pagination.currentPage + 2
+      ) {
+        return (
+          <span key={num} className="px-2 text-gray-400 select-none">
+            ...
+          </span>
+        );
+      }
+      return null;
+    }).filter(Boolean);
+  }, [pagination.totalPages, pagination.currentPage]);              <button
                 onClick={() => loadBookmarks(pagination.currentPage + 1)}
                 disabled={!pagination.hasNextPage}
                 className={`px-4 py-2 rounded-full font-semibold transition-colors shadow-sm border border-gray-300 bg-white text-gray-700 hover:bg-rose-100 hover:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 ${

@@ -3,18 +3,21 @@
 
 class MonetizationConfig {
   constructor() {
-    // Check if we're in development and can access import.meta.env
-    this.monetization = this.getMonetizationStatus();
+    this.monetization = null; // Will be fetched lazily
   }
 
   // Get monetization status from environment or API
-  getMonetizationStatus() {
+  async getMonetizationStatus() {
+    if (this.monetization !== null) {
+      return this.monetization;
+    }
     // Try to get from Vite environment variables
     try {
       // Vite automatically exposes VITE_ prefixed environment variables
       if (typeof window !== "undefined" && window.location) {
         // In browser environment, we'll fetch this from the server API
-        return this.fetchMonetizationStatus();
+        this.monetization = await this.fetchMonetizationStatus();
+        return this.monetization;
       }
       return "off"; // Default to free access
     } catch (error) {
@@ -40,41 +43,43 @@ class MonetizationConfig {
   }
 
   // Check if monetization is enabled
-  isMonetizationEnabled() {
-    return this.monetization === "on";
+  async isMonetizationEnabled() {
+    const status = await this.getMonetizationStatus();
+    return status === "on";
   }
 
   // Check if credit system should be shown
-  isCreditSystemEnabled() {
-    return this.isMonetizationEnabled();
+  async isCreditSystemEnabled() {
+    return await this.isMonetizationEnabled();
   }
 
   // Check if credits/transactions routes should be available
-  shouldShowMonetizationRoutes() {
-    return this.isMonetizationEnabled();
+  async shouldShowMonetizationRoutes() {
+    return await this.isMonetizationEnabled();
   }
 
   // Check if credit-related UI should be displayed
-  shouldShowCreditUI() {
-    return this.isMonetizationEnabled();
+  async shouldShowCreditUI() {
+    return await this.isMonetizationEnabled();
   }
 
   // Get message for free access mode
-  getFreeAccessMessage() {
-    return this.isMonetizationEnabled()
+  async getFreeAccessMessage() {
+    return (await this.isMonetizationEnabled())
       ? null
       : "Contact information is free during our launch period!";
   }
 
   // Get configuration for components
-  getConfig() {
+  async getConfig() {
+    const monetizationEnabled = await this.isMonetizationEnabled();
     return {
-      monetizationEnabled: this.isMonetizationEnabled(),
-      creditSystemEnabled: this.isCreditSystemEnabled(),
-      showCreditUI: this.shouldShowCreditUI(),
-      showMonetizationRoutes: this.shouldShowMonetizationRoutes(),
-      freeAccessMessage: this.getFreeAccessMessage(),
-      mode: this.monetization,
+      monetizationEnabled,
+      creditSystemEnabled: await this.isCreditSystemEnabled(),
+      showCreditUI: await this.shouldShowCreditUI(),
+      showMonetizationRoutes: await this.shouldShowMonetizationRoutes(),
+      freeAccessMessage: await this.getFreeAccessMessage(),
+      mode: await this.getMonetizationStatus(),
     };
   }
 

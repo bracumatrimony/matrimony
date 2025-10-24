@@ -4,8 +4,8 @@ class AdminService {
     this.baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
   }
 
-  // Make authenticated API request
-  async makeRequest(endpoint, options = {}) {
+  // Make authenticated API request with retry
+  async makeRequest(endpoint, options = {}, retries = 3) {
     const url = `${this.baseURL}${endpoint}`;
 
     const config = {
@@ -23,28 +23,35 @@ class AdminService {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    try {
-      const response = await fetch(url, config);
-      const data = await response.json();
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const response = await fetch(url, config);
+        const data = await response.json();
 
-      if (!response.ok) {
-        // Check if it's an authentication error
-        if (response.status === 401) {
-          console.error(
-            "Authentication failed. Token may be invalid or expired."
-          );
-          // Clear user data and redirect to login
-          localStorage.removeItem("user");
-          window.location.href = "/login";
+        if (!response.ok) {
+          // Check if it's an authentication error
+          if (response.status === 401) {
+            console.error(
+              "Authentication failed. Token may be invalid or expired."
+            );
+            // Clear user data and redirect to login
+            localStorage.removeItem("user");
+            window.location.href = "/login";
+            throw new Error("Authentication failed");
+          }
+
+          throw new Error(data.message || "API request failed");
         }
 
-        throw new Error(data.message || "API request failed");
+        return data;
+      } catch (error) {
+        console.error(`Admin API Error (attempt ${attempt}):`, error);
+        if (attempt === retries) {
+          throw error;
+        }
+        // Wait before retry
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
       }
-
-      return data;
-    } catch (error) {
-      console.error("Admin API Error:", error);
-      throw error;
     }
   }
 
