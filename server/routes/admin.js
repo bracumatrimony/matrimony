@@ -234,20 +234,47 @@ router.put(
         });
       }
 
+      console.log(
+        `Approving profile ${profile.profileId} for user ${
+          profile.userId?._id || "unknown"
+        }`
+      );
+
       profile.status = "approved";
       profile.rejectionReason = null;
       profile.isUnderReview = false;
       profile.hasEditPending = false;
-      await profile.save();
+
+      // Ensure biodataId is set
+      if (profile.profileId && !profile.biodataId) {
+        profile.biodataId = profile.profileId;
+      }
+
+      try {
+        await profile.save();
+        console.log(`Profile ${profile.profileId} saved successfully`);
+      } catch (saveError) {
+        console.error(
+          `Failed to save profile ${profile.profileId}:`,
+          saveError
+        );
+        throw saveError;
+      }
 
       // Send approval email notification
       try {
-        await sendEmail(
-          profile.userId.email,
-          "biodataApproved",
-          profile.userId.name
-        );
-        console.log(`Approval email sent to ${profile.userId.email}`);
+        if (profile.userId && profile.userId.email && profile.userId.name) {
+          await sendEmail(
+            profile.userId.email,
+            "biodataApproved",
+            profile.userId.name
+          );
+          console.log(`Approval email sent to ${profile.userId.email}`);
+        } else {
+          console.warn(
+            `Cannot send approval email: user not found, no email, or no name for profile ${profile.profileId}. userId: ${profile.userId}`
+          );
+        }
       } catch (emailError) {
         console.error("Failed to send approval email:", emailError);
         // Don't fail the approval if email fails
@@ -296,21 +323,48 @@ router.put(
         });
       }
 
+      console.log(
+        `Rejecting profile ${profile.profileId} for user ${
+          profile.userId?._id || "unknown"
+        }`
+      );
+
       profile.status = "rejected";
       profile.rejectionReason = reason;
       profile.isUnderReview = false;
       profile.hasEditPending = false;
-      await profile.save();
+
+      // Ensure biodataId is set
+      if (profile.profileId && !profile.biodataId) {
+        profile.biodataId = profile.profileId;
+      }
+
+      try {
+        await profile.save();
+        console.log(`Profile ${profile.profileId} rejected successfully`);
+      } catch (saveError) {
+        console.error(
+          `Failed to save profile ${profile.profileId}:`,
+          saveError
+        );
+        throw saveError;
+      }
 
       // Send rejection email to the user
       try {
-        await sendEmail(
-          profile.userId.email,
-          "biodataRejected",
-          profile.userId.name,
-          reason
-        );
-        console.log(`Rejection email sent to ${profile.userId.email}`);
+        if (profile.userId && profile.userId.email && profile.userId.name) {
+          await sendEmail(
+            profile.userId.email,
+            "biodataRejected",
+            profile.userId.name,
+            reason
+          );
+          console.log(`Rejection email sent to ${profile.userId.email}`);
+        } else {
+          console.warn(
+            `Cannot send rejection email: user not found, no email, or no name for profile ${profile.profileId}. userId: ${profile.userId}`
+          );
+        }
       } catch (emailError) {
         console.error("Failed to send rejection email:", emailError);
         // Don't fail the rejection if email fails
@@ -392,6 +446,11 @@ router.put("/profiles/:profileId", [auth, adminAuth], async (req, res) => {
       profile.rejectionReason = null;
       profile.isUnderReview = false;
       profile.hasEditPending = false;
+    }
+
+    // Ensure biodataId is set
+    if (profile.profileId && !profile.biodataId) {
+      profile.biodataId = profile.profileId;
     }
 
     await profile.save();

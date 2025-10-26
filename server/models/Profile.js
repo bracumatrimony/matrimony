@@ -503,7 +503,7 @@ profileSchema.index({ profileId: 1, status: 1 });
 
 // Pre-save middleware to update lastUpdated and ensure biodataId
 profileSchema.pre("save", function (next) {
-  if (!this.biodataId && this.profileId) {
+  if (this.profileId && !this.biodataId) {
     this.biodataId = this.profileId;
   }
   this.lastUpdated = new Date();
