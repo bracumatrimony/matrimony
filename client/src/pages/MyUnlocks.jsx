@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye } from "lucide-react";
+import { Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import profileService from "../services/profileService";
 import { SectionSpinner } from "../components/LoadingSpinner";
 import { useAuth } from "../contexts/AuthContext";
@@ -9,6 +9,8 @@ export default function MyUnlocks() {
   const [unlockedProfiles, setUnlockedProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -47,6 +49,22 @@ export default function MyUnlocks() {
 
     fetchUnlockedProfiles();
   }, [user, navigate]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(unlockedProfiles.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProfiles = unlockedProfiles.slice(startIndex, endIndex);
+
+  // Pagination handlers
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -129,7 +147,7 @@ export default function MyUnlocks() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {unlockedProfiles.map((profile, index) => {
+                  {currentProfiles.map((profile, index) => {
                     const rowBgColor =
                       index % 2 === 0 ? "bg-white" : "bg-gray-50";
                     return (
@@ -163,6 +181,103 @@ export default function MyUnlocks() {
             </div>
           )}
         </div>
+
+        {/* Pagination Controls */}
+        {unlockedProfiles.length > 0 && totalPages > 1 && (
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            {/* Items per page selector */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-600">Show:</label>
+              <select
+                value={itemsPerPage}
+                onChange={(e) =>
+                  handleItemsPerPageChange(Number(e.target.value))
+                }
+                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+              <span className="text-sm text-gray-600">per page</span>
+            </div>
+
+            {/* Pagination info */}
+            <div className="text-sm text-gray-600">
+              Showing {startIndex + 1}-
+              {Math.min(endIndex, unlockedProfiles.length)} of{" "}
+              {unlockedProfiles.length} unlocked profiles
+            </div>
+
+            {/* Page navigation */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-2 rounded-md font-medium transition-colors shadow-sm border border-gray-300 bg-white text-gray-700 hover:bg-rose-50 hover:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 ${
+                  currentPage === 1
+                    ? "opacity-50 cursor-not-allowed"
+                    : "cursor-pointer"
+                }`}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              {/* Page number buttons */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (num) => {
+                  // Show first, last, current, and neighbors; ellipsis for gaps
+                  if (
+                    num === 1 ||
+                    num === totalPages ||
+                    Math.abs(num - currentPage) <= 1
+                  ) {
+                    return (
+                      <button
+                        key={num}
+                        onClick={() => handlePageChange(num)}
+                        className={`px-3 py-2 rounded-md font-medium transition-colors shadow-sm border text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 ${
+                          num === currentPage
+                            ? "bg-gradient-to-r from-rose-500 to-pink-500 text-white border-rose-500"
+                            : "bg-white text-gray-700 border-gray-300 hover:bg-rose-50 hover:border-rose-400 cursor-pointer"
+                        }`}
+                        disabled={num === currentPage}
+                      >
+                        {num}
+                      </button>
+                    );
+                  } else if (
+                    num === currentPage - 2 ||
+                    num === currentPage + 2
+                  ) {
+                    return (
+                      <span
+                        key={num}
+                        className="px-2 text-gray-400 select-none"
+                      >
+                        ...
+                      </span>
+                    );
+                  }
+                  return null;
+                }
+              )}
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-2 rounded-md font-medium transition-colors shadow-sm border border-gray-300 bg-white text-gray-700 hover:bg-rose-50 hover:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 ${
+                  currentPage === totalPages
+                    ? "opacity-50 cursor-not-allowed"
+                    : "cursor-pointer"
+                }`}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
