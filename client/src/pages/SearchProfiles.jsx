@@ -183,71 +183,75 @@ export default function SearchProfiles() {
         description="Search and find compatible matches from BRACU Matrimony. Browse verified profiles with advanced filters for age, location, and preferences."
         keywords="search profiles, find matches, BRACU matrimony search, biodata search"
       />
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col">
         {/* Mobile Search Bar */}
-        <div className="block lg:hidden px-4 py-3 bg-white border-b border-gray-200">
-          <div className="flex gap-2">
+        <div className="block lg:hidden px-4 py-4 bg-white border-b border-slate-200">
+          <div className="flex gap-3">
             <div className="relative group flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-rose-500 h-4 w-4 transition-colors" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 h-5 w-5 transition-colors" />
               <input
                 type="text"
-                placeholder="Search profiles..."
+                placeholder="Search by name, profession, or interests..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all text-sm"
+                className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm bg-slate-50 focus:bg-white shadow-sm"
               />
             </div>
             <button
               onClick={() => setIsFilterOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-2 px-5 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
             >
-              <Filter className="h-4 w-4 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Filters</span>
+              <Filter className="h-4 w-4" />
+              <span className="text-sm font-medium hidden sm:inline">
+                Filters
+              </span>
             </button>
           </div>
         </div>
 
         <div className="flex flex-1 min-h-0">
           {/* Sidebar - Search and Filters (Desktop) */}
-          <div className="hidden lg:flex w-80 bg-white border-r border-gray-200 min-h-full flex-col">
+          <div className="hidden lg:flex w-80 bg-white border-r border-slate-200 min-h-full flex-col shadow-lg">
             {/* Search Bar */}
-            <div className="hidden p-6 border-b border-gray-100">
+            <div className="p-6 border-b border-slate-100 bg-slate-50">
               <div className="relative group">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-rose-500 h-4 w-4 transition-colors" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 h-5 w-5 transition-colors" />
                 <input
                   type="text"
-                  placeholder="Search profiles..."
+                  placeholder="Search by name, profession, or interests..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all text-sm"
+                  className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm bg-white shadow-sm"
                 />
               </div>
             </div>
 
             {/* Filters */}
-            <div className="p-6 flex-1">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-900">Filters</h3>
+            <div className="p-6 flex-1 bg-white">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-serif font-semibold text-slate-800">
+                  Refine Your Search
+                </h3>
                 <button
                   onClick={clearFilters}
-                  className="text-xs text-rose-600 hover:text-rose-700 transition-colors cursor-pointer"
+                  className="text-sm text-slate-600 hover:text-slate-800 transition-colors cursor-pointer underline decoration-slate-300 hover:decoration-slate-600"
                 >
                   Clear All
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {/* Gender Filter */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">
-                    Gender
+                  <label className="block text-sm font-medium text-slate-700 mb-3">
+                    Looking for
                   </label>
                   <select
                     value={filters.gender}
                     onChange={(e) =>
                       handleFilterChange("gender", e.target.value)
                     }
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors bg-white"
+                    className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
                   >
                     <option value="">Any Gender</option>
                     <option value="Male">Male</option>
@@ -257,42 +261,42 @@ export default function SearchProfiles() {
 
                 {/* Age Filter */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-3">
                     Age Range
                   </label>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-3">
                     <input
                       type="number"
-                      placeholder="Min"
+                      placeholder="Min age"
                       value={filters.ageMin}
                       onChange={(e) =>
                         handleFilterChange("ageMin", e.target.value)
                       }
-                      className="w-1/2 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors"
+                      className="w-1/2 px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all shadow-sm hover:shadow-md"
                     />
                     <input
                       type="number"
-                      placeholder="Max"
+                      placeholder="Max age"
                       value={filters.ageMax}
                       onChange={(e) =>
                         handleFilterChange("ageMax", e.target.value)
                       }
-                      className="w-1/2 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors"
+                      className="w-1/2 px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all shadow-sm hover:shadow-md"
                     />
                   </div>
                 </div>
 
                 {/* Location Filter */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">
-                    Preferred District/Region
+                  <label className="block text-sm font-medium text-slate-700 mb-3">
+                    Preferred Location
                   </label>
                   <select
                     value={filters.district}
                     onChange={(e) =>
                       handleFilterChange("district", e.target.value)
                     }
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors bg-white"
+                    className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
                   >
                     {locationsByDivision[""].map((option) => (
                       <option key={option.value} value={option.value}>
@@ -318,7 +322,7 @@ export default function SearchProfiles() {
 
                 {/* Religion Filter */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-3">
                     Religion
                   </label>
                   <select
@@ -326,7 +330,7 @@ export default function SearchProfiles() {
                     onChange={(e) =>
                       handleFilterChange("religion", e.target.value)
                     }
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors bg-white"
+                    className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
                   >
                     <option value="">Any Religion</option>
                     <option value="Muslim">Muslim</option>
@@ -338,13 +342,13 @@ export default function SearchProfiles() {
                 </div>
 
                 {/* Apply Filter Button */}
-                <div className="pt-4">
+                <div className="pt-6">
                   <button
                     onClick={() => {
                       setPage(1);
                       loadProfiles({ ...filters, searchQuery }, 1, limit);
                     }}
-                    className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer font-medium"
+                    className="w-full bg-slate-800 hover:bg-slate-900 text-white px-6 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"
                   >
                     Apply Filters
                   </button>
@@ -363,40 +367,40 @@ export default function SearchProfiles() {
               />
 
               {/* Drawer */}
-              <div className="fixed inset-y-0 left-0 w-80 bg-white z-50 lg:hidden flex flex-col shadow-xl">
+              <div className="fixed inset-y-0 left-0 w-80 bg-white z-50 lg:hidden flex flex-col shadow-2xl border-r border-slate-200">
                 {/* Drawer Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Filters & Search
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-slate-50">
+                  <h2 className="text-xl font-serif font-semibold text-slate-800">
+                    Refine Your Search
                   </h2>
                   <button
                     onClick={() => setIsFilterOpen(false)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                   >
-                    <X className="h-5 w-5 text-gray-600" />
+                    <X className="h-6 w-6 text-slate-600" />
                   </button>
                 </div>
 
                 {/* Drawer Content */}
                 <div className="flex-1 overflow-y-auto">
                   {/* Search Bar in Drawer */}
-                  <div className="p-4 border-b border-gray-100">
+                  <div className="p-6 border-b border-slate-100">
                     <div className="relative group">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-rose-500 h-4 w-4 transition-colors" />
+                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 h-5 w-5 transition-colors" />
                       <input
                         type="text"
-                        placeholder="Search profiles..."
+                        placeholder="Search by name, profession, or interests..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all text-sm"
+                        className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm bg-white shadow-sm"
                       />
                     </div>
                   </div>
 
                   {/* Filters */}
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-medium text-gray-900">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-medium text-slate-800">
                         Filters
                       </h3>
                       <button
@@ -407,18 +411,18 @@ export default function SearchProfiles() {
                       </button>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       {/* Gender Filter */}
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-2">
-                          Gender
+                        <label className="block text-sm font-medium text-slate-700 mb-3">
+                          Looking for
                         </label>
                         <select
                           value={filters.gender}
                           onChange={(e) =>
                             handleFilterChange("gender", e.target.value)
                           }
-                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors bg-white"
+                          className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
                         >
                           <option value="">Any Gender</option>
                           <option value="Male">Male</option>
@@ -428,42 +432,42 @@ export default function SearchProfiles() {
 
                       {/* Age Filter */}
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-slate-700 mb-3">
                           Age Range
                         </label>
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-3">
                           <input
                             type="number"
-                            placeholder="Min"
+                            placeholder="Min age"
                             value={filters.ageMin}
                             onChange={(e) =>
                               handleFilterChange("ageMin", e.target.value)
                             }
-                            className="w-1/2 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors"
+                            className="w-1/2 px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all shadow-sm hover:shadow-md"
                           />
                           <input
                             type="number"
-                            placeholder="Max"
+                            placeholder="Max age"
                             value={filters.ageMax}
                             onChange={(e) =>
                               handleFilterChange("ageMax", e.target.value)
                             }
-                            className="w-1/2 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors"
+                            className="w-1/2 px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all shadow-sm hover:shadow-md"
                           />
                         </div>
                       </div>
 
                       {/* Location Filter */}
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-2">
-                          Preferred District/Region
+                        <label className="block text-sm font-medium text-slate-700 mb-3">
+                          Preferred Location
                         </label>
                         <select
                           value={filters.district}
                           onChange={(e) =>
                             handleFilterChange("district", e.target.value)
                           }
-                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors bg-white"
+                          className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
                         >
                           {locationsByDivision[""].map((option) => (
                             <option key={option.value} value={option.value}>
@@ -492,7 +496,7 @@ export default function SearchProfiles() {
 
                       {/* Religion Filter */}
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-slate-700 mb-3">
                           Religion
                         </label>
                         <select
@@ -500,7 +504,7 @@ export default function SearchProfiles() {
                           onChange={(e) =>
                             handleFilterChange("religion", e.target.value)
                           }
-                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors bg-white"
+                          className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
                         >
                           <option value="">Any Religion</option>
                           <option value="Muslim">Muslim</option>
@@ -515,14 +519,14 @@ export default function SearchProfiles() {
                 </div>
 
                 {/* Drawer Footer */}
-                <div className="p-4 border-t border-gray-200 bg-white">
+                <div className="p-6 border-t border-slate-200 bg-slate-50">
                   <button
                     onClick={() => {
                       setPage(1);
                       loadProfiles({ ...filters, searchQuery }, 1, limit);
                       setIsFilterOpen(false);
                     }}
-                    className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-lg transition-colors cursor-pointer font-medium"
+                    className="w-full bg-slate-800 hover:bg-slate-900 text-white px-6 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"
                   >
                     Apply Filters
                   </button>
@@ -534,35 +538,35 @@ export default function SearchProfiles() {
           {/* Main Content */}
           <div className="flex-1">
             {/* Profile Grid */}
-            <div className="px-4 sm:px-6 py-4 sm:py-8">
+            <div className="px-6 sm:px-8 py-8">
               <div className="max-w-7xl mx-auto">
                 {loading ? (
-                  <div className="text-center py-16">
-                    <SectionSpinner text="Loading profiles..." />
+                  <div className="text-center py-20">
+                    <SectionSpinner text="Finding your perfect match..." />
                   </div>
                 ) : error ? (
-                  <div className="text-center py-16">
-                    <div className="w-20 h-20 bg-gradient-to-br from-red-300 to-red-400 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <span className="text-white text-2xl">!</span>
+                  <div className="text-center py-20">
+                    <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
+                      <span className="text-red-600 text-3xl">!</span>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">
-                      Failed to load profiles
+                    <h3 className="text-2xl font-serif font-bold text-slate-800 mb-4">
+                      Unable to Load Profiles
                     </h3>
-                    <p className="text-gray-600 mb-6">{error}</p>
+                    <p className="text-slate-600 mb-8 text-lg">{error}</p>
                     <button
                       onClick={loadProfiles}
-                      className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer font-medium"
+                      className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"
                     >
                       Try Again
                     </button>
                   </div>
                 ) : profiles.length > 0 ? (
                   <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
                       {profiles.map((profile, index) => (
                         <div
                           key={profile._id || profile.id}
-                          className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow animate-fadeInUp"
+                          className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden transition-all duration-300 animate-fadeInUp"
                           style={{ animationDelay: `${index * 50}ms` }}
                         >
                           <ProfileCard
@@ -573,17 +577,17 @@ export default function SearchProfiles() {
                       ))}
                     </div>
                     {/* Pagination Controls */}
-                    <div className="flex flex-wrap justify-center items-center mt-6 sm:mt-8 gap-1 sm:gap-2">
+                    <div className="flex flex-wrap justify-center items-center mt-12 gap-2 sm:gap-3">
                       <button
                         onClick={handlePrevPage}
                         disabled={page === 1}
-                        className={`px-3 sm:px-4 py-2 rounded-full font-semibold transition-colors shadow-sm border border-gray-300 bg-white text-gray-700 hover:bg-rose-100 hover:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-sm sm:text-base ${
+                        className={`px-4 sm:px-5 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base ${
                           page === 1
                             ? "opacity-50 cursor-not-allowed"
-                            : "cursor-pointer"
+                            : "cursor-pointer hover:shadow-md"
                         }`}
                       >
-                        &larr;
+                        &larr; Previous
                       </button>
                       {/* Page number buttons */}
                       {Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -607,10 +611,10 @@ export default function SearchProfiles() {
                                     );
                                   }
                                 }}
-                                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full font-semibold transition-colors shadow-sm border text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 ${
+                                className={`px-3.5 sm:px-4 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 ${
                                   num === page
-                                    ? "bg-gradient-to-r from-rose-500 to-pink-500 text-white border-rose-500"
-                                    : "bg-white text-gray-700 border-gray-300 hover:bg-rose-50 hover:border-rose-400 cursor-pointer"
+                                    ? "bg-slate-800 text-white border-slate-800 shadow-md"
+                                    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer hover:shadow-md"
                                 }`}
                                 disabled={num === page}
                               >
@@ -621,7 +625,7 @@ export default function SearchProfiles() {
                             return (
                               <span
                                 key={num}
-                                className="px-2 text-gray-400 select-none"
+                                className="px-3 text-slate-400 select-none text-sm"
                               >
                                 ...
                               </span>
@@ -633,36 +637,35 @@ export default function SearchProfiles() {
                       <button
                         onClick={handleNextPage}
                         disabled={page === totalPages}
-                        className={`px-3 sm:px-4 py-2 rounded-full font-semibold transition-colors shadow-sm border border-gray-300 bg-white text-gray-700 hover:bg-rose-100 hover:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-sm sm:text-base ${
+                        className={`px-4 sm:px-5 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base ${
                           page === totalPages
                             ? "opacity-50 cursor-not-allowed"
-                            : "cursor-pointer"
+                            : "cursor-pointer hover:shadow-md"
                         }`}
                       >
-                        &rarr;
+                        Next &rarr;
                       </button>
                     </div>
                   </>
                 ) : (
-                  <div className="text-center py-16">
-                    <div className="w-full">
-                      <div className="w-20 h-20 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Filter className="h-10 w-10 text-white" />
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-3">
-                        No profiles found
-                      </h3>
-                      <p className="text-gray-600 mb-6">
-                        Try adjusting your search criteria or filters to find
-                        more profiles.
-                      </p>
-                      <button
-                        onClick={clearFilters}
-                        className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer font-medium"
-                      >
-                        Clear All Filters
-                      </button>
+                  <div className="text-center py-20">
+                    <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
+                      <Filter className="h-12 w-12 text-slate-400" />
                     </div>
+                    <h3 className="text-2xl font-serif font-bold text-slate-800 mb-4">
+                      No Profiles Found
+                    </h3>
+                    <p className="text-slate-600 mb-8 text-lg max-w-md mx-auto">
+                      We couldn't find any profiles matching your criteria. Try
+                      adjusting your search filters to discover more potential
+                      matches.
+                    </p>
+                    <button
+                      onClick={clearFilters}
+                      className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"
+                    >
+                      Clear All Filters
+                    </button>
                   </div>
                 )}
               </div>
@@ -676,7 +679,7 @@ export default function SearchProfiles() {
           authService.isValidBRACUEmail(currentUser.email) && (
             <button
               onClick={() => navigate("/profile/create")}
-              className="fixed bottom-8 right-8 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white p-5 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-rose-300 z-50 border-2 border-white cursor-pointer"
+              className="fixed bottom-8 right-8 bg-slate-800 hover:bg-slate-900 text-white p-5 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-slate-300 z-50 border-2 border-white cursor-pointer"
               title="Create New Profile"
             >
               <Plus className="h-8 w-8" />

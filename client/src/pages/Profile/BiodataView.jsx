@@ -1336,7 +1336,7 @@ export default function BiodataView() {
                         </h3>
                         <p className="text-base text-rose-700 mb-4 leading-relaxed">
                           Use 1 credit to unlock the contact information for
-                          this profile.
+                          this biodata.
                         </p>
 
                         <div className="flex items-center justify-center gap-2 mb-4">

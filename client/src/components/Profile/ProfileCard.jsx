@@ -1,10 +1,10 @@
 import {
-  Eye,
-  MapPin,
-  Briefcase,
-  User,
-  Calendar,
-  GraduationCap,
+  ExternalLink,
+  Navigation,
+  Building2,
+  UserCircle,
+  CalendarDays,
+  BookOpen,
   BookmarkX,
 } from "lucide-react";
 import BookmarkButton from "../BookmarkButton";
@@ -25,33 +25,38 @@ const ProfileCard = memo(function ProfileCard({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow">
+    <div className="bg-gradient-to-br from-white via-gray-50 to-white rounded-2xl shadow-lg border-2 border-gray-300 overflow-hidden hover:shadow-2xl transition-all duration-300 backdrop-blur-sm hover:border-gray-400 group">
       {/* Profile Header */}
-      <div className="p-6 border-b border-gray-100">
+      <div className="p-6 bg-gradient-to-r from-blue-50/30 to-purple-50/30 border-b border-gray-100/50">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-              {profile.gender === "Male" ? (
-                <img
-                  src="https://res.cloudinary.com/dtv7wldhe/image/upload/v1759583572/male_d4wuwd.png"
-                  alt="Male Profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : profile.gender === "Female" ? (
-                <img
-                  src="https://res.cloudinary.com/dtv7wldhe/image/upload/v1759583575/female_p0k4x3.png"
-                  alt="Female Profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User className="h-6 w-6 text-gray-500" />
-              )}
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-white shadow-lg group-hover:ring-blue-200 transition-all duration-300">
+                {profile.gender === "Male" ? (
+                  <img
+                    src="https://res.cloudinary.com/dtv7wldhe/image/upload/v1759583572/male_d4wuwd.png"
+                    alt="Male Profile"
+                    className="w-full h-full object-cover transition-all duration-300"
+                  />
+                ) : profile.gender === "Female" ? (
+                  <img
+                    src="https://res.cloudinary.com/dtv7wldhe/image/upload/v1759583575/female_p0k4x3.png"
+                    alt="Female Profile"
+                    className="w-full h-full object-cover transition-all duration-300"
+                  />
+                ) : (
+                  <UserCircle className="h-7 w-7 text-black transition-colors duration-300" />
+                )}
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gradient-to-r from-green-400 to-green-500 rounded-full border-2 border-white shadow-sm"></div>
             </div>
             <div>
-              <h3 className="font-medium text-gray-900">{profile.profileId}</h3>
-              <div className="flex items-center text-sm text-gray-600">
-                <Calendar className="h-3 w-3 mr-1" />
-                <span>{profile.age} years</span>
+              <h3 className="font-bold text-gray-900 text-lg group-hover:text-blue-900 transition-colors duration-300">
+                {profile.profileId}
+              </h3>
+              <div className="flex items-center text-sm text-gray-600 bg-blue-50 px-2 py-1 rounded-full">
+                <CalendarDays className="h-3 w-3 mr-1 text-black" />
+                <span className="font-medium">{profile.age} years</span>
               </div>
             </div>
           </div>
@@ -76,7 +81,7 @@ const ProfileCard = memo(function ProfileCard({
         </div>
         <div className="space-y-2">
           <div className="flex items-center text-sm text-gray-600">
-            <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+            <Navigation className="h-4 w-4 mr-2 text-black flex-shrink-0" />
             <span className="truncate">
               {profile.presentAddressDistrict && profile.presentAddressDivision
                 ? `${profile.presentAddressDistrict}, ${profile.presentAddressDivision}`
@@ -86,13 +91,13 @@ const ProfileCard = memo(function ProfileCard({
             </span>
           </div>
           <div className="flex items-center text-sm text-gray-600">
-            <GraduationCap className="h-3 w-3 mr-1 flex-shrink-0" />
+            <BookOpen className="h-4 w-4 mr-2 text-black flex-shrink-0" />
             <span className="truncate">
               {profile.graduationSubject || "Education not specified"}
             </span>
           </div>
           <div className="flex items-center text-sm text-gray-600">
-            <Briefcase className="h-3 w-3 mr-1 flex-shrink-0" />
+            <Building2 className="h-4 w-4 mr-2 text-black flex-shrink-0" />
             <span className="truncate">
               {profile.profession || "Profession not specified"}
             </span>
@@ -107,7 +112,7 @@ const ProfileCard = memo(function ProfileCard({
             onClick={handleViewProfile}
             className="flex-1 flex items-center justify-center px-3 py-2 text-white text-sm rounded-md transition-colors bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 cursor-pointer"
           >
-            <Eye className="h-4 w-4 mr-1" />
+            <ExternalLink className="h-4 w-4 mr-1" />
             View Biodata
           </button>
         </div>
