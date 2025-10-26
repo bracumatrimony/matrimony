@@ -184,9 +184,21 @@ export default function SearchProfiles() {
         keywords="search profiles, find matches, BRACU matrimony search, biodata search"
       />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col">
+        {/* Mobile Filter Bar */}
+        <div className="block md:hidden bg-white border-b border-slate-200 shadow-sm">
+          <div className="px-4 py-3">
+            <button
+              onClick={() => setIsFilterOpen(true)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              <Filter className="h-5 w-5" />
+              <span className="font-medium">Filter Profiles</span>
+            </button>
+          </div>
+        </div>
         <div className="flex flex-1 min-h-0">
           {/* Sidebar - Search and Filters (Desktop) */}
-          <div className="hidden lg:flex w-80 bg-white border-r border-slate-200 min-h-full flex-col shadow-lg">
+          <div className="hidden md:flex w-80 bg-white border-r border-slate-200 min-h-full flex-col shadow-lg">
             {/* Filters */}
             <div className="p-6 flex-1 bg-white">
               <div className="flex items-center justify-between mb-6">
