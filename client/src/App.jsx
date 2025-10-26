@@ -34,6 +34,7 @@ const TransactionsWrapper = lazy(() =>
   import("./components/TransactionsWrapper")
 );
 const AllOrdersWrapper = lazy(() => import("./components/AllOrdersWrapper"));
+const MyUnlocks = lazy(() => import("./pages/MyUnlocks"));
 
 // Admin Protected Route Component
 function AdminProtectedRoute({ children }) {
@@ -164,6 +165,14 @@ function App() {
                       element={
                         <ProtectedRoute>
                           <Bookmarks />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/my-unlocks"
+                      element={
+                        <ProtectedRoute>
+                          <MyUnlocks />
                         </ProtectedRoute>
                       }
                     />

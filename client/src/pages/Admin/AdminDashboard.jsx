@@ -21,6 +21,7 @@ import {
   Star,
   Activity,
   User,
+  RefreshCw,
 } from "lucide-react";
 import adminService from "../../services/adminService";
 import { SectionSpinner, InlineSpinner } from "../../components/LoadingSpinner";
@@ -29,6 +30,7 @@ import AllUsers from "./AllUsers";
 import AllBiodata from "./AllBiodata";
 import Reports from "./Reports";
 import VerificationRequests from "./VerificationRequests";
+import { monetizationConfig } from "../../config/monetization";
 import "../../styles/admin.css";
 
 export default function AdminDashboard() {
@@ -55,6 +57,9 @@ export default function AdminDashboard() {
   const [notification, setNotification] = useState(null);
   const [reportsLoaded, setReportsLoaded] = useState(false);
   const [transactionsLoaded, setTransactionsLoaded] = useState(false);
+  const [monetizationStatus, setMonetizationStatus] = useState(
+    monetizationConfig.isEnabled() ? "ON" : "OFF"
+  );
 
   useEffect(() => {
     loadDashboardData();
@@ -74,6 +79,22 @@ export default function AdminDashboard() {
       loadPendingTransactions();
     }
   }, [activeTab, transactionsLoaded]);
+
+  // Listen for monetization config changes
+  useEffect(() => {
+    const handleConfigChange = () => {
+      setMonetizationStatus(monetizationConfig.isEnabled() ? "ON" : "OFF");
+    };
+
+    window.addEventListener("monetizationConfigChanged", handleConfigChange);
+
+    return () => {
+      window.removeEventListener(
+        "monetizationConfigChanged",
+        handleConfigChange
+      );
+    };
+  }, []);
 
   const loadDashboardData = async () => {
     try {
@@ -158,6 +179,17 @@ export default function AdminDashboard() {
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
+  };
+
+  const refreshMonetizationConfig = async () => {
+    try {
+      await monetizationConfig.forceRefresh();
+      setMonetizationStatus(monetizationConfig.isEnabled() ? "ON" : "OFF");
+      showNotification("Monetization configuration refreshed!", "success");
+    } catch (error) {
+      console.error("Failed to refresh monetization config:", error);
+      showNotification("Failed to refresh monetization configuration", "error");
+    }
   };
 
   const handleApproveTransaction = async (transactionId) => {
@@ -547,7 +579,7 @@ export default function AdminDashboard() {
             {activeTab === "overview" && (
               <>
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                   <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
                     <div className="flex items-center">
                       <div className="p-3 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl shadow-lg">
@@ -609,6 +641,43 @@ export default function AdminDashboard() {
                           {stats.activeUsers}
                         </p>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div
+                          className={`p-3 rounded-xl shadow-lg ${
+                            monetizationStatus === "ON"
+                              ? "bg-gradient-to-r from-green-500 to-green-600"
+                              : "bg-gradient-to-r from-gray-500 to-gray-600"
+                          }`}
+                        >
+                          <CreditCard className={`h-6 w-6 text-white`} />
+                        </div>
+                        <div className="ml-4">
+                          <p className="text-sm font-medium text-gray-600 mb-1">
+                            Monetization
+                          </p>
+                          <p
+                            className={`text-3xl font-bold ${
+                              monetizationStatus === "ON"
+                                ? "text-green-600"
+                                : "text-gray-600"
+                            }`}
+                          >
+                            {monetizationStatus}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={refreshMonetizationConfig}
+                        className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                        title="Refresh monetization config"
+                      >
+                        <RefreshCw className="h-5 w-5" />
+                      </button>
                     </div>
                   </div>
                 </div>

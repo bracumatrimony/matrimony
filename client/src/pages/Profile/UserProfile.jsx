@@ -315,25 +315,26 @@ export default function UserProfile() {
                 </div>
               </div>
 
-              {/* Credits Badge - Show only when monetization is enabled */}
-              {monetizationEnabled && (
-                <div className="text-left sm:text-right w-full sm:w-auto">
-                  <div className="bg-gray-900 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md w-full sm:w-auto">
-                    <div className="flex items-center justify-center space-x-2">
-                      <CreditCard className="h-4 w-4" />
-                      <span className="font-medium text-sm sm:text-base">
-                        {user.credits || 0} Credits
-                      </span>
+              {/* Credits Badge - Show only when monetization is enabled and user is verified */}
+              {monetizationEnabled &&
+                (!user.email.endsWith("@gmail.com") || user.alumniVerified) && (
+                  <div className="text-left sm:text-right w-full sm:w-auto">
+                    <div className="bg-gray-900 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md w-full sm:w-auto">
+                      <div className="flex items-center justify-center space-x-2">
+                        <CreditCard className="h-4 w-4" />
+                        <span className="font-medium text-sm sm:text-base">
+                          {user.credits || 0} Credits
+                        </span>
+                      </div>
                     </div>
+                    <button
+                      onClick={() => navigate("/credits")}
+                      className="mt-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md transition-colors cursor-pointer font-medium text-sm sm:text-base w-full sm:w-auto"
+                    >
+                      Buy more credits
+                    </button>
                   </div>
-                  <button
-                    onClick={() => navigate("/credits")}
-                    className="mt-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md transition-colors cursor-pointer font-medium text-sm sm:text-base w-full sm:w-auto"
-                  >
-                    Buy more credits
-                  </button>
-                </div>
-              )}
+                )}
             </div>
           </div>
         </div>
@@ -695,14 +696,16 @@ export default function UserProfile() {
                       {stats.bookmarkedBy}
                     </span>
                   </div>
-                  {monetizationEnabled && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Contact Unlocks</span>
-                      <span className="text-2xl font-semibold text-gray-900">
-                        {stats.unlockedContacts}
-                      </span>
-                    </div>
-                  )}
+                  {monetizationEnabled &&
+                    (!user.email.endsWith("@gmail.com") ||
+                      user.alumniVerified) && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Contact Unlocks</span>
+                        <span className="text-2xl font-semibold text-gray-900">
+                          {stats.unlockedContacts}
+                        </span>
+                      </div>
+                    )}
                 </div>
               </div>
             </div>
@@ -741,20 +744,22 @@ export default function UserProfile() {
                     </div>
                   </button>
 
-                  {/* Buy Credits button - Show only when monetization is enabled */}
-                  {monetizationEnabled && (
-                    <button
-                      onClick={() => navigate("/credits")}
-                      className="w-full text-left px-4 py-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
-                    >
-                      <div className="font-medium text-gray-900">
-                        Buy Credits
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Unlock more features
-                      </div>
-                    </button>
-                  )}
+                  {/* Buy Credits button - Show only when monetization is enabled and user is verified */}
+                  {monetizationEnabled &&
+                    (!user.email.endsWith("@gmail.com") ||
+                      user.alumniVerified) && (
+                      <button
+                        onClick={() => navigate("/credits")}
+                        className="w-full text-left px-4 py-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
+                      >
+                        <div className="font-medium text-gray-900">
+                          Buy Credits
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Unlock more features
+                        </div>
+                      </button>
+                    )}
                 </div>
               </div>
             </div>

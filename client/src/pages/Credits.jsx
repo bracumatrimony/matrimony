@@ -37,14 +37,24 @@ export default function Credits() {
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
-      setUser(JSON.parse(userData));
-      // Load user profile to check approval status only if user has a profile
       const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+
+      // Check if user should have access to credits
+      if (
+        parsedUser.email.endsWith("@gmail.com") &&
+        !parsedUser.alumniVerified
+      ) {
+        navigate("/");
+        return;
+      }
+
+      // Load user profile to check approval status only if user has a profile
       if (parsedUser?.hasProfile) {
         loadUserProfile();
       }
     }
-  }, []);
+  }, [navigate]);
 
   const loadUserProfile = async () => {
     try {
@@ -63,23 +73,24 @@ export default function Credits() {
     {
       id: 1,
       credits: 1,
-      price: 200,
+      price: 70,
+      originalPrice: 70,
       discount: 0,
       popular: false,
     },
     {
       id: 2,
       credits: 5,
-      price: 800,
-      originalPrice: 1000,
-      discount: 20,
+      price: 299,
+      originalPrice: 350,
+      discount: 15,
       popular: true,
     },
     {
       id: 3,
       credits: 10,
-      price: 1400,
-      originalPrice: 2000,
+      price: 499,
+      originalPrice: 700,
       discount: 30,
       popular: false,
     },
@@ -481,7 +492,7 @@ export default function Credits() {
                     </strong>{" "}
                     to:{" "}
                     <span className="font-mono font-bold text-blue-900">
-                      01712-345678
+                      01622044060
                     </span>
                   </p>
                   <p>2. Note the Transaction ID from bKash</p>

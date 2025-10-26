@@ -12,6 +12,7 @@ import {
   Shield,
   LogOut,
   Package,
+  Eye,
 } from "lucide-react";
 
 export default function Header() {
@@ -83,16 +84,18 @@ export default function Header() {
 
             {user ? (
               <>
-                {/* Conditionally show credits display based on monetization config */}
-                {isMonetizationEnabled && (
-                  <Link
-                    to="/credits"
-                    className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors font-medium no-underline"
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    <span>Credits: {user?.credits || 0}</span>
-                  </Link>
-                )}
+                {/* Conditionally show credits display based on monetization config and user verification */}
+                {isMonetizationEnabled &&
+                  (!user.email.endsWith("@gmail.com") ||
+                    user.alumniVerified) && (
+                    <Link
+                      to="/credits"
+                      className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors font-medium no-underline"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      <span>Credits: {user?.credits || 0}</span>
+                    </Link>
+                  )}
                 <div className="relative group">
                   <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors font-medium bg-white hover:bg-gray-50 px-4 py-2 rounded-md border border-gray-200">
                     {user?.avatar || user?.picture ? (
@@ -129,29 +132,40 @@ export default function Header() {
                         <span>Bookmarks</span>
                       </div>
                     </Link>
-                    {/* Conditionally show transactions and orders links based on monetization config */}
-                    {isMonetizationEnabled && (
-                      <>
-                        <Link
-                          to="/transactions"
-                          className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors no-underline"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <CreditCard className="h-4 w-4" />
-                            <span>Transactions</span>
-                          </div>
-                        </Link>
-                        <Link
-                          to="/orders"
-                          className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors no-underline"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <Package className="h-4 w-4" />
-                            <span>All Orders</span>
-                          </div>
-                        </Link>
-                      </>
-                    )}
+                    {/* Conditionally show credit-related links based on monetization config and user verification */}
+                    {isMonetizationEnabled &&
+                      (!user.email.endsWith("@gmail.com") ||
+                        user.alumniVerified) && (
+                        <>
+                          <Link
+                            to="/my-unlocks"
+                            className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors no-underline"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <Eye className="h-4 w-4" />
+                              <span>My Unlocks</span>
+                            </div>
+                          </Link>
+                          <Link
+                            to="/transactions"
+                            className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors no-underline"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <CreditCard className="h-4 w-4" />
+                              <span>Transactions</span>
+                            </div>
+                          </Link>
+                          <Link
+                            to="/orders"
+                            className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors no-underline"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <Package className="h-4 w-4" />
+                              <span>All Orders</span>
+                            </div>
+                          </Link>
+                        </>
+                      )}
                     {user?.role === "admin" && (
                       <Link
                         to="/admin/dashboard"
@@ -224,17 +238,19 @@ export default function Header() {
                     <User className="h-4 w-4" />
                     <span>My Profile</span>
                   </Link>
-                  {/* Conditionally show credits in mobile menu based on monetization config */}
-                  {isMonetizationEnabled && (
-                    <Link
-                      to="/credits"
-                      className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-white transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <CreditCard className="h-4 w-4" />
-                      <span>Credits: {user?.credits || 0}</span>
-                    </Link>
-                  )}
+                  {/* Conditionally show credits in mobile menu based on monetization config and user verification */}
+                  {isMonetizationEnabled &&
+                    (!user.email.endsWith("@gmail.com") ||
+                      user.alumniVerified) && (
+                      <Link
+                        to="/credits"
+                        className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-white transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        <span>Credits: {user?.credits || 0}</span>
+                      </Link>
+                    )}
                   <Link
                     to="/bookmarks"
                     className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-white transition-colors"
@@ -243,27 +259,29 @@ export default function Header() {
                     <Bookmark className="h-4 w-4" />
                     <span>Bookmarks</span>
                   </Link>
-                  {/* Conditionally show transactions and orders links based on monetization config */}
-                  {monetizationEnabled && (
-                    <>
-                      <Link
-                        to="/transactions"
-                        className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-white transition-colors"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <CreditCard className="h-4 w-4" />
-                        <span>Transactions</span>
-                      </Link>
-                      <Link
-                        to="/orders"
-                        className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-white transition-colors"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <Package className="h-4 w-4" />
-                        <span>All Orders</span>
-                      </Link>
-                    </>
-                  )}
+                  {/* Conditionally show transactions and orders links based on monetization config and user verification */}
+                  {isMonetizationEnabled &&
+                    (!user.email.endsWith("@gmail.com") ||
+                      user.alumniVerified) && (
+                      <>
+                        <Link
+                          to="/transactions"
+                          className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-white transition-colors"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          <CreditCard className="h-4 w-4" />
+                          <span>Transactions</span>
+                        </Link>
+                        <Link
+                          to="/orders"
+                          className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-4 py-2 rounded-md hover:bg-white transition-colors"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          <Package className="h-4 w-4" />
+                          <span>All Orders</span>
+                        </Link>
+                      </>
+                    )}
                   {user?.role === "admin" && (
                     <Link
                       to="/admin/dashboard"

@@ -13,6 +13,10 @@ const profileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    biodataId: {
+      type: String,
+      required: true,
+    },
 
     // Status
     status: {
@@ -497,8 +501,11 @@ profileSchema.index({ partnerEconomicCondition: 1, status: 1 });
 // PERFORMANCE: Compound index for the most common query pattern
 profileSchema.index({ profileId: 1, status: 1 });
 
-// Pre-save middleware to update lastUpdated
+// Pre-save middleware to update lastUpdated and ensure biodataId
 profileSchema.pre("save", function (next) {
+  if (!this.biodataId && this.profileId) {
+    this.biodataId = this.profileId;
+  }
   this.lastUpdated = new Date();
   next();
 });

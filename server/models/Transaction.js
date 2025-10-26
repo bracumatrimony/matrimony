@@ -4,7 +4,7 @@ const transactionSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   type: {
     type: String,
-    enum: ["purchase", "credit_deduction", "credit_addition"],
+    enum: ["purchase", "credit_deduction", "credit_addition", "contact_unlock"],
     required: true,
   },
   status: {
@@ -13,7 +13,7 @@ const transactionSchema = new mongoose.Schema({
     default: "approved", // Default to approved for existing transactions
   },
   amount: { type: Number, required: true },
-  credits: { type: Number, required: true }, // Number of credits being purchased
+  credits: { type: Number }, // Number of credits being purchased (optional for other types)
   price: { type: Number }, // Price paid (for purchases)
   transactionId: { type: String }, // bKash transaction ID
   phoneNumber: { type: String }, // User's phone number for payment

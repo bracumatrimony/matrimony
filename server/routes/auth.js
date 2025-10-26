@@ -104,6 +104,8 @@ router.post("/google", async (req, res) => {
       hasProfile: user.hasProfile,
       role: user.role,
       isGoogleUser: user.isGoogleUser,
+      credits: user.credits,
+      alumniVerified: user.alumniVerified,
       token: token, // Include token in response for cross-domain compatibility
     };
 
@@ -222,6 +224,8 @@ router.post("/google/callback", async (req, res) => {
       hasProfile: user.hasProfile,
       role: user.role,
       isGoogleUser: user.isGoogleUser,
+      credits: user.credits,
+      alumniVerified: user.alumniVerified,
       token: token, // Include token in response for cross-domain compatibility
     };
 

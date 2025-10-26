@@ -202,4 +202,29 @@ router.get("/orders", auth, async (req, res) => {
   }
 });
 
+// @route   GET /api/transactions/history
+// @desc    Get user's transaction history (credit additions and deductions)
+// @access  Private
+router.get("/history", auth, async (req, res) => {
+  try {
+    const transactions = await Transaction.find({
+      user: req.user.id,
+      type: { $in: ["credit_addition", "credit_deduction"] },
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.json({
+      success: true,
+      transactions: transactions,
+    });
+  } catch (error) {
+    console.error("Get transaction history error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get transaction history",
+    });
+  }
+});
+
 module.exports = router;

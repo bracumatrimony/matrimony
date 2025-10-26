@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { monetizationConfig } from "../config/monetization";
 import Transaction from "../components/Transaction";
 import FeatureNotAvailable from "../components/FeatureNotAvailable";
@@ -9,6 +10,7 @@ export default function TransactionsWrapper() {
     monetizationConfig.isEnabled()
   );
   const [isLoading, setIsLoading] = useState(monetizationConfig.isLoading);
+  const navigate = useNavigate();
 
   // Listen for monetization config changes
   useEffect(() => {
@@ -30,6 +32,17 @@ export default function TransactionsWrapper() {
       );
     };
   }, []);
+
+  // Check user access
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const user = JSON.parse(userData);
+      if (user.email.endsWith("@gmail.com") && !user.alumniVerified) {
+        navigate("/");
+      }
+    }
+  }, [navigate]);
 
   // Show loading while config is being fetched
   if (isLoading) {

@@ -284,7 +284,31 @@ class ProfileService {
     }
   }
 
-  // Get biodata statistics
+  // Get all unlocked profiles for the current user
+  async getUnlockedProfiles() {
+    try {
+      const response = await this.makeRequest("/profiles/my-unlocks", {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("Get unlocked profiles error:", error);
+      throw error;
+    }
+  }
+
+  // Get user's transaction history
+  async getTransactionHistory() {
+    try {
+      const response = await this.makeRequest("/transactions/history", {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("Get transaction history error:", error);
+      throw error;
+    }
+  }
   async getStats() {
     try {
       const response = await this.makePublicRequest("/profiles/stats", {

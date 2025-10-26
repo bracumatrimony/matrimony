@@ -32,6 +32,24 @@ class AuthService {
     return !!user;
   }
 
+  // Get fresh user data from server
+  async getCurrentUserFromServer() {
+    try {
+      const response = await this.makeRequest("/auth/me", {
+        method: "GET",
+      });
+      if (response.success) {
+        // Update localStorage with fresh data
+        this.setUserSession(response.user);
+        return response.user;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching current user from server:", error);
+      return null;
+    }
+  }
+
   // Logout user
   async logout() {
     try {

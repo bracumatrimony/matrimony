@@ -113,6 +113,7 @@ router.post(
     const profile = new Profile({
       userId: user._id,
       profileId: user.profileId,
+      biodataId: user.profileId,
       ...req.body,
     });
 
@@ -286,6 +287,70 @@ router.get("/stats", async (req, res) => {
   }
 });
 
+// @route   GET /api/profiles/my-unlocks
+// @desc    Get all profiles that the current user has unlocked
+// @access  Private
+router.get(
+  "/my-unlocks",
+  auth,
+  asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+
+    // Get the user with unlocked contacts
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Check if user can access contact information (BRACU email or alumni verified)
+    if (!canAccessContactInfo(user)) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Access denied. Only BRACU students and verified alumni can view unlocked profiles.",
+      });
+    }
+
+    // If no unlocked contacts, return empty array
+    if (!user.unlockedContacts || user.unlockedContacts.length === 0) {
+      return res.json({
+        success: true,
+        profiles: [],
+        message: "No unlocked profiles found",
+      });
+    }
+
+    // Get all unlocked profiles
+    const profiles = await Profile.find({
+      profileId: { $in: user.unlockedContacts },
+      status: "approved",
+    })
+      .populate("userId", "name")
+      .select("profileId biodataId age location contactInformation createdAt")
+      .lean();
+
+    // Ensure biodataId is set for profiles that don't have it (backwards compatibility)
+    const profilesWithBiodataId = profiles.map((profile) => ({
+      ...profile,
+      biodataId: profile.biodataId || profile.profileId,
+    }));
+
+    // Add unlock timestamp for each profile (simplified approach)
+    const profilesWithUnlockTime = profilesWithBiodataId.map((profile) => ({
+      ...profile,
+      unlockedAt: new Date(), // Use current date as unlock time
+    }));
+
+    res.json({
+      success: true,
+      profiles: profilesWithUnlockTime,
+    });
+  })
+);
+
 // @route   GET /api/profiles/:profileId
 // @desc    Get single profile
 // @access  Public for approved profiles, Private for additional features
@@ -321,6 +386,22 @@ router.get("/:profileId", async (req, res) => {
       .select("-__v"); // Exclude version key
 
     if (!profile) {
+      // Check if profile exists but is pending
+      const pendingProfile = await Profile.findOne({
+        profileId: req.params.profileId,
+        status: "pending_approval",
+      })
+        .select("status")
+        .lean();
+
+      if (pendingProfile) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "This biodata is currently under review and not available for viewing.",
+        });
+      }
+
       return res.status(404).json({
         success: false,
         message: "Profile not found",
@@ -597,19 +678,19 @@ router.post(
       user.unlockedContacts.push(profileId);
       await user.save();
 
-      // Record transaction if monetization is enabled
-      if (monetizationConfig.shouldRecordTransactions()) {
-        const Transaction = require("../models/Transaction");
-        try {
-          await Transaction.create({
-            user: user._id,
-            type: "credit_deduction",
-            amount: 1,
-            description: `Deducted 1 credit for unlocking contact of profile ${profileId}`,
-          });
-        } catch (err) {
-          console.error("Transaction creation failed:", err);
-        }
+      // Record transaction
+      const Transaction = require("../models/Transaction");
+      try {
+        await Transaction.create({
+          user: user._id,
+          type: "credit_deduction",
+          amount: 1,
+          description: `Contact information unlocked for Biodata ${
+            profile.biodataId || profile.profileId
+          }. 1 credit deducted from your account.`,
+        });
+      } catch (err) {
+        console.error("Transaction creation failed:", err);
       }
     } else {
       // Track unlocked profiles without deducting credits (free access mode)
@@ -617,6 +698,21 @@ router.post(
       if (!user.unlockedContacts.includes(profileId)) {
         user.unlockedContacts.push(profileId);
         await user.save();
+      }
+
+      // Still record transaction for tracking purposes
+      const Transaction = require("../models/Transaction");
+      try {
+        await Transaction.create({
+          user: user._id,
+          type: "contact_unlock",
+          amount: 0,
+          description: `Contact information accessed for Biodata ${
+            profile.biodataId || profile.profileId
+          } (free access mode).`,
+        });
+      } catch (err) {
+        console.error("Transaction creation failed:", err);
       }
     }
 

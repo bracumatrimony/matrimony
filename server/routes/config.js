@@ -16,6 +16,7 @@ router.get("/monetization", (req, res) => {
       creditSystemEnabled: config.creditSystem,
       freeAccess: config.freeAccess,
       message: config.message,
+      serverTimestamp: global.SERVER_STARTUP_TIME || Date.now(),
     });
   } catch (error) {
     console.error("Error getting monetization config:", error);
@@ -26,6 +27,7 @@ router.get("/monetization", (req, res) => {
       monetization: "off",
       creditSystemEnabled: false,
       freeAccess: true,
+      serverTimestamp: Date.now(),
     });
   }
 });

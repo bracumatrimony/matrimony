@@ -57,7 +57,7 @@ export default function BiodataView() {
     profileName: "",
   });
 
-  const { user: authUser, updateUser } = useAuth();
+  const { user: authUser, updateUser, refreshUser } = useAuth();
 
   // Check if this is admin view from URL params AND user has admin role
   const currentUser = authService.getCurrentUser();
@@ -217,11 +217,18 @@ export default function BiodataView() {
   const memoizedIsAdminView = useMemo(() => isAdminView, [isAdminView]);
 
   useEffect(() => {
-    loadProfile();
-    // Load user credits
-    if (authUser) {
-      setUserCredits(authUser.credits || 0);
-    }
+    const loadData = async () => {
+      // Refresh user data to ensure we have latest verification status
+      if (authUser) {
+        await refreshUser();
+      }
+      await loadProfile();
+      // Load user credits
+      if (authUser) {
+        setUserCredits(authUser.credits || 0);
+      }
+    };
+    loadData();
   }, [memoizedProfileId, memoizedIsAdminView]);
 
   const loadProfile = useCallback(async () => {
@@ -501,12 +508,13 @@ export default function BiodataView() {
   }
 
   if (error) {
+    const isPending = error.toLowerCase().includes("under review");
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
             <h1 className="text-xl font-semibold text-gray-900 mb-2">
-              Profile Not Found
+              {isPending ? "Biodata Unavailable" : "Profile Not Found"}
             </h1>
             <p className="text-gray-600 mb-4">{error}</p>
             <button

@@ -5,13 +5,12 @@ class MonetizationConfig {
   constructor() {
     // Try to load cached config from localStorage first
     const cachedConfig = this.getCachedConfig();
-    this.mode = cachedConfig || "off"; // Default to off until server config is loaded
-    this.isLoading = !cachedConfig; // Not loading if we have cached config
+    this.mode = cachedConfig ? cachedConfig.mode : "off"; // Default to off until server config is loaded
+    this.serverTimestamp = cachedConfig ? cachedConfig.serverTimestamp : null;
+    this.isLoading = true; // Always loading to check for updates
 
-    // Only load from server if we don't have cached config or it's expired
-    if (!cachedConfig || this.isCacheExpired()) {
-      this.loadServerConfig(); // Load config from server
-    }
+    // Always load from server to check for updates (server restart, env change)
+    this.loadServerConfig(); // Load config from server
   }
 
   // Get cached config from localStorage
@@ -19,8 +18,8 @@ class MonetizationConfig {
     try {
       const cached = localStorage.getItem("monetizationConfig");
       if (cached) {
-        const { mode, timestamp } = JSON.parse(cached);
-        return mode;
+        const { mode, timestamp, serverTimestamp } = JSON.parse(cached);
+        return { mode, timestamp, serverTimestamp };
       }
     } catch (error) {
       console.warn("Failed to load cached monetization config:", error);
@@ -28,14 +27,14 @@ class MonetizationConfig {
     return null;
   }
 
-  // Check if cache is expired (1 hour)
+  // Check if cache is expired (5 minutes instead of 1 hour for faster updates)
   isCacheExpired() {
     try {
       const cached = localStorage.getItem("monetizationConfig");
       if (cached) {
         const { timestamp } = JSON.parse(cached);
-        const oneHour = 60 * 60 * 1000;
-        return Date.now() - timestamp > oneHour;
+        const fiveMinutes = 5 * 60 * 1000; // Reduced from 1 hour to 5 minutes
+        return Date.now() - timestamp > fiveMinutes;
       }
     } catch (error) {
       return true;
@@ -44,17 +43,34 @@ class MonetizationConfig {
   }
 
   // Save config to localStorage
-  saveToCache(mode) {
+  saveToCache(mode, serverTimestamp) {
     try {
       localStorage.setItem(
         "monetizationConfig",
         JSON.stringify({
           mode,
           timestamp: Date.now(),
+          serverTimestamp,
         })
       );
     } catch (error) {
       console.warn("Failed to cache monetization config:", error);
+    }
+  }
+
+  // Force refresh configuration from server
+  async forceRefresh() {
+    try {
+      this.isLoading = true;
+      // Clear cache to force fresh load
+      localStorage.removeItem("monetizationConfig");
+      this.serverTimestamp = null;
+
+      await this.loadServerConfig();
+      return this.mode;
+    } catch (error) {
+      console.error("Failed to force refresh monetization config:", error);
+      return this.mode;
     }
   }
 
@@ -68,19 +84,31 @@ class MonetizationConfig {
       const data = await response.json();
 
       if (data.success) {
-        this.mode = data.monetization;
-        this.isLoading = false;
+        // Check if server has newer config (server restarted) or mode changed
+        const shouldUpdate =
+          !this.serverTimestamp ||
+          data.serverTimestamp > this.serverTimestamp ||
+          this.mode !== data.monetization;
 
-        // Save to cache
-        this.saveToCache(this.mode);
+        if (shouldUpdate) {
+          const oldMode = this.mode;
+          this.mode = data.monetization;
+          this.serverTimestamp = data.serverTimestamp;
+          this.isLoading = false;
 
-        // Trigger re-render for any listening components
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(
-            new CustomEvent("monetizationConfigChanged", {
-              detail: { mode: this.mode },
-            })
-          );
+          // Save to cache
+          this.saveToCache(this.mode, this.serverTimestamp);
+
+          // Trigger re-render for any listening components only if mode changed
+          if (typeof window !== "undefined" && oldMode !== this.mode) {
+            window.dispatchEvent(
+              new CustomEvent("monetizationConfigChanged", {
+                detail: { mode: this.mode },
+              })
+            );
+          }
+        } else {
+          this.isLoading = false;
         }
       }
     } catch (error) {

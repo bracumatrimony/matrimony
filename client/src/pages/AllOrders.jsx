@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
-import {
-  CheckCircle,
-  Clock,
-  XCircle,
-  CreditCard,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
 import profileService from "../services/profileService";
 import { SectionSpinner } from "../components/LoadingSpinner";
 import { useAuth } from "../contexts/AuthContext";
@@ -17,9 +11,15 @@ export default function AllOrders() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const { refreshUser } = useAuth();
+  const { user, refreshUser } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (user && user.email.endsWith("@gmail.com") && !user.alumniVerified) {
+      navigate("/");
+      return;
+    }
+
     const fetchOrders = async () => {
       try {
         // Refresh user data to ensure latest credits are shown in header
@@ -33,20 +33,7 @@ export default function AllOrders() {
       }
     };
     fetchOrders();
-  }, [refreshUser]);
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "approved":
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "pending":
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      case "rejected":
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      default:
-        return <Clock className="h-5 w-5 text-gray-500" />;
-    }
-  };
+  }, [user, refreshUser, navigate]);
 
   const getStatusText = (status) => {
     switch (status) {
@@ -119,17 +106,19 @@ export default function AllOrders() {
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">All Orders</h1>
-          <p className="text-gray-600">
-            View the status of your credit purchase orders
-          </p>
+          <div className="bg-gradient-to-r from-gray-800 to-black rounded-lg p-6 text-white shadow-lg">
+            <h1 className="text-3xl font-bold mb-2">All Orders</h1>
+            <p className="text-gray-100">
+              View the status of your credit purchase orders
+            </p>
+          </div>
         </div>
 
         {/* Orders List */}
-        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
           {orders.length === 0 ? (
             <div className="text-center py-12">
-              <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <CreditCard className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
                 No orders found
               </h3>
@@ -138,89 +127,117 @@ export default function AllOrders() {
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
-              {currentOrders.map((order) => (
-                <div key={order._id} className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3 flex-1">
-                      {getStatusIcon(order.status)}
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="text-base font-semibold text-gray-900">
-                              {order.credits} Credit
-                              {order.credits > 1 ? "s" : ""} - ৳{order.price}
-                            </h3>
-                            <p className="text-sm text-gray-500">
-                              Order #{order._id.slice(-8)}
-                            </p>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gradient-to-r from-gray-800 to-black">
+                  <tr>
+                    <th className="py-4 px-4 md:px-6 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="py-4 px-4 md:px-6 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                      Order Details
+                    </th>
+                    <th className="py-4 px-4 md:px-6 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                      Transaction Info
+                    </th>
+                    <th className="py-4 px-4 md:px-6 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {currentOrders.map((order, index) => {
+                    const rowBgColor =
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50";
+                    return (
+                      <tr
+                        key={order._id}
+                        className={`${rowBgColor} hover:bg-blue-50 transition-colors duration-150`}
+                      >
+                        <td className="py-4 px-4 md:px-6 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div
+                              className={`w-2 h-2 rounded-full mr-3 ${
+                                order.status === "approved"
+                                  ? "bg-green-500"
+                                  : order.status === "pending"
+                                  ? "bg-yellow-500"
+                                  : order.status === "rejected"
+                                  ? "bg-red-500"
+                                  : "bg-gray-500"
+                              }`}
+                            ></div>
+                            <div
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                                order.status
+                              )}`}
+                            >
+                              {getStatusText(order.status)}
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-600">
-                          <span>
-                            <span className="font-medium">Txn ID:</span>{" "}
-                            {order.transactionId}
-                          </span>
-                          <span>
-                            <span className="font-medium">Phone:</span>{" "}
-                            {order.phoneNumber}
-                          </span>
-                          <span>
-                            <span className="font-medium">Submitted:</span>{" "}
-                            {new Date(order.createdAt).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              }
-                            )}
-                          </span>
-                          {order.processedAt && (
-                            <span>
-                              <span className="font-medium">Processed:</span>{" "}
-                              {new Date(order.processedAt).toLocaleDateString(
-                                "en-US",
+                        </td>
+                        <td className="py-4 px-4 md:px-6">
+                          <div className="text-sm font-medium text-gray-900">
+                            {order.credits} Credit{order.credits > 1 ? "s" : ""}{" "}
+                            - ৳{order.price}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Order #{order._id.slice(-8)}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 md:px-6">
+                          <div className="text-sm text-gray-600 space-y-1">
+                            <div>
+                              <span className="font-medium">Txn ID:</span>{" "}
+                              {order.transactionId}
+                            </div>
+                            <div>
+                              <span className="font-medium">Phone:</span>{" "}
+                              {order.phoneNumber}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 md:px-6 whitespace-nowrap text-sm text-gray-500">
+                          <div className="md:hidden">
+                            <div className="font-medium">
+                              {new Date(order.createdAt).toLocaleDateString()}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {new Date(order.createdAt).toLocaleTimeString(
+                                [],
                                 {
-                                  month: "short",
-                                  day: "numeric",
                                   hour: "2-digit",
                                   minute: "2-digit",
                                 }
                               )}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end space-y-1">
-                      <div
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                          order.status
-                        )}`}
-                      >
-                        {getStatusText(order.status)}
-                      </div>
-                      {order.status === "pending" && (
-                        <p className="text-xs text-yellow-700 bg-yellow-50 px-2 py-1 rounded">
-                          Under review
-                        </p>
-                      )}
-                      {order.status === "approved" && (
-                        <p className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded">
-                          Credits added
-                        </p>
-                      )}
-                      {order.status === "rejected" && (
-                        <p className="text-xs text-red-700 bg-red-50 px-2 py-1 rounded">
-                          Rejected
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                            </div>
+                            {order.processedAt && (
+                              <div className="text-xs text-gray-400 mt-1">
+                                Processed:{" "}
+                                {new Date(
+                                  order.processedAt
+                                ).toLocaleDateString()}
+                              </div>
+                            )}
+                          </div>
+                          <div className="hidden md:block">
+                            <div>
+                              Submitted:{" "}
+                              {new Date(order.createdAt).toLocaleString()}
+                            </div>
+                            {order.processedAt && (
+                              <div className="text-xs text-gray-400 mt-1">
+                                Processed:{" "}
+                                {new Date(order.processedAt).toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

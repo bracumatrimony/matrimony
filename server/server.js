@@ -10,6 +10,9 @@ const { errorHandler, notFound } = require("./middleware/errorHandler");
 // Load environment variables
 dotenv.config();
 
+// Server startup timestamp for cache invalidation
+global.SERVER_STARTUP_TIME = Date.now();
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -111,7 +114,6 @@ app.use((req, res, next) => {
   res.setHeader("X-XSS-Protection", "1; mode=block");
   next();
 });
-// ...existing code...
 
 // Serve static files from client's public directory
 const path = require("path");

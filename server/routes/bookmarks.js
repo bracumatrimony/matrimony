@@ -117,10 +117,24 @@ router.get(
     const limit = Math.max(1, parseInt(req.query.limit) || 9);
     const skip = (page - 1) * limit;
 
-    // Get total count for pagination info
-    const totalBookmarks = await Bookmark.countDocuments({
-      userId: req.user.id,
-    });
+    // Get total count for pagination info (only count bookmarks with approved profiles)
+    const totalBookmarksResult = await Bookmark.aggregate([
+      { $match: { userId: req.user.id } },
+      {
+        $lookup: {
+          from: "profiles",
+          localField: "profileId",
+          foreignField: "profileId",
+          as: "profile",
+        },
+      },
+      { $unwind: "$profile" },
+      { $match: { "profile.status": "approved" } },
+      { $count: "total" },
+    ]);
+
+    const totalBookmarks =
+      totalBookmarksResult.length > 0 ? totalBookmarksResult[0].total : 0;
 
     // Get paginated bookmarks using aggregation
     const bookmarks = await Bookmark.aggregate([
@@ -132,11 +146,12 @@ router.get(
         $lookup: {
           from: "profiles",
           localField: "profileId",
-          foreignField: "_id",
+          foreignField: "profileId",
           as: "profile",
         },
       },
       { $unwind: "$profile" },
+      { $match: { "profile.status": "approved" } },
       {
         $lookup: {
           from: "users",
@@ -154,6 +169,12 @@ router.get(
           createdAt: 1,
           "profile._id": 1,
           "profile.profileId": 1,
+          "profile.biodataId": 1,
+          "profile.age": 1,
+          "profile.presentAddressDistrict": 1,
+          "profile.presentAddressDivision": 1,
+          "profile.graduationSubject": 1,
+          "profile.profession": 1,
           "profile.userId._id": 1,
           "profile.userId.name": 1,
           "profile.userId.email": 1,
