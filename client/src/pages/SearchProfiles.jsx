@@ -184,52 +184,13 @@ export default function SearchProfiles() {
         keywords="search profiles, find matches, BRACU matrimony search, biodata search"
       />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col">
-        {/* Mobile Search Bar */}
-        <div className="block lg:hidden px-4 py-4 bg-white border-b border-slate-200">
-          <div className="flex gap-3">
-            <div className="relative group flex-1">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 h-5 w-5 transition-colors" />
-              <input
-                type="text"
-                placeholder="Search by name, profession, or interests..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm bg-slate-50 focus:bg-white shadow-sm"
-              />
-            </div>
-            <button
-              onClick={() => setIsFilterOpen(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
-            >
-              <Filter className="h-4 w-4" />
-              <span className="text-sm font-medium hidden sm:inline">
-                Filters
-              </span>
-            </button>
-          </div>
-        </div>
-
         <div className="flex flex-1 min-h-0">
           {/* Sidebar - Search and Filters (Desktop) */}
           <div className="hidden lg:flex w-80 bg-white border-r border-slate-200 min-h-full flex-col shadow-lg">
-            {/* Search Bar */}
-            <div className="p-6 border-b border-slate-100 bg-slate-50">
-              <div className="relative group">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 h-5 w-5 transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Search by name, profession, or interests..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm bg-white shadow-sm"
-                />
-              </div>
-            </div>
-
             {/* Filters */}
             <div className="p-6 flex-1 bg-white">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-serif font-semibold text-slate-800">
+                <h3 className="text-lg font-medium text-slate-800">
                   Refine Your Search
                 </h3>
                 <button
@@ -370,7 +331,7 @@ export default function SearchProfiles() {
               <div className="fixed inset-y-0 left-0 w-80 bg-white z-50 lg:hidden flex flex-col shadow-2xl border-r border-slate-200">
                 {/* Drawer Header */}
                 <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-slate-50">
-                  <h2 className="text-xl font-serif font-semibold text-slate-800">
+                  <h2 className="text-xl font-medium text-slate-800">
                     Refine Your Search
                   </h2>
                   <button
@@ -383,20 +344,6 @@ export default function SearchProfiles() {
 
                 {/* Drawer Content */}
                 <div className="flex-1 overflow-y-auto">
-                  {/* Search Bar in Drawer */}
-                  <div className="p-6 border-b border-slate-100">
-                    <div className="relative group">
-                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600 h-5 w-5 transition-colors" />
-                      <input
-                        type="text"
-                        placeholder="Search by name, profession, or interests..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-sm bg-white shadow-sm"
-                      />
-                    </div>
-                  </div>
-
                   {/* Filters */}
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
