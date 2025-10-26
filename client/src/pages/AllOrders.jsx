@@ -8,6 +8,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import profileService from "../services/profileService";
+import { SectionSpinner } from "../components/LoadingSpinner";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function AllOrders() {
@@ -94,7 +95,7 @@ export default function AllOrders() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex justify-center items-center min-h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500"></div>
+            <SectionSpinner text="Loading orders..." />
           </div>
         </div>
       </div>

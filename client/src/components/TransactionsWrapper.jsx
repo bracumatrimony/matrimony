@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { monetizationConfig } from "../config/monetization";
 import Transaction from "../components/Transaction";
 import FeatureNotAvailable from "../components/FeatureNotAvailable";
+import { PageSpinner } from "../components/LoadingSpinner";
 
 export default function TransactionsWrapper() {
   const [monetizationEnabled, setMonetizationEnabled] = useState(
@@ -32,11 +33,7 @@ export default function TransactionsWrapper() {
 
   // Show loading while config is being fetched
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500"></div>
-      </div>
-    );
+    return <PageSpinner text="Loading..." />;
   }
 
   // Show 404 if monetization is disabled
