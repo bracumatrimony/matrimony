@@ -9,7 +9,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { ButtonSpinner } from "../components/LoadingSpinner";
+import { ButtonSpinner, SectionSpinner } from "../components/LoadingSpinner";
 import profileService from "../services/profileService";
 
 export default function Credits() {
@@ -17,6 +17,7 @@ export default function Credits() {
   const [userProfile, setUserProfile] = useState(null);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [openFAQ, setOpenFAQ] = useState({});
   const [transactionId, setTransactionId] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -35,25 +36,31 @@ export default function Credits() {
   }, [showSuccessAnimation, navigate]);
 
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
+    const initializeComponent = async () => {
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
 
-      // Check if user should have access to credits
-      if (
-        parsedUser.email.endsWith("@gmail.com") &&
-        !parsedUser.alumniVerified
-      ) {
-        navigate("/");
-        return;
-      }
+        // Check if user should have access to credits
+        if (
+          parsedUser.email.endsWith("@gmail.com") &&
+          !parsedUser.alumniVerified
+        ) {
+          navigate("/");
+          setLoading(false);
+          return;
+        }
 
-      // Load user profile to check approval status only if user has a profile
-      if (parsedUser?.hasProfile) {
-        loadUserProfile();
+        // Load user profile to check approval status only if user has a profile
+        if (parsedUser?.hasProfile) {
+          await loadUserProfile();
+        }
       }
-    }
+      setLoading(false);
+    };
+
+    initializeComponent();
   }, [navigate]);
 
   const loadUserProfile = async () => {
@@ -146,6 +153,18 @@ export default function Credits() {
       setIsLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex justify-center items-center min-h-64">
+            <SectionSpinner text="Loading credits..." />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
