@@ -9,7 +9,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { ButtonSpinner, SectionSpinner } from "../components/LoadingSpinner";
+import { ButtonSpinner } from "../components/LoadingSpinner";
 import profileService from "../services/profileService";
 
 export default function Credits() {
@@ -17,7 +17,7 @@ export default function Credits() {
   const [userProfile, setUserProfile] = useState(null);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [openFAQ, setOpenFAQ] = useState({});
   const [transactionId, setTransactionId] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -48,7 +48,6 @@ export default function Credits() {
           !parsedUser.alumniVerified
         ) {
           navigate("/");
-          setLoading(false);
           return;
         }
 
@@ -57,7 +56,6 @@ export default function Credits() {
           await loadUserProfile();
         }
       }
-      setLoading(false);
     };
 
     initializeComponent();
@@ -153,18 +151,6 @@ export default function Credits() {
       setIsLoading(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex justify-center items-center min-h-64">
-            <SectionSpinner text="Loading credits..." />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">

@@ -1,14 +1,3 @@
-// Removed unused React import for performance
-
-/**
- * Centralized Loading Spinner Component
- *
- * @param {string} size - Size of the spinner: 'xs', 'sm', 'md', 'lg', 'xl'
- * @param {string} color - Color theme: 'rose', 'indigo', 'gray', 'white', 'emerald'
- * @param {string} className - Additional CSS classes
- * @param {string} text - Optional loading text
- * @param {boolean} fullScreen - Whether to display as fullscreen overlay
- */
 const LoadingSpinner = ({
   size = "md",
   color = "rose",
