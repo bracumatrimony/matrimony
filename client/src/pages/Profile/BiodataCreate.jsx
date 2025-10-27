@@ -58,12 +58,12 @@ export default function BiodataCreate() {
 
     // Segment 2: Education & Profession
     educationMedium: "",
+    sscPassingYear: "",
+    sscGroup: "",
+    sscResult: "",
     hscPassingYear: "",
     hscGroup: "",
     hscResult: "",
-    intermediatePassingYear: "",
-    intermediateGroup: "",
-    intermediateResult: "",
     graduationSubject: "",
     educationalInstitution: "",
     currentStudyYear: "",
@@ -108,6 +108,7 @@ export default function BiodataCreate() {
 
     // Contact Information
     contactInformation: "",
+    personalContactInfo: "",
 
     // Gender (added for modal selection)
     gender: "",
@@ -415,12 +416,12 @@ export default function BiodataCreate() {
 
         // Education & Profession
         educationMedium: formData.educationMedium,
+        sscPassingYear: formData.sscPassingYear,
+        sscGroup: formData.sscGroup?.trim() || "",
+        sscResult: formData.sscResult?.trim() || "",
         hscPassingYear: formData.hscPassingYear,
         hscGroup: formData.hscGroup?.trim() || "",
         hscResult: formData.hscResult?.trim() || "",
-        intermediatePassingYear: formData.intermediatePassingYear,
-        intermediateGroup: formData.intermediateGroup?.trim() || "",
-        intermediateResult: formData.intermediateResult?.trim() || "",
         graduationSubject: formData.graduationSubject?.trim() || "",
         educationalInstitution: formData.educationalInstitution?.trim() || "",
         currentStudyYear: formData.currentStudyYear?.trim() || "",
@@ -473,6 +474,7 @@ export default function BiodataCreate() {
 
         // Contact Information
         contactInformation: formData.contactInformation?.trim() || "",
+        personalContactInfo: formData.personalContactInfo?.trim() || "",
 
         // Gender - use the selectedGender parameter to avoid state timing issues
         gender: selectedGender || formData.gender || "",
@@ -913,6 +915,72 @@ export default function BiodataCreate() {
                 )}
               </div>
 
+              {/* SSC Passing Year */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Year of passing SSC/equivalent:
+                </label>
+                <input
+                  type="number"
+                  name="sscPassingYear"
+                  value={formData.sscPassingYear}
+                  onChange={handleChange}
+                  min="1990"
+                  max="2035"
+                  className={`w-full px-3 py-2 border ${
+                    errors.sscPassingYear ? "border-red-300" : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500`}
+                  placeholder="e.g., 2019"
+                />
+                {errors.sscPassingYear && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.sscPassingYear}
+                  </p>
+                )}
+              </div>
+
+              {/* SSC Group */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Group/Department of SSC:
+                </label>
+                <input
+                  type="text"
+                  name="sscGroup"
+                  value={formData.sscGroup}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border ${
+                    errors.sscGroup ? "border-red-300" : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500`}
+                  placeholder="e.g., Science, Commerce, Arts"
+                />
+                {errors.sscGroup && (
+                  <p className="mt-1 text-sm text-red-600">{errors.sscGroup}</p>
+                )}
+              </div>
+
+              {/* SSC Result */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Result/grade of SSC:
+                </label>
+                <input
+                  type="text"
+                  name="sscResult"
+                  value={formData.sscResult}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border ${
+                    errors.sscResult ? "border-red-300" : "border-gray-300"
+                  } rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500`}
+                  placeholder="e.g., GPA 5.00, A+, First Division"
+                />
+                {errors.sscResult && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.sscResult}
+                  </p>
+                )}
+              </div>
+
               {/* HSC Passing Year */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -920,85 +988,11 @@ export default function BiodataCreate() {
                 </label>
                 <input
                   type="number"
-                  name="intermediatePassingYear"
-                  value={formData.intermediatePassingYear}
-                  onChange={handleChange}
-                  min="1990"
-                  max="2030"
-                  className={`w-full px-3 py-2 border ${
-                    errors.intermediatePassingYear
-                      ? "border-red-300"
-                      : "border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500`}
-                  placeholder="e.g., 2019"
-                />
-                {errors.intermediatePassingYear && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.intermediatePassingYear}
-                  </p>
-                )}
-              </div>
-
-              {/* HSC Group */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Group/Department of HSC: *
-                </label>
-                <input
-                  type="text"
-                  name="intermediateGroup"
-                  value={formData.intermediateGroup}
-                  onChange={handleChange}
-                  className={`w-full px-3 py-2 border ${
-                    errors.intermediateGroup
-                      ? "border-red-300"
-                      : "border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500`}
-                  placeholder="e.g., Science, Commerce, Arts"
-                />
-                {errors.intermediateGroup && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.intermediateGroup}
-                  </p>
-                )}
-              </div>
-
-              {/* HSC Result */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Result/grade of HSC: *
-                </label>
-                <input
-                  type="text"
-                  name="intermediateResult"
-                  value={formData.intermediateResult}
-                  onChange={handleChange}
-                  className={`w-full px-3 py-2 border ${
-                    errors.intermediateResult
-                      ? "border-red-300"
-                      : "border-gray-300"
-                  } rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500`}
-                  placeholder="e.g., GPA 5.00, A+, First Division"
-                />
-                {errors.intermediateResult && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.intermediateResult}
-                  </p>
-                )}
-              </div>
-
-              {/* Intermediate Passing Year */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Year of passing SSC/equivalent:
-                </label>
-                <input
-                  type="number"
                   name="hscPassingYear"
                   value={formData.hscPassingYear}
                   onChange={handleChange}
                   min="1990"
-                  max="2035"
+                  max="2030"
                   className={`w-full px-3 py-2 border ${
                     errors.hscPassingYear ? "border-red-300" : "border-gray-300"
                   } rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500`}
@@ -1011,10 +1005,10 @@ export default function BiodataCreate() {
                 )}
               </div>
 
-              {/* Intermediate Group */}
+              {/* HSC Group */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Group/Department of SSC:
+                  Group/Department of HSC: *
                 </label>
                 <input
                   type="text"
@@ -1031,10 +1025,10 @@ export default function BiodataCreate() {
                 )}
               </div>
 
-              {/* Intermediate Result */}
+              {/* HSC Result */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Result/grade of SSC:
+                  Result/grade of HSC: *
                 </label>
                 <input
                   type="text"
@@ -1180,8 +1174,22 @@ export default function BiodataCreate() {
                       ? "border-red-300"
                       : "border-gray-300"
                   } rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500`}
-                  placeholder="Please describe your profession, responsibilities, workplace, etc."
+                  placeholder="Describe your profession, responsibilities, and current activities"
                 />
+                <div className="mt-3 p-4 border border-amber-300 rounded-md bg-amber-50 shadow-sm">
+                  <p className="text-sm text-amber-800 leading-relaxed mb-2">
+                    <span className="font-semibold">Note:</span> This field
+                    appears prominently on your biodata and is one of the first
+                    things potential matches will see when browsing.
+                  </p>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    For professionals: "Senior Software Engineer at tech company
+                    in Dhaka, 5+ years in web development."
+                    <br />
+                    For students: "Final year Computer Science student at BRAC
+                    University, focusing on AI."
+                  </p>
+                </div>
                 {errors.professionDescription && (
                   <p className="mt-1 text-sm text-red-600">
                     {errors.professionDescription}
@@ -1657,8 +1665,7 @@ export default function BiodataCreate() {
               {/* Hobbies, Likes, Dislikes, Dreams */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Please describe your hobbies, likes, dislikes, tastes, and
-                  dreams: *
+                  Tell us about yourself: *
                 </label>
                 <textarea
                   name="hobbiesLikesDislikesDreams"
@@ -1677,6 +1684,17 @@ export default function BiodataCreate() {
                     {errors.hobbiesLikesDislikesDreams}
                   </p>
                 )}
+                <div className="mt-3 p-4 border border-amber-300 rounded-md bg-amber-50 shadow-sm">
+                  <p className="text-sm text-amber-800 leading-relaxed mb-2">
+                    <span className="font-semibold">Note:</span> This section
+                    helps potential matches understand your personality,
+                    interests, and life goals.
+                  </p>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    Share your hobbies, favorite activities, things you dislike,
+                    and your dreams for the future.
+                  </p>
+                </div>
               </div>
 
               {/* Marriage Compatibility Views (Female only) */}
@@ -2136,6 +2154,13 @@ export default function BiodataCreate() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500"
                   placeholder="Describe any specific qualities, characteristics, or requirements you seek in your partner"
                 />
+                <div className="mt-3 p-4 border border-amber-300 rounded-md bg-amber-50 shadow-sm">
+                  <p className="text-sm text-amber-800 leading-relaxed mb-2">
+                    <span className="font-semibold">Compatibility Check:</span>{" "}
+                    This field helps potential matches understand if they are
+                    compatible with your preferences and expectations.
+                  </p>
+                </div>
               </div>
 
               {/* Contact Information */}
@@ -2175,6 +2200,40 @@ export default function BiodataCreate() {
                         visible to other users when they view your profile.
                         Please provide accurate and up-to-date contact details
                         so potential matches can reach out to you easily.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Personal Contact Information */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Personal Contact Information (For Admin Use Only)
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <textarea
+                      name="personalContactInfo"
+                      value={formData.personalContactInfo}
+                      onChange={handleChange}
+                      rows={3}
+                      required
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500 ${
+                        errors.personalContactInfo
+                          ? "border-red-300"
+                          : "border-gray-300"
+                      }`}
+                      placeholder="Your personal phone number and Facebook ID"
+                    />
+                    {errors.personalContactInfo && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.personalContactInfo}
+                      </p>
+                    )}
+                    <div className="mt-2 p-3 bg-yellow-50 border-4 border-black rounded-lg">
+                      <p className="text-sm text-yellow-800">
+                        <strong>Important:</strong> Admin will handle this
+                        information personally and confidentially. It will not
+                        be displayed publicly on your profile or visible to
+                        other users.
                       </p>
                     </div>
                   </div>

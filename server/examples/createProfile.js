@@ -4,8 +4,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Draft = require("../models/Draft");
 
-const MONGO_URI =
-  process.env.MONGODB_URI
+const MONGO_URI = process.env.MONGODB_URI;
 
 // Complete biodata data for testing
 const testPersonalBiodata = {
@@ -35,12 +34,12 @@ const testPersonalBiodata = {
 
   // Education & Profession
   educationMedium: "English",
-  hscPassingYear: 2019,
+  sscPassingYear: 2019,
+  sscGroup: "Science",
+  sscResult: "GPA 5.00 (Golden A+)",
+  hscPassingYear: 2017,
   hscGroup: "Science",
   hscResult: "GPA 5.00 (Golden A+)",
-  intermediatePassingYear: 2017,
-  intermediateGroup: "Science",
-  intermediateResult: "GPA 5.00 (Golden A+)",
   graduationSubject: "Computer Science and Engineering",
   educationalInstitution:
     "BRAC University (BSc in CSE with CGPA 3.95 out of 4.00)",
@@ -158,12 +157,12 @@ async function createTestPersonalProfile() {
 
       // Segment 2: Education & Profession
       educationMedium: testPersonalBiodata.educationMedium,
+      sscPassingYear: testPersonalBiodata.sscPassingYear,
+      sscGroup: testPersonalBiodata.sscGroup,
+      sscResult: testPersonalBiodata.sscResult,
       hscPassingYear: testPersonalBiodata.hscPassingYear,
       hscGroup: testPersonalBiodata.hscGroup,
       hscResult: testPersonalBiodata.hscResult,
-      intermediatePassingYear: testPersonalBiodata.intermediatePassingYear,
-      intermediateGroup: testPersonalBiodata.intermediateGroup,
-      intermediateResult: testPersonalBiodata.intermediateResult,
       graduationSubject: testPersonalBiodata.graduationSubject,
       educationalInstitution: testPersonalBiodata.educationalInstitution,
       currentStudyYear: testPersonalBiodata.currentStudyYear,

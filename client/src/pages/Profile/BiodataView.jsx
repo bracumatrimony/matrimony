@@ -1054,32 +1054,32 @@ export default function BiodataView() {
                   fieldName="educationMedium"
                 />
                 <InfoRow
-                  label="HSC/Equivalent Year"
-                  value={profile?.intermediatePassingYear}
-                  fieldName="intermediatePassingYear"
-                />
-                <InfoRow
-                  label="HSC Group"
-                  value={profile?.intermediateGroup}
-                  fieldName="intermediateGroup"
-                />
-                <InfoRow
-                  label="HSC Result"
-                  value={profile?.intermediateResult}
-                  fieldName="intermediateResult"
-                />
-                <InfoRow
                   label="SSC/Equivalent Year"
+                  value={profile?.sscPassingYear}
+                  fieldName="sscPassingYear"
+                />
+                <InfoRow
+                  label="SSC Group"
+                  value={profile?.sscGroup}
+                  fieldName="sscGroup"
+                />
+                <InfoRow
+                  label="SSC Result"
+                  value={profile?.sscResult}
+                  fieldName="sscResult"
+                />
+                <InfoRow
+                  label="HSC/Equivalent Year"
                   value={profile?.hscPassingYear}
                   fieldName="hscPassingYear"
                 />
                 <InfoRow
-                  label="SSC Group"
+                  label="HSC Group"
                   value={profile?.hscGroup}
                   fieldName="hscGroup"
                 />
                 <InfoRow
-                  label="SSC Result"
+                  label="HSC Result"
                   value={profile?.hscResult}
                   fieldName="hscResult"
                 />
@@ -1144,7 +1144,7 @@ export default function BiodataView() {
                   fieldName="mentalPhysicalIllness"
                 />
                 <InfoRow
-                  label="Hobbies & Interests"
+                  label="Tell us about yourself"
                   value={profile?.hobbiesLikesDislikesDreams}
                   fieldName="hobbiesLikesDislikesDreams"
                 />
@@ -1403,6 +1403,31 @@ export default function BiodataView() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Admin-only Personal Contact Information */}
+            {currentUser?.isAdmin && profile?.personalContactInfo && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Shield className="w-5 h-5 text-amber-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Private Contact Information
+                  </h3>
+                </div>
+                <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4 border border-amber-200">
+                  <div className="flex items-start gap-3">
+                    <Shield className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-amber-800 mb-2">
+                        Admin Only - Not visible to regular users
+                      </p>
+                      <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                        {profile.personalContactInfo}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 

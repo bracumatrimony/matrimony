@@ -1170,9 +1170,35 @@ export default function BiodataEdit() {
                 validationErrors={validationErrors}
               />
               <EditableField
+                label="SSC/Equivalent Year"
+                name="sscPassingYear"
+                value={formData.sscPassingYear}
+                type="number"
+                placeholder="SSC passing year"
+                handleChange={handleChange}
+                validationErrors={validationErrors}
+              />
+              <EditableField
+                label="SSC Group"
+                name="sscGroup"
+                value={formData.sscGroup}
+                type="select"
+                options={["Science", "Business Studies", "Humanities"]}
+                handleChange={handleChange}
+                validationErrors={validationErrors}
+              />
+              <EditableField
+                label="SSC Result"
+                name="sscResult"
+                value={formData.sscResult}
+                placeholder="e.g., GPA 5.00"
+                handleChange={handleChange}
+                validationErrors={validationErrors}
+              />
+              <EditableField
                 label="HSC/Equivalent Year"
-                name="intermediatePassingYear"
-                value={formData.intermediatePassingYear}
+                name="hscPassingYear"
+                value={formData.hscPassingYear}
                 type="number"
                 placeholder="HSC passing year"
                 required={true}
@@ -1181,8 +1207,8 @@ export default function BiodataEdit() {
               />
               <EditableField
                 label="HSC Group"
-                name="intermediateGroup"
-                value={formData.intermediateGroup}
+                name="hscGroup"
+                value={formData.hscGroup}
                 type="select"
                 options={["Science", "Business Studies", "Humanities"]}
                 required={true}
@@ -1191,36 +1217,10 @@ export default function BiodataEdit() {
               />
               <EditableField
                 label="HSC Result"
-                name="intermediateResult"
-                value={formData.intermediateResult}
-                placeholder="e.g., GPA 5.00"
-                required={true}
-                handleChange={handleChange}
-                validationErrors={validationErrors}
-              />
-              <EditableField
-                label="SSC/Equivalent Year"
-                name="hscPassingYear"
-                value={formData.hscPassingYear}
-                type="number"
-                placeholder="SSC passing year"
-                handleChange={handleChange}
-                validationErrors={validationErrors}
-              />
-              <EditableField
-                label="SSC Group"
-                name="hscGroup"
-                value={formData.hscGroup}
-                type="select"
-                options={["Science", "Business Studies", "Humanities"]}
-                handleChange={handleChange}
-                validationErrors={validationErrors}
-              />
-              <EditableField
-                label="SSC Result"
                 name="hscResult"
                 value={formData.hscResult}
                 placeholder="e.g., GPA 5.00"
+                required={true}
                 handleChange={handleChange}
                 validationErrors={validationErrors}
               />
@@ -1341,7 +1341,7 @@ export default function BiodataEdit() {
                 validationErrors={validationErrors}
               />
               <EditableField
-                label="Hobbies & Interests"
+                label="Tell us about yourself"
                 name="hobbiesLikesDislikesDreams"
                 value={formData.hobbiesLikesDislikesDreams}
                 type="textarea"
@@ -1560,6 +1560,19 @@ export default function BiodataEdit() {
                 handleChange={handleChange}
                 validationErrors={validationErrors}
               />
+              {isAdmin && (
+                <EditableField
+                  label="Private Contact Information"
+                  name="personalContactInfo"
+                  value={formData.personalContactInfo}
+                  type="textarea"
+                  rows={3}
+                  placeholder="Admin-only private contact details (not visible to regular users)"
+                  handleChange={handleChange}
+                  validationErrors={validationErrors}
+                  className="border-amber-200 bg-amber-50"
+                />
+              )}
             </div>
           </div>
 

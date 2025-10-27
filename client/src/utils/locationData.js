@@ -11,7 +11,7 @@ export const divisions = [
   { value: "Sylhet", label: "Sylhet Division" },
   { value: "Rangpur", label: "Rangpur Division" },
   { value: "Mymensingh", label: "Mymensingh Division" },
-  { value: "International", label: "International" },
+  { value: "International", label: "Outside Bangladesh" },
 ];
 
 export const getDistrictsByDivision = async () => {
@@ -28,14 +28,14 @@ export const locationsByDivision = {
     { value: "", label: "Select District/Region" },
     { value: "Any", label: "Any District/Region" },
   ],
-  "Dhaka Division": districtsByDivision.Dhaka,
-  "Chittagong Division": districtsByDivision.Chittagong,
-  "Rajshahi Division": districtsByDivision.Rajshahi,
-  "Khulna Division": districtsByDivision.Khulna,
-  "Barisal Division": districtsByDivision.Barisal,
-  "Sylhet Division": districtsByDivision.Sylhet,
-  "Rangpur Division": districtsByDivision.Rangpur,
-  "Mymensingh Division": districtsByDivision.Mymensingh,
+  Dhaka: districtsByDivision.Dhaka,
+  Chittagong: districtsByDivision.Chittagong,
+  Rajshahi: districtsByDivision.Rajshahi,
+  Khulna: districtsByDivision.Khulna,
+  Barisal: districtsByDivision.Barisal,
+  Sylhet: districtsByDivision.Sylhet,
+  Rangpur: districtsByDivision.Rangpur,
+  Mymensingh: districtsByDivision.Mymensingh,
   International: districtsByDivision.International,
 };
 

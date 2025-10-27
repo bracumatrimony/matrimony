@@ -139,11 +139,24 @@ const profileSchema = new mongoose.Schema(
       },
       required: [true, "Education medium is required"],
     },
+    sscPassingYear: {
+      type: Number,
+      min: [1990, "SSC passing year must be after 1990"],
+      max: [2035, "SSC passing year cannot be after 2035"],
+    },
+    sscGroup: {
+      type: String,
+      trim: true,
+    },
+    sscResult: {
+      type: String,
+      trim: true,
+    },
     hscPassingYear: {
       type: Number,
       required: [true, "HSC passing year is required"],
       min: [1990, "HSC passing year must be after 1990"],
-      max: [2035, "HSC passing year cannot be after 2035"],
+      max: [2030, "HSC passing year cannot be after 2030"],
     },
     hscGroup: {
       type: String,
@@ -153,19 +166,6 @@ const profileSchema = new mongoose.Schema(
     hscResult: {
       type: String,
       required: [true, "HSC result is required"],
-      trim: true,
-    },
-    intermediatePassingYear: {
-      type: Number,
-      min: [1990, "Intermediate passing year must be after 1990"],
-      max: [2030, "Intermediate passing year cannot be after 2030"],
-    },
-    intermediateGroup: {
-      type: String,
-      trim: true,
-    },
-    intermediateResult: {
-      type: String,
       trim: true,
     },
     graduationSubject: {
@@ -440,6 +440,21 @@ const profileSchema = new mongoose.Schema(
         },
         message:
           "Contact information must be between 10-500 characters when provided",
+      },
+    },
+    personalContactInfo: {
+      type: String,
+      required: true,
+      default: "",
+      trim: true,
+      validate: {
+        validator: function (value) {
+          // Required field - must be provided and valid
+          if (!value || value.trim() === "") return false; // Not empty
+          return value.trim().length >= 5 && value.trim().length <= 1000;
+        },
+        message:
+          "Personal contact information must be between 5-1000 characters",
       },
     },
 

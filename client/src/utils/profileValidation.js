@@ -49,22 +49,18 @@ export const validateProfileData = (formData) => {
     errors.educationMedium = "Education medium is required";
   }
 
-  if (!formData.intermediatePassingYear) {
-    errors.intermediatePassingYear = "HSC passing year is required";
-  } else if (
-    formData.intermediatePassingYear < 1990 ||
-    formData.intermediatePassingYear > 2030
-  ) {
-    errors.intermediatePassingYear =
-      "HSC passing year must be between 1990 and 2030";
+  if (!formData.hscPassingYear) {
+    errors.hscPassingYear = "HSC passing year is required";
+  } else if (formData.hscPassingYear < 1990 || formData.hscPassingYear > 2030) {
+    errors.hscPassingYear = "HSC passing year must be between 1990 and 2030";
   }
 
-  if (!formData.intermediateGroup?.trim()) {
-    errors.intermediateGroup = "HSC group is required";
+  if (!formData.hscGroup?.trim()) {
+    errors.hscGroup = "HSC group is required";
   }
 
-  if (!formData.intermediateResult?.trim()) {
-    errors.intermediateResult = "HSC result is required";
+  if (!formData.hscResult?.trim()) {
+    errors.hscResult = "HSC result is required";
   }
 
   if (!formData.profession?.trim()) {
@@ -208,19 +204,18 @@ export const validateStep = (step, formData) => {
     case 2: // Education & Profession
       if (!formData.educationMedium)
         errors.educationMedium = "Education medium is required";
-      if (!formData.intermediatePassingYear) {
-        errors.intermediatePassingYear = "HSC passing year is required";
+      if (!formData.hscPassingYear) {
+        errors.hscPassingYear = "HSC passing year is required";
       } else if (
-        formData.intermediatePassingYear < 1990 ||
-        formData.intermediatePassingYear > 2030
+        formData.hscPassingYear < 1990 ||
+        formData.hscPassingYear > 2030
       ) {
-        errors.intermediatePassingYear =
+        errors.hscPassingYear =
           "HSC passing year must be between 1990 and 2030";
       }
-      if (!formData.intermediateGroup?.trim())
-        errors.intermediateGroup = "HSC group is required";
-      if (!formData.intermediateResult?.trim())
-        errors.intermediateResult = "HSC result is required";
+      if (!formData.hscGroup?.trim()) errors.hscGroup = "HSC group is required";
+      if (!formData.hscResult?.trim())
+        errors.hscResult = "HSC result is required";
       if (!formData.profession?.trim())
         errors.profession = "Profession is required";
       if (!formData.professionDescription?.trim()) {
@@ -231,6 +226,12 @@ export const validateStep = (step, formData) => {
       break;
 
     case 3: // Lifestyle, Health & Compatibility
+      if (!formData.gender) {
+        errors.gender = "Gender is required";
+      }
+      if (!formData.religion) {
+        errors.religion = "Religion is required";
+      }
       if (!formData.age) {
         errors.age = "Age is required";
       } else if (formData.age < 18 || formData.age > 100) {
@@ -247,9 +248,6 @@ export const validateStep = (step, formData) => {
       }
       if (!formData.maritalStatus) {
         errors.maritalStatus = "Marital status is required";
-      }
-      if (!formData.religion) {
-        errors.religion = "Religion is required";
       }
       if (!formData.presentAddressDivision?.trim()) {
         errors.presentAddressDivision = "Present address division is required";
@@ -341,6 +339,17 @@ export const validateStep = (step, formData) => {
       } else if (formData.contactInformation.trim().length > 500) {
         errors.contactInformation =
           "Contact information cannot exceed 500 characters";
+      }
+
+      // Personal Contact Information validation (required for admins)
+      if (!formData.personalContactInfo?.trim()) {
+        errors.personalContactInfo = "Personal contact information is required";
+      } else if (formData.personalContactInfo.trim().length < 5) {
+        errors.personalContactInfo =
+          "Personal contact information must be at least 5 characters long";
+      } else if (formData.personalContactInfo.trim().length > 1000) {
+        errors.personalContactInfo =
+          "Personal contact information cannot exceed 1000 characters";
       }
       break;
   }

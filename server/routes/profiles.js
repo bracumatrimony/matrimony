@@ -99,6 +99,32 @@ router.post(
       });
     }
 
+    // Validate personalContactInfo (required for admin use)
+    if (
+      !req.body.personalContactInfo ||
+      req.body.personalContactInfo.trim() === ""
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Personal contact information is required",
+      });
+    }
+
+    if (req.body.personalContactInfo.trim().length < 5) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Personal contact information must be at least 5 characters long",
+      });
+    }
+
+    if (req.body.personalContactInfo.trim().length > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: "Personal contact information cannot exceed 1000 characters",
+      });
+    }
+
     // Debug: Log received data
     console.log("Creating profile for user:", user._id);
     console.log("Profile data received:", JSON.stringify(req.body, null, 2));
@@ -177,7 +203,7 @@ router.get("/search", async (req, res) => {
         { profession: searchRegex },
         { presentAddressDistrict: searchRegex },
         { permanentAddressDistrict: searchRegex },
-        { hscGroup: searchRegex },
+        { sscGroup: searchRegex },
         { bracu_department: searchRegex },
       ];
     }
@@ -503,6 +529,34 @@ router.put(
         return res.status(400).json({
           success: false,
           message: "Contact information cannot exceed 500 characters",
+        });
+      }
+    }
+
+    // Validate personalContactInfo if it's being updated (required for admin use)
+    if (req.body.personalContactInfo !== undefined) {
+      if (
+        !req.body.personalContactInfo ||
+        req.body.personalContactInfo.trim() === ""
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Personal contact information is required",
+        });
+      }
+
+      if (req.body.personalContactInfo.trim().length < 5) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Personal contact information must be at least 5 characters long",
+        });
+      }
+
+      if (req.body.personalContactInfo.trim().length > 1000) {
+        return res.status(400).json({
+          success: false,
+          message: "Personal contact information cannot exceed 1000 characters",
         });
       }
     }

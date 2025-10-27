@@ -41,9 +41,9 @@ const maleBiodata = {
 
   // Education & Profession
   educationMedium: "English",
-  hscPassingYear: 2018,
-  hscGroup: "Science",
-  hscResult: "GPA 5.00 (Golden A+)",
+  sscPassingYear: 2018,
+  sscGroup: "Science",
+  sscResult: "GPA 5.00 (Golden A+)",
   graduationSubject: "Computer Science and Engineering",
   educationalInstitution:
     "BRAC University (BSc in CSE with CGPA 3.92 out of 4.00)",
@@ -132,9 +132,9 @@ const femaleBiodata = {
 
   // Education & Profession
   educationMedium: "English",
-  hscPassingYear: 2019,
-  hscGroup: "Science",
-  hscResult: "GPA 5.00 (Golden A+)",
+  sscPassingYear: 2019,
+  sscGroup: "Science",
+  sscResult: "GPA 5.00 (Golden A+)",
   graduationSubject: "Pharmacy",
   educationalInstitution:
     "BRAC University (B.Pharm with CGPA 3.88 out of 4.00)",
@@ -251,6 +251,9 @@ async function createDemoBiodata() {
 
           // Education & Profession
           educationMedium: maleBiodata.educationMedium,
+          sscPassingYear: maleBiodata.sscPassingYear,
+          sscGroup: maleBiodata.sscGroup,
+          sscResult: maleBiodata.sscResult,
           hscPassingYear: maleBiodata.hscPassingYear,
           hscGroup: maleBiodata.hscGroup,
           hscResult: maleBiodata.hscResult,
@@ -364,6 +367,9 @@ async function createDemoBiodata() {
 
           // Education & Profession
           educationMedium: femaleBiodata.educationMedium,
+          sscPassingYear: femaleBiodata.sscPassingYear,
+          sscGroup: femaleBiodata.sscGroup,
+          sscResult: femaleBiodata.sscResult,
           hscPassingYear: femaleBiodata.hscPassingYear,
           hscGroup: femaleBiodata.hscGroup,
           hscResult: femaleBiodata.hscResult,
