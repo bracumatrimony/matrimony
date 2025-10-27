@@ -214,7 +214,7 @@ const Transaction = () => {
         <div className="md:hidden space-y-4">
           {Array.isArray(currentTransactions) &&
           currentTransactions.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-8 text-center">
+            <div className="bg-white rounded-lg shadow-lg border border-black p-8 text-center">
               <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-lg font-medium text-gray-900 mb-2">
                 No transactions found
