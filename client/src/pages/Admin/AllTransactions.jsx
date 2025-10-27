@@ -226,7 +226,9 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
                           </td>
                           <td className="py-4 px-4 md:px-6 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
-                              {transaction.phoneNumber || "N/A"}
+                              {transaction.phoneNumber ||
+                                transaction.user?.phone ||
+                                "N/A"}
                             </div>
                           </td>
                           <td className="py-4 px-4 md:px-6 min-w-[180px]">
@@ -348,7 +350,13 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
                     </div>
                     <div>
                       <span className="font-medium">Phone Number:</span>{" "}
-                      {transaction.phoneNumber || "N/A"}
+                      {transaction.phoneNumber ||
+                        transaction.user?.phone ||
+                        "N/A"}
+                    </div>
+                    <div>
+                      <span className="font-medium">Amount:</span> ৳
+                      {transaction.amount}
                     </div>
                     <div>
                       <span className="font-medium">Credits:</span>{" "}

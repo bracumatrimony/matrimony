@@ -24,6 +24,20 @@ const userSchema = new mongoose.Schema(
         message: "Please enter a valid email address",
       },
     },
+    phone: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: function (phone) {
+          // Optional phone validation - allow empty or valid format
+          return (
+            !phone ||
+            /^[\+]?[1-9][\d]{0,15}$/.test(phone.replace(/[\s\-\(\)]/g, ""))
+          );
+        },
+        message: "Please enter a valid phone number",
+      },
+    },
     password: {
       type: String,
       minLength: [6, "Password must be at least 6 characters long"],

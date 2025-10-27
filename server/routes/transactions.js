@@ -92,7 +92,7 @@ router.get("/all", [auth, adminAuth], async (req, res) => {
     const allTransactions = await Transaction.find({
       status: { $in: ["approved", "rejected"] },
     })
-      .populate("user", "name email")
+      .populate("user", "name email phone")
       .populate("processedBy", "name email")
       .sort({ createdAt: -1 });
 
