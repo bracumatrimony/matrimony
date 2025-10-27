@@ -17,7 +17,6 @@ export default function Credits() {
   const [userProfile, setUserProfile] = useState(null);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [openFAQ, setOpenFAQ] = useState({});
   const [transactionId, setTransactionId] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
