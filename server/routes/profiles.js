@@ -248,7 +248,7 @@ router.get("/search", async (req, res) => {
 
     // Fetch all matching profiles
     const allProfiles = await Profile.find(filters)
-      .select("-privacy -contactInformation -__v")
+      .select("-privacy -contactInformation -personalContactInfo -__v")
       .lean();
 
     // Shuffle the entire result set to ensure all profiles get equal traffic
@@ -445,9 +445,15 @@ router.get("/:profileId", async (req, res) => {
         .catch((err) => console.log("View count update failed:", err));
     }
 
+    // Filter sensitive information for non-admin users
+    const profileResponse = profile.toObject();
+    if (!currentUser || currentUser.role !== "admin") {
+      delete profileResponse.personalContactInfo;
+    }
+
     res.json({
       success: true,
-      profile,
+      profile: profileResponse,
       isAuthenticated: !!currentUser,
     });
   } catch (error) {
