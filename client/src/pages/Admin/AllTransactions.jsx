@@ -58,6 +58,9 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
               transaction.transactionId
                 ?.toLowerCase()
                 .includes(searchQuery.toLowerCase()) ||
+              transaction.phoneNumber
+                ?.toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
               transaction.status
                 ?.toLowerCase()
                 .includes(searchQuery.toLowerCase())
@@ -126,25 +129,15 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="bg-gradient-to-r from-gray-800 to-black rounded-lg p-6 text-white shadow-lg">
-            <h1 className="text-3xl font-bold mb-2">All Transactions</h1>
-            <p className="text-gray-100">
-              View all approved and rejected transactions
-            </p>
-          </div>
-        </div>
-
         {/* Search Bar */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
           <div className="flex items-center space-x-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search by user name, email, transaction ID, or status..."
+                  placeholder="Search by user name, email, transaction ID, phone number, or status..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -181,6 +174,9 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
                         User & Transaction
                       </th>
                       <th className="py-4 px-4 md:px-6 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                        Phone Number
+                      </th>
+                      <th className="py-4 px-4 md:px-6 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider min-w-[180px]">
                         Details
                       </th>
                       <th className="py-4 px-4 md:px-6 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
@@ -228,7 +224,12 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
                                 `TXN-${transaction._id.slice(-8)}`}
                             </div>
                           </td>
-                          <td className="py-4 px-4 md:px-6">
+                          <td className="py-4 px-4 md:px-6 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">
+                              {transaction.phoneNumber || "N/A"}
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 md:px-6 min-w-[180px]">
                             <div className="text-sm text-gray-600 space-y-1">
                               <div>
                                 <span className="font-medium">Amount:</span> ৳
@@ -237,10 +238,6 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
                               <div>
                                 <span className="font-medium">Credits:</span>{" "}
                                 {transaction.credits}
-                              </div>
-                              <div>
-                                <span className="font-medium">Type:</span>{" "}
-                                {transaction.type.replace("_", " ")}
                               </div>
                             </div>
                           </td>
@@ -350,12 +347,12 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
                         `TXN-${transaction._id.slice(-8)}`}
                     </div>
                     <div>
-                      <span className="font-medium">Credits:</span>{" "}
-                      {transaction.credits}
+                      <span className="font-medium">Phone Number:</span>{" "}
+                      {transaction.phoneNumber || "N/A"}
                     </div>
                     <div>
-                      <span className="font-medium">Type:</span>{" "}
-                      {transaction.type.replace("_", " ")}
+                      <span className="font-medium">Credits:</span>{" "}
+                      {transaction.credits}
                     </div>
                   </div>
                 </div>
