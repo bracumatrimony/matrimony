@@ -340,7 +340,18 @@ router.put(
       }
 
       try {
-        await profile.save();
+        // Use updateOne to bypass validation issues with required fields
+        await Profile.updateOne(
+          { profileId: req.params.profileId },
+          {
+            status: "rejected",
+            rejectionReason: reason,
+            isUnderReview: false,
+            hasEditPending: false,
+            biodataId: profile.biodataId,
+          },
+          { runValidators: false }
+        );
         console.log(`Profile ${profile.profileId} rejected successfully`);
       } catch (saveError) {
         console.error(

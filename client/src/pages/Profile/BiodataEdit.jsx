@@ -1547,8 +1547,7 @@ export default function BiodataEdit() {
             id="contact-info"
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
           >
-            <SectionHeader icon={Contact} title="Contact Information" />
-            <div className="space-y-0">
+            {isAdmin && (
               <EditableField
                 label="Contact Information"
                 name="contactInformation"
@@ -1560,20 +1559,27 @@ export default function BiodataEdit() {
                 handleChange={handleChange}
                 validationErrors={validationErrors}
               />
-              {isAdmin && (
-                <EditableField
-                  label="Private Contact Information"
-                  name="personalContactInfo"
-                  value={formData.personalContactInfo}
-                  type="textarea"
-                  rows={3}
-                  placeholder="Admin-only private contact details (not visible to regular users)"
-                  handleChange={handleChange}
-                  validationErrors={validationErrors}
-                  className="border-amber-200 bg-amber-50"
-                />
-              )}
-            </div>
+            )}
+            <EditableField
+              label={
+                isAdmin
+                  ? "Private Contact Information"
+                  : "Personal Contact Information"
+              }
+              name="personalContactInfo"
+              value={formData.personalContactInfo}
+              type="textarea"
+              rows={3}
+              placeholder={
+                isAdmin
+                  ? "Admin-only private contact details (not visible to regular users)"
+                  : "Private contact details (phone, email, etc. - not visible to other users)"
+              }
+              required={true}
+              handleChange={handleChange}
+              validationErrors={validationErrors}
+              className={isAdmin ? "border-amber-200 bg-amber-50" : ""}
+            />
           </div>
 
           {/* Save Button - Fixed at bottom */}
