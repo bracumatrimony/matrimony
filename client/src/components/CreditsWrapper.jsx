@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { monetizationConfig } from "../config/monetization";
 import Credits from "../pages/Credits";
 import NotFound from "../components/NotFound";
+import { PageSpinner } from "../components/LoadingSpinner";
 
 export default function CreditsWrapper() {
   const [monetizationEnabled, setMonetizationEnabled] = useState(
@@ -18,16 +19,16 @@ export default function CreditsWrapper() {
 
     window.addEventListener("monetizationConfigChanged", handleConfigChange);
 
-    // Initial check - only show loading if config is actually loading
+    // Initial check - only show loading if config is actually still loading and not loaded
     setMonetizationEnabled(monetizationConfig.isEnabled());
-    if (monetizationConfig.isLoading) {
+    if (monetizationConfig.isLoading && !monetizationConfig.isLoaded()) {
       setIsLoading(true);
     }
 
-    // Set a timeout to prevent infinite loading (3 seconds max)
+    // Set a timeout to prevent infinite loading (500ms max)
     const timeout = setTimeout(() => {
       setIsLoading(false);
-    }, 3000);
+    }, 500);
 
     return () => {
       window.removeEventListener(
@@ -40,11 +41,7 @@ export default function CreditsWrapper() {
 
   // Show loading while config is being fetched
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen ">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500"></div>
-      </div>
-    );
+    return <PageSpinner text="Loading credits..." />;
   }
 
   // Show 404 if monetization is disabled

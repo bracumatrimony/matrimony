@@ -139,9 +139,9 @@ class MonetizationConfig {
     return this.isEnabled();
   }
 
-  // Check if monetization routes should be available
-  shouldShowRoutes() {
-    return this.isEnabled();
+  // Check if config has been loaded at least once
+  isLoaded() {
+    return this.serverTimestamp !== null;
   }
 
   // Check if credit UI should be displayed
