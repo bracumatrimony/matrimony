@@ -80,7 +80,16 @@ class MonetizationConfig {
       // Get API URL from environment variable or use default for development
       const apiUrl =
         import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-      const response = await fetch(`${apiUrl}/config/monetization`);
+
+      // Add timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+      const response = await fetch(`${apiUrl}/config/monetization`, {
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
       const data = await response.json();
 
       if (data.success) {

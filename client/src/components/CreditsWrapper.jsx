@@ -7,7 +7,7 @@ export default function CreditsWrapper() {
   const [monetizationEnabled, setMonetizationEnabled] = useState(
     monetizationConfig.isEnabled()
   );
-  const [isLoading, setIsLoading] = useState(monetizationConfig.isLoading);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Listen for monetization config changes
   useEffect(() => {
@@ -18,15 +18,23 @@ export default function CreditsWrapper() {
 
     window.addEventListener("monetizationConfigChanged", handleConfigChange);
 
-    // Initial check
+    // Initial check - only show loading if config is actually loading
     setMonetizationEnabled(monetizationConfig.isEnabled());
-    setIsLoading(monetizationConfig.isLoading);
+    if (monetizationConfig.isLoading) {
+      setIsLoading(true);
+    }
+
+    // Set a timeout to prevent infinite loading (3 seconds max)
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
 
     return () => {
       window.removeEventListener(
         "monetizationConfigChanged",
         handleConfigChange
       );
+      clearTimeout(timeout);
     };
   }, []);
 
