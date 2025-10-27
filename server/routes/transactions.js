@@ -84,7 +84,30 @@ router.get("/pending", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   PUT /api/transactions/:id/approve
+// @route   GET /api/transactions/all
+// @desc    Get all transactions (approved and rejected) for admin
+// @access  Private (Admin only)
+router.get("/all", [auth, adminAuth], async (req, res) => {
+  try {
+    const allTransactions = await Transaction.find({
+      status: { $in: ["approved", "rejected"] },
+    })
+      .populate("user", "name email")
+      .populate("processedBy", "name email")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      transactions: allTransactions,
+    });
+  } catch (error) {
+    console.error("Get all transactions error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get all transactions",
+    });
+  }
+});
 // @desc    Approve a pending transaction and add credits to user
 // @access  Private (Admin only)
 router.put("/:id/approve", [auth, adminAuth], async (req, res) => {

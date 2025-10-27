@@ -36,9 +36,9 @@ router.get("/dashboard", [auth, adminAuth], async (req, res) => {
 
     const activeUsers = await User.countDocuments({ isActive: true });
 
-    // Calculate total revenue from transactions
+    // Calculate total revenue from approved purchase transactions
     const revenueResult = await Transaction.aggregate([
-      { $match: { status: "completed" } },
+      { $match: { status: "approved", type: "purchase" } },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
     const totalRevenue = revenueResult.length > 0 ? revenueResult[0].total : 0;

@@ -163,6 +163,11 @@ class AdminService {
     return this.makeRequest("/transactions/pending");
   }
 
+  // Get all transactions (approved and rejected)
+  async getAllTransactions() {
+    return this.makeRequest("/transactions/all");
+  }
+
   // Approve transaction
   async approveTransaction(transactionId) {
     return this.makeRequest(`/transactions/${transactionId}/approve`, {

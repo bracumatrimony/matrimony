@@ -30,6 +30,8 @@ import AllUsers from "./AllUsers";
 import AllBiodata from "./AllBiodata";
 import Reports from "./Reports";
 import VerificationRequests from "./VerificationRequests";
+import PendingTransactions from "./PendingTransactions";
+import AllTransactions from "./AllTransactions";
 import { monetizationConfig } from "../../config/monetization";
 import "../../styles/admin.css";
 
@@ -47,7 +49,6 @@ export default function AdminDashboard() {
   });
   const [pendingProfiles, setPendingProfiles] = useState([]);
   const [reports, setReports] = useState([]);
-  const [pendingTransactions, setPendingTransactions] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
@@ -56,7 +57,6 @@ export default function AdminDashboard() {
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
   const [reportsLoaded, setReportsLoaded] = useState(false);
-  const [transactionsLoaded, setTransactionsLoaded] = useState(false);
   const [monetizationStatus, setMonetizationStatus] = useState(
     monetizationConfig.isEnabled() ? "ON" : "OFF"
   );
@@ -73,13 +73,6 @@ export default function AdminDashboard() {
     }
   }, [activeTab, reportsLoaded]);
 
-  // Load transactions when transactions tab becomes active
-  useEffect(() => {
-    if (activeTab === "transactions" && !transactionsLoaded) {
-      loadPendingTransactions();
-    }
-  }, [activeTab, transactionsLoaded]);
-
   // Listen for monetization config changes
   useEffect(() => {
     const handleConfigChange = () => {
@@ -95,6 +88,18 @@ export default function AdminDashboard() {
       );
     };
   }, []);
+
+  const refreshMonetizationConfig = async () => {
+    try {
+      await monetizationConfig.forceRefresh();
+      // Reload dashboard data to reflect any changes
+      await loadDashboardData();
+      showNotification("Monetization config refreshed successfully", "success");
+    } catch (error) {
+      console.error("Failed to refresh monetization config:", error);
+      showNotification("Failed to refresh monetization config", "error");
+    }
+  };
 
   const loadDashboardData = async () => {
     try {
@@ -121,19 +126,6 @@ export default function AdminDashboard() {
       setError("Failed to load dashboard data. Please refresh the page.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadPendingTransactions = async () => {
-    try {
-      const transactionsData = await adminService.getPendingTransactions();
-      if (transactionsData.success) {
-        setPendingTransactions(transactionsData.transactions);
-        setTransactionsLoaded(true);
-      }
-    } catch (error) {
-      console.error("Failed to load pending transactions:", error);
-      showNotification?.("Failed to load pending transactions.", "error");
     }
   };
 
@@ -179,57 +171,6 @@ export default function AdminDashboard() {
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 5000);
-  };
-
-  const refreshMonetizationConfig = async () => {
-    try {
-      await monetizationConfig.forceRefresh();
-      setMonetizationStatus(monetizationConfig.isEnabled() ? "ON" : "OFF");
-      showNotification("Monetization configuration refreshed!", "success");
-    } catch (error) {
-      console.error("Failed to refresh monetization config:", error);
-      showNotification("Failed to refresh monetization configuration", "error");
-    }
-  };
-
-  const handleApproveTransaction = async (transactionId) => {
-    try {
-      const result = await adminService.approveTransaction(transactionId);
-      if (result.success) {
-        // Remove from pending transactions list
-        setPendingTransactions((prev) =>
-          prev.filter((t) => t._id !== transactionId)
-        );
-        updatePendingTransactions(-1);
-        // Refresh user data in case the admin approved their own transaction
-        await refreshUser();
-        showNotification("Transaction approved successfully!", "success");
-      } else {
-        showNotification("Failed to approve transaction", "error");
-      }
-    } catch (error) {
-      console.error("Error approving transaction:", error);
-      showNotification("Failed to approve transaction", "error");
-    }
-  };
-
-  const handleRejectTransaction = async (transactionId) => {
-    try {
-      const result = await adminService.rejectTransaction(transactionId);
-      if (result.success) {
-        // Remove from pending transactions list
-        setPendingTransactions((prev) =>
-          prev.filter((t) => t._id !== transactionId)
-        );
-        updatePendingTransactions(-1);
-        showNotification("Transaction rejected successfully!", "success");
-      } else {
-        showNotification("Failed to reject transaction", "error");
-      }
-    } catch (error) {
-      console.error("Error rejecting transaction:", error);
-      showNotification("Failed to reject transaction", "error");
-    }
   };
 
   const formatDate = (dateString) => {
@@ -528,6 +469,30 @@ export default function AdminDashboard() {
 
             <button
               onClick={() => {
+                setActiveTab("all-transactions");
+                setCurrentPage(1);
+                if (window.innerWidth < 1024) setSidebarOpen(false);
+              }}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer group ${
+                activeTab === "all-transactions"
+                  ? "bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-lg"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <Activity
+                className={`h-5 w-5 ${
+                  activeTab === "all-transactions"
+                    ? "text-white"
+                    : "text-gray-500 group-hover:text-gray-700"
+                }`}
+              />
+              {sidebarOpen && (
+                <span className="font-medium">All Transactions</span>
+              )}
+            </button>
+
+            <button
+              onClick={() => {
                 setActiveTab("reports");
                 if (window.innerWidth < 1024) setSidebarOpen(false);
               }}
@@ -579,7 +544,7 @@ export default function AdminDashboard() {
             {activeTab === "overview" && (
               <>
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
                     <div className="flex items-center">
                       <div className="p-3 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl shadow-lg">
@@ -643,140 +608,9 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   </div>
-
-                  <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div
-                          className={`p-3 rounded-xl shadow-lg ${
-                            monetizationStatus === "ON"
-                              ? "bg-gradient-to-r from-green-500 to-green-600"
-                              : "bg-gradient-to-r from-gray-500 to-gray-600"
-                          }`}
-                        >
-                          <CreditCard className={`h-6 w-6 text-white`} />
-                        </div>
-                        <div className="ml-4">
-                          <p className="text-sm font-medium text-gray-600 mb-1">
-                            Monetization
-                          </p>
-                          <p
-                            className={`text-3xl font-bold ${
-                              monetizationStatus === "ON"
-                                ? "text-green-600"
-                                : "text-gray-600"
-                            }`}
-                          >
-                            {monetizationStatus}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={refreshMonetizationConfig}
-                        className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                        title="Refresh monetization config"
-                      >
-                        <RefreshCw className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
                 </div>
 
-                {/* Recent Activity */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-xl font-bold text-gray-900">
-                        Recent Pending Profiles
-                      </h2>
-                      <div className="p-2 bg-gradient-to-r from-orange-100 to-orange-200 rounded-lg">
-                        <Clock className="h-5 w-5 text-orange-600" />
-                      </div>
-                    </div>
-                    {pendingProfiles.slice(0, 3).map((profile) => (
-                      <div
-                        key={profile._id || profile.id}
-                        className="border-b border-gray-100 py-4 last:border-b-0 hover:bg-gray-50 rounded-lg px-2 transition-colors"
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h3 className="font-bold text-gray-900 mb-1">
-                              {profile.userId?.name ||
-                                profile.fullName ||
-                                profile.name}
-                            </h3>
-                            <p className="text-sm text-gray-600 mb-1">
-                              {profile.userId?.email || profile.email}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              ID: {profile.profileId}
-                            </p>
-                          </div>
-                          <span className="bg-gradient-to-r from-orange-100 to-orange-200 text-orange-800 text-xs px-3 py-1 rounded-full font-medium shadow-sm">
-                            Pending
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                    {pendingProfiles.length > 3 && (
-                      <button
-                        onClick={() => setActiveTab("pending")}
-                        className="w-full mt-4 bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-700 hover:to-gray-800 text-sm font-medium py-3 rounded-xl transition-all duration-200 cursor-pointer shadow-lg"
-                      >
-                        View all {pendingProfiles.length} pending profiles →
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-xl font-bold text-gray-900">
-                        Recent Reports
-                      </h2>
-                      <div className="p-2 bg-gradient-to-r from-red-100 to-red-200 rounded-lg">
-                        <Flag className="h-5 w-5 text-red-600" />
-                      </div>
-                    </div>
-                    {reports.slice(0, 3).map((report) => (
-                      <div
-                        key={report.id}
-                        className="border-b border-gray-100 py-4 last:border-b-0 hover:bg-gray-50 rounded-lg px-2 transition-colors"
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h3 className="font-bold text-gray-900 mb-1">
-                              Profile{" "}
-                              {report.reportedProfile?.profileId ||
-                                report.reportedProfile}
-                            </h3>
-                            <p className="text-sm text-gray-600 mb-1">
-                              {report.reason}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              By:{" "}
-                              {report.reportedBy?.email || report.reportedBy}
-                            </p>
-                          </div>
-                          <span
-                            className={`text-xs px-3 py-1 rounded-full font-medium ${getReportStatusColor(
-                              report.status
-                            )}`}
-                          >
-                            {report.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                    {reports.length > 3 && (
-                      <button
-                        onClick={() => setActiveTab("reports")}
-                        className="w-full mt-4 bg-gradient-to-r from-gray-900 to-gray-800 text-white hover:from-gray-800 hover:to-gray-700 text-sm font-medium py-3 rounded-xl transition-all duration-200 cursor-pointer"
-                      >
-                        View all {reports.length} reports →
-                      </button>
-                    )}
-                  </div>
-                </div>
+                {/* Content based on active tab */}
               </>
             )}
 
@@ -815,178 +649,22 @@ export default function AdminDashboard() {
                 showNotification={showNotification}
               />
             )}
-            {activeTab === "transactions" &&
-              (() => {
-                const totalPages = Math.ceil(
-                  pendingTransactions.length / itemsPerPage
-                );
-                const startIndex = (currentPage - 1) * itemsPerPage;
-                const endIndex = startIndex + itemsPerPage;
-                const currentTransactions = pendingTransactions.slice(
-                  startIndex,
-                  endIndex
-                );
-
-                return (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h1 className="text-3xl font-bold text-gray-900">
-                        Pending Transactions
-                      </h1>
-                      <div className="text-sm text-gray-600">
-                        {pendingTransactions.length} pending transaction
-                        {pendingTransactions.length !== 1 ? "s" : ""}
-                      </div>
-                    </div>
-
-                    {pendingTransactions.length === 0 ? (
-                      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-                        <CreditCard className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                          No Pending Transactions
-                        </h3>
-                        <p className="text-gray-600">
-                          All transactions have been processed.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                          <h2 className="text-lg font-semibold text-gray-900">
-                            Transaction Queue
-                          </h2>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Review and process pending credit purchase requests
-                          </p>
-                        </div>
-                        <div className="divide-y divide-gray-200">
-                          {currentTransactions.map((transaction) => (
-                            <div
-                              key={transaction._id}
-                              className="p-4 hover:bg-gray-50 transition-colors"
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-4 flex-1">
-                                  <div className="flex-shrink-0">
-                                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                      <CreditCard className="h-5 w-5 text-blue-600" />
-                                    </div>
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center space-x-2 mb-1">
-                                      <h3 className="text-sm font-medium text-gray-900 truncate">
-                                        {transaction.user?.name ||
-                                          "Unknown User"}
-                                      </h3>
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        Pending
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center space-x-6 text-sm text-gray-700">
-                                      <div className="flex items-center space-x-1">
-                                        <span className="text-xs text-gray-500">
-                                          amount
-                                        </span>
-                                        <span className="font-semibold text-green-600">
-                                          ৳{transaction.price || "N/A"}
-                                        </span>
-                                      </div>
-                                      <div className="flex items-center space-x-1">
-                                        <span className="text-xs text-gray-500">
-                                          credits
-                                        </span>
-                                        <span className="font-semibold text-blue-600">
-                                          {transaction.credits || "N/A"}
-                                        </span>
-                                      </div>
-                                      <div className="flex items-center space-x-1">
-                                        <span className="text-xs text-gray-500">
-                                          phone
-                                        </span>
-                                        <span className="font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
-                                          {transaction.phoneNumber || "N/A"}
-                                        </span>
-                                      </div>
-                                      <div className="flex items-center space-x-1">
-                                        <span className="text-xs text-gray-500">
-                                          txn ID
-                                        </span>
-                                        <span className="font-mono font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
-                                          {transaction.transactionId.slice(
-                                            -8
-                                          ) || "N/A"}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <button
-                                    onClick={() =>
-                                      handleApproveTransaction(transaction._id)
-                                    }
-                                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-                                  >
-                                    <Check className="h-3 w-3 mr-1" />
-                                    Approve
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      handleRejectTransaction(transaction._id)
-                                    }
-                                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-                                  >
-                                    <X className="h-3 w-3 mr-1" />
-                                    Reject
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Pagination */}
-                        {pendingTransactions.length > itemsPerPage && (
-                          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-                            <div className="flex items-center justify-between">
-                              <div className="text-sm text-gray-700">
-                                Showing {startIndex + 1} to{" "}
-                                {Math.min(endIndex, pendingTransactions.length)}{" "}
-                                of {pendingTransactions.length} transactions
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <button
-                                  onClick={() =>
-                                    setCurrentPage(Math.max(1, currentPage - 1))
-                                  }
-                                  disabled={currentPage === 1}
-                                  className="relative inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  Previous
-                                </button>
-                                <span className="relative inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md">
-                                  Page {currentPage} of {totalPages}
-                                </span>
-                                <button
-                                  onClick={() =>
-                                    setCurrentPage(
-                                      Math.min(totalPages, currentPage + 1)
-                                    )
-                                  }
-                                  disabled={currentPage === totalPages}
-                                  className="relative inline-flex items-center px-3 py-1.5 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  Next
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
+            {activeTab === "transactions" && (
+              <PendingTransactions
+                onViewProfile={handleViewProfile}
+                showNotification={showNotification}
+                onTransactionUpdate={() => {
+                  // Refresh dashboard stats when transactions are processed
+                  loadDashboardData();
+                }}
+              />
+            )}
+            {activeTab === "all-transactions" && (
+              <AllTransactions
+                onViewProfile={handleViewProfile}
+                showNotification={showNotification}
+              />
+            )}
           </>
         )}
       </div>
