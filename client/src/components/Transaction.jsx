@@ -150,9 +150,9 @@ const Transaction = () => {
                       displayDescription =
                         tx.description ||
                         "Contact information unlocked for a biodata profile.";
-                      // For free unlocks (amount = 0), show as neutral, for paid unlocks show as deduction
+                      // For free unlocks (credits = 0), show as neutral, for paid unlocks show as deduction
                       amountColor =
-                        tx.amount === 0 ? "text-blue-600" : "text-red-600";
+                        tx.credits === 0 ? "text-blue-600" : "text-red-600";
                     }
                     return (
                       <tr
@@ -175,9 +175,10 @@ const Transaction = () => {
                         <td
                           className={`py-4 px-4 md:px-6 whitespace-nowrap text-sm text-center font-bold ${amountColor}`}
                         >
-                          {tx.type === "contact_unlock" && tx.amount === 0
+                          {tx.type === "contact_unlock" &&
+                          (tx.credits === 0 || tx.credits === undefined)
                             ? "Free"
-                            : tx.amount}
+                            : tx.credits || tx.amount}
                         </td>
                         <td className="py-4 px-4 md:px-6 text-sm text-gray-600 max-w-xs md:max-w-none">
                           <div className="truncate md:whitespace-normal md:break-words">
@@ -250,7 +251,7 @@ const Transaction = () => {
                     tx.description ||
                     "Contact information unlocked for a biodata profile.";
                   amountColor =
-                    tx.amount === 0 ? "text-blue-600" : "text-red-600";
+                    tx.credits === 0 ? "text-blue-600" : "text-red-600";
                 }
 
                 return (
@@ -284,9 +285,10 @@ const Transaction = () => {
                       <div
                         className={`text-lg font-bold ${amountColor} flex-shrink-0 ml-3`}
                       >
-                        {tx.type === "contact_unlock" && tx.amount === 0
+                        {tx.type === "contact_unlock" &&
+                        (tx.credits === 0 || tx.credits === undefined)
                           ? "Free"
-                          : tx.amount}
+                          : tx.credits || tx.amount}
                       </div>
                     </div>
                     <div className="text-sm text-gray-600 leading-relaxed">

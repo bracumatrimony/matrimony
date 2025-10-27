@@ -744,7 +744,8 @@ router.post(
         await Transaction.create({
           user: user._id,
           type: "credit_deduction",
-          amount: 1,
+          amount: 0,
+          credits: 1,
           description: `Contact information unlocked for Biodata ${
             profile.biodataId || profile.profileId
           }. 1 credit deducted from your account.`,
@@ -767,6 +768,7 @@ router.post(
           user: user._id,
           type: "contact_unlock",
           amount: 0,
+          credits: 0,
           description: `Contact information accessed for Biodata ${
             profile.biodataId || profile.profileId
           } (free access mode).`,

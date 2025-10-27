@@ -144,7 +144,7 @@ router.put("/:id/approve", [auth, adminAuth], async (req, res) => {
       user: transaction.user,
       type: "credit_addition",
       status: "approved",
-      amount: transaction.credits,
+      amount: 0,
       credits: transaction.credits,
       description: `Credits added after purchase approval: ${transaction.credits} credits`,
     });

@@ -115,7 +115,8 @@ router.put("/credits", auth, async (req, res) => {
       await Transaction.create({
         user: req.user.id,
         type: transactionType,
-        amount: credits,
+        amount: 0,
+        credits: credits,
         description: transactionDesc,
       });
     }
