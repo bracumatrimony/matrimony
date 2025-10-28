@@ -472,6 +472,12 @@ router.get("/:profileId", async (req, res) => {
       delete profileResponse.userId.email;
     }
 
+    // Delete any name or email fields that might exist on the profile itself (defense in depth)
+    if (!isOwner && !isAdmin) {
+      delete profileResponse.name;
+      delete profileResponse.email;
+    }
+
     res.json({
       success: true,
       profile: profileResponse,
@@ -678,7 +684,7 @@ router.delete(
 );
 
 // @route   POST /api/profiles/:profileId/unlock-contact
-// @desc    Unlock contact information of a profile (TEMPORARILY FREE - NO CREDITS REQUIRED)
+// @desc    Unlock contact information of a profile
 // @access  Private
 router.post(
   "/:profileId/unlock-contact",
@@ -696,19 +702,6 @@ router.post(
       });
     }
 
-    // Environment-based monetization control
-    if (monetizationConfig.shouldRequireCreditsForContact()) {
-      // Check if user has enough credits (monetization enabled)
-      if (user.credits < 1) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Insufficient credits. You need at least 1 credit to unlock contact information.",
-        });
-      }
-    }
-    // If monetization is disabled, contact info is free
-
     // Find the profile to unlock
     const profile = await Profile.findOne({
       profileId: profileId,
@@ -722,96 +715,41 @@ router.post(
       });
     }
 
-    // Check if user can access contact information (BRACU email or alumni verified)
-    if (!canAccessContactInfo(user)) {
+    // Check if user is the owner or admin
+    const isOwner = profile.userId._id.toString() === userId;
+    const isAdmin = user.role === "admin";
+
+    // Only owner and admin can access contact information
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({
         success: false,
         message:
-          "Access denied. Only BRACU students and verified alumni can unlock contact information.",
+          "Access denied. Contact information is only available to the profile owner or administrators.",
       });
     }
 
-    // Check if user is trying to unlock their own profile
-    if (profile.userId._id.toString() === userId) {
-      return res.status(400).json({
-        success: false,
-        message: "You cannot unlock your own contact information",
-      });
-    }
-
-    // Check if already unlocked (keep for tracking purposes)
-    if (user.unlockedContacts && user.unlockedContacts.includes(profileId)) {
+    // For owner, return contact information directly
+    if (isOwner) {
       return res.json({
         success: true,
-        message: "Contact information already unlocked",
+        message: "Contact information accessed",
+        contactInfo:
+          profile.contactInformation || "No contact information provided.",
+        remainingCredits: user.credits,
+      });
+    }
+
+    // For admin, return contact information
+    if (isAdmin) {
+      return res.json({
+        success: true,
+        message: "Contact information accessed by admin",
         contactInfo:
           profile.contactInformation ||
           "No contact information provided by the user.",
         remainingCredits: user.credits,
       });
     }
-
-    // Environment-based credit deduction and transaction recording
-    if (monetizationConfig.shouldRequireCreditsForContact()) {
-      // Deduct credit and record transaction (monetization enabled)
-      user.credits -= 1;
-      user.unlockedContacts = user.unlockedContacts || [];
-      user.unlockedContacts.push(profileId);
-      await user.save();
-
-      // Record transaction
-      const Transaction = require("../models/Transaction");
-      try {
-        await Transaction.create({
-          user: user._id,
-          type: "credit_deduction",
-          amount: 0,
-          credits: 1,
-          description: `Contact information unlocked for Biodata ${
-            profile.biodataId || profile.profileId
-          }. 1 credit deducted from your account.`,
-        });
-      } catch (err) {
-        console.error("Transaction creation failed:", err);
-      }
-    } else {
-      // Track unlocked profiles without deducting credits (free access mode)
-      user.unlockedContacts = user.unlockedContacts || [];
-      if (!user.unlockedContacts.includes(profileId)) {
-        user.unlockedContacts.push(profileId);
-        await user.save();
-      }
-
-      // Still record transaction for tracking purposes
-      const Transaction = require("../models/Transaction");
-      try {
-        await Transaction.create({
-          user: user._id,
-          type: "contact_unlock",
-          amount: 0,
-          credits: 0,
-          description: `Contact information accessed for Biodata ${
-            profile.biodataId || profile.profileId
-          } (free access mode).`,
-        });
-      } catch (err) {
-        console.error("Transaction creation failed:", err);
-      }
-    }
-
-    // Return contact information with environment-aware message
-    const message = monetizationConfig.shouldRequireCreditsForContact()
-      ? "Contact information unlocked successfully"
-      : "Contact information accessed successfully (free access mode)";
-
-    res.json({
-      success: true,
-      message: message,
-      contactInfo:
-        profile.contactInformation ||
-        "No contact information provided by the user.",
-      remainingCredits: user.credits,
-    });
   })
 );
 
@@ -840,50 +778,33 @@ router.get(
       });
     }
 
-    // Check if user is trying to check their own profile
-    if (profile.userId._id.toString() === userId) {
-      return res.json({
-        success: true,
-        isUnlocked: false,
-        isOwnProfile: true,
-        message: "This is your own profile",
-      });
-    }
+    // Check if user is the owner or admin
+    const isOwner = profile.userId._id.toString() === userId;
+    const isAdmin = req.user.role === "admin";
 
-    // Check if user can access contact information (BRACU email or alumni verified)
-    if (!canAccessContactInfo(req.user)) {
+    // Only owner and admin can access contact information
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({
         success: false,
         message:
-          "Access denied. Only BRACU students and verified alumni can view contact information.",
+          "Access denied. Contact information is only available to the profile owner or administrators.",
       });
     }
 
-    // Environment-based contact status check using auth middleware data
-    if (monetizationConfig.shouldRequireCreditsForContact()) {
-      // Original credit-based logic (monetization enabled)
-      const isUnlocked =
-        req.user.unlockedContacts &&
-        req.user.unlockedContacts.includes(profileId);
-
-      if (isUnlocked) {
-        return res.json({
-          success: true,
-          isUnlocked: true,
-          contactInfo:
-            profile.contactInformation ||
-            "No contact information provided by the user.",
-          remainingCredits: req.user.credits,
-        });
-      }
-
-      res.json({
+    // For owner, always return as unlocked
+    if (isOwner) {
+      return res.json({
         success: true,
-        isUnlocked: false,
+        isUnlocked: true,
+        isOwnProfile: true,
+        contactInfo:
+          profile.contactInformation || "No contact information provided.",
         remainingCredits: req.user.credits,
       });
-    } else {
-      // Always return contact information as unlocked (free access mode)
+    }
+
+    // For admin, return contact information
+    if (isAdmin) {
       return res.json({
         success: true,
         isUnlocked: true,
@@ -891,7 +812,6 @@ router.get(
           profile.contactInformation ||
           "No contact information provided by the user.",
         remainingCredits: req.user.credits,
-        message: "Contact information is free during launch period",
       });
     }
   })
