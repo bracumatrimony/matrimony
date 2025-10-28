@@ -76,7 +76,7 @@ export default function BiodataView() {
     { id: "lifestyle-health", label: "Lifestyle & Health", icon: Activity },
     { id: "partner-preferences", label: "Partner Preferences", icon: Heart },
     { id: "declaration", label: "Declaration", icon: Shield },
-    ...(isOwnProfile || isAdminView
+    ...(profile?.status === "approved"
       ? [{ id: "contact-info", label: "Contact Information", icon: Contact }]
       : []),
   ];
@@ -1246,8 +1246,8 @@ export default function BiodataView() {
               </dl>
             </div>
 
-            {/* Contact Information Section - Show for own profile, other users' approved profiles, or admin view */}
-            {(isOwnProfile || isAdminView) && (
+            {/* Contact Information Section - Show for approved profiles */}
+            {profile?.status === "approved" && (
               <div
                 id="contact-info"
                 className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-20"
