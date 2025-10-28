@@ -247,7 +247,7 @@ const emailTemplates = {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Profile Rejected</title>
+        <title>Biodata Rejected</title>
         <style>
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -434,7 +434,7 @@ const emailTemplates = {
             <div class="greeting">Dear ${userName},</div>
 
             <div class="status-card">
-              <div class="status-title">Profile Rejected</div>
+              <div class="status-title">Biodata Rejected</div>
               <div class="status-text">Your biodata has been reviewed and rejected for the following reason: ${
                 reason || "No specific reason provided"
               }</div>

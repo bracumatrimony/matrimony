@@ -383,7 +383,7 @@ router.put(
 
       res.json({
         success: true,
-        message: "Profile rejected successfully",
+        message: "Biodata rejected successfully",
         profile,
       });
     } catch (error) {

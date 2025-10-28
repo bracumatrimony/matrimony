@@ -101,7 +101,7 @@ export default function PendingBiodata({
       );
       setTotalPendingProfiles((prev) => Math.max(0, prev - 1));
 
-      showNotification?.("Profile rejected successfully!", "success");
+      showNotification?.("Biodata rejected successfully!", "success");
       onReject?.(profileId);
     } catch (error) {
       console.error("Failed to reject profile:", error);

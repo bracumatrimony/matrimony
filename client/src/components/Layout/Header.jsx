@@ -225,7 +225,7 @@ export default function Header() {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <Search className="h-4 w-4" />
-                <span>Search Profiles</span>
+                <span>Search Biodata's</span>
               </Link>
 
               {user ? (

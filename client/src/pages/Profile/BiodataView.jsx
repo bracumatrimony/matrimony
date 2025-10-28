@@ -76,7 +76,7 @@ export default function BiodataView() {
     { id: "lifestyle-health", label: "Lifestyle & Health", icon: Activity },
     { id: "partner-preferences", label: "Partner Preferences", icon: Heart },
     { id: "declaration", label: "Declaration", icon: Shield },
-    ...(profile?.status === "approved"
+    ...(profile?.status === "approved" || isAdminView
       ? [{ id: "contact-info", label: "Contact Information", icon: Contact }]
       : []),
   ];
@@ -340,7 +340,7 @@ export default function BiodataView() {
 
     try {
       await adminService.rejectProfile(profileId, reason);
-      showNotification("Profile rejected successfully!", "success");
+      showNotification("Biodata rejected successfully!", "success");
       // Reload profile to update status
       await loadProfile();
     } catch (error) {
@@ -1246,8 +1246,8 @@ export default function BiodataView() {
               </dl>
             </div>
 
-            {/* Contact Information Section - Show for approved profiles */}
-            {profile?.status === "approved" && (
+            {/* Contact Information Section - Show for approved profiles or admin view */}
+            {(profile?.status === "approved" || isAdminView) && (
               <div
                 id="contact-info"
                 className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-20"
