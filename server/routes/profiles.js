@@ -449,6 +449,7 @@ router.get("/:profileId", async (req, res) => {
     const profileResponse = profile.toObject();
     if (!currentUser || currentUser.role !== "admin") {
       delete profileResponse.personalContactInfo;
+      delete profileResponse.contactInformation;
       delete profileResponse.userId.name;
       delete profileResponse.userId.email;
     }
