@@ -48,6 +48,7 @@ export default function BiodataView() {
   const [contactInfo, setContactInfo] = useState(null);
   const [isUnlockingContact, setIsUnlockingContact] = useState(false);
   const [userCredits, setUserCredits] = useState(0);
+  const [canUnlockContact, setCanUnlockContact] = useState(false);
   const [monetizationEnabled, setMonetizationEnabled] = useState(
     monetizationConfig.isEnabled()
   );
@@ -287,12 +288,12 @@ export default function BiodataView() {
         setProfile(response.profile);
 
         // Process contact status if available (only for authenticated users)
-        if (
-          contactStatusResponse.success &&
-          contactStatusResponse.isUnlocked &&
-          currentUser
-        ) {
-          setContactInfo(contactStatusResponse.contactInfo);
+        if (contactStatusResponse.success && currentUser) {
+          if (contactStatusResponse.isUnlocked) {
+            setContactInfo(contactStatusResponse.contactInfo);
+          }
+          // Set whether user can unlock contacts
+          setCanUnlockContact(contactStatusResponse.canUnlock !== false);
           // Update user credits if available
           if (contactStatusResponse.remainingCredits !== undefined) {
             setUserCredits(contactStatusResponse.remainingCredits);
@@ -1318,58 +1319,78 @@ export default function BiodataView() {
                 ) : monetizationEnabled ? (
                   /* Credit-based unlock system */
                   !contactInfo ? (
-                    <div className="text-center py-6">
-                      <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-lg p-6 border border-rose-200">
-                        <Lock className="w-8 h-8 text-rose-500 mx-auto mb-3" />
-                        <h3 className="text-lg font-semibold text-rose-800 mb-3">
-                          Contact Information Locked
-                        </h3>
-                        <p className="text-base text-rose-700 mb-4 leading-relaxed">
-                          Use 1 credit to unlock the contact information for
-                          this biodata.
-                        </p>
+                    canUnlockContact ? (
+                      <div className="text-center py-6">
+                        <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-lg p-6 border border-rose-200">
+                          <Lock className="w-8 h-8 text-rose-500 mx-auto mb-3" />
+                          <h3 className="text-lg font-semibold text-rose-800 mb-3">
+                            Contact Information Locked
+                          </h3>
+                          <p className="text-base text-rose-700 mb-4 leading-relaxed">
+                            Use 1 credit to unlock the contact information for
+                            this biodata.
+                          </p>
 
-                        <div className="flex items-center justify-center gap-2 mb-4">
-                          <CreditCard className="w-4 h-4 text-rose-500" />
-                          <span className="text-base font-semibold text-rose-800">
-                            Your Credits: {userCredits}
-                          </span>
-                        </div>
-
-                        {userCredits >= 1 ? (
-                          <button
-                            onClick={handleUnlockContact}
-                            disabled={isUnlockingContact}
-                            className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                          >
-                            {isUnlockingContact ? (
-                              <>
-                                <ButtonSpinner />
-                                Unlocking...
-                              </>
-                            ) : (
-                              <>
-                                <Unlock className="w-4 h-4" />
-                                Unlock Contact (1 Credit)
-                              </>
-                            )}
-                          </button>
-                        ) : (
-                          <div className="space-y-3">
-                            <p className="text-base text-red-700 font-medium">
-                              Insufficient credits. You need at least 1 credit.
-                            </p>
-                            <button
-                              onClick={() => navigate("/credits")}
-                              className="inline-flex items-center gap-2 text-white px-4 py-2 rounded-lg transition-colors text-sm cursor-pointer bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700"
-                            >
-                              <CreditCard className="w-4 h-4" />
-                              Purchase Credits
-                            </button>
+                          <div className="flex items-center justify-center gap-2 mb-4">
+                            <CreditCard className="w-4 h-4 text-rose-500" />
+                            <span className="text-base font-semibold text-rose-800">
+                              Your Credits: {userCredits}
+                            </span>
                           </div>
-                        )}
+
+                          {userCredits >= 1 ? (
+                            <button
+                              onClick={handleUnlockContact}
+                              disabled={isUnlockingContact}
+                              className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            >
+                              {isUnlockingContact ? (
+                                <>
+                                  <ButtonSpinner />
+                                  Unlocking...
+                                </>
+                              ) : (
+                                <>
+                                  <Unlock className="w-4 h-4" />
+                                  Unlock Contact (1 Credit)
+                                </>
+                              )}
+                            </button>
+                          ) : (
+                            <div className="space-y-3">
+                              <p className="text-base text-red-700 font-medium">
+                                Insufficient credits. You need at least 1
+                                credit.
+                              </p>
+                              <button
+                                onClick={() => navigate("/credits")}
+                                className="inline-flex items-center gap-2 text-white px-4 py-2 rounded-lg transition-colors text-sm cursor-pointer bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700"
+                              >
+                                <CreditCard className="w-4 h-4" />
+                                Purchase Credits
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="text-center py-6">
+                        <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-lg p-6 border border-gray-200">
+                          <Shield className="w-8 h-8 text-gray-500 mx-auto mb-3" />
+                          <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                            Contact Information Restricted
+                          </h3>
+                          <p className="text-base text-gray-700 mb-4 leading-relaxed">
+                            Contact information is only available to BRACU
+                            students and verified alumni.
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Please ensure you are logged in with your BRACU
+                            email or have completed alumni verification.
+                          </p>
+                        </div>
+                      </div>
+                    )
                   ) : (
                     <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
                       <div>
