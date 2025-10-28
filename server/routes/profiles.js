@@ -445,11 +445,29 @@ router.get("/:profileId", async (req, res) => {
         .catch((err) => console.log("View count update failed:", err));
     }
 
-    // Filter sensitive information for non-admin users
+    // Filter sensitive information based on user permissions and privacy settings
     const profileResponse = profile.toObject();
-    if (!currentUser || currentUser.role !== "admin") {
+    const isOwner =
+      currentUser &&
+      currentUser._id.toString() === profile.userId._id.toString();
+    const isAdmin = currentUser && currentUser.role === "admin";
+    const canAccessContact =
+      isOwner ||
+      isAdmin ||
+      (profile.privacy?.showContactInfo && canAccessContactInfo(currentUser));
+
+    // personalContactInfo is for owner and admin use only
+    if (!isOwner && !isAdmin) {
       delete profileResponse.personalContactInfo;
+    }
+
+    // contactInformation is shown to owner and admin, or after unlocking via separate endpoint
+    if (!isOwner && !isAdmin) {
       delete profileResponse.contactInformation;
+    }
+
+    // userId name and email: show to owner and admin only
+    if (!isOwner && !isAdmin) {
       delete profileResponse.userId.name;
       delete profileResponse.userId.email;
     }
