@@ -2787,7 +2787,7 @@ export default function BiodataCreate() {
                 }}
                 className="text-2xl font-bold text-white mb-2"
               >
-                Profile Created Successfully!
+                Biodata Created Successfully!
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0 }}

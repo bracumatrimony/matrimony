@@ -405,7 +405,7 @@ export default function UserProfile() {
                         <div className="flex items-center">
                           <p className="text-yellow-800 text-sm">
                             {profile.editCount > 0
-                              ? "Your biodata changes are being reviewed by our admin team. Your profile will be visible to others once the updates are approved."
+                              ? "Your biodata changes are being reviewed by our admin team. We'll notify you via email once it's approved and live on the platform."
                               : "Your biodata is currently under review by our admin team. We'll notify you via email once it's approved and live on the platform."}
                           </p>
                         </div>
