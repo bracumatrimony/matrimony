@@ -849,8 +849,8 @@ export default function BiodataEdit() {
                     <img
                       src={
                         formData.gender.toLowerCase() === "male"
-                          ? "https://res.cloudinary.com/dtv7wldhe/image/upload/v1759583572/male_d4wuwd.png"
-                          : "https://res.cloudinary.com/dtv7wldhe/image/upload/v1759583575/female_p0k4x3.png"
+                          ? "https://res.cloudinary.com/dkir6pztp/image/upload/v1761749493/Male_psqwq6.png"
+                          : "https://res.cloudinary.com/dkir6pztp/image/upload/v1761749492/Female_l2vxzs.png"
                       }
                       alt={`${formData.gender} avatar`}
                       className="w-full h-full object-cover"

@@ -87,31 +87,14 @@ export default function Login() {
         <div className="absolute md:relative inset-0 md:flex-1 bg-black flex items-center justify-center p-4 md:p-6 overflow-hidden">
           {/* Background Image */}
           <img
-            src="https://res.cloudinary.com/dtv7wldhe/image/upload/v1759697257/3_iz1iyj.jpg"
+            src="https://res.cloudinary.com/dkir6pztp/image/upload/v1761750189/Login_Banner_dkgw6y.jpg"
             alt="wedding background"
-            className="absolute inset-0 w-full h-full object-cover opacity-80"
+            className="absolute inset-0 w-full h-full object-cover"
             style={{ backgroundColor: "black" }}
           />
 
           {/* Overlay for text readability (tuned for clarity on mobile) */}
           <div className="absolute inset-0 bg-black/20 md:bg-black/30"></div>
-
-          {/* Desktop Quote - Hidden on mobile */}
-          <div className="hidden md:block text-center relative z-10 auth-brand">
-            <div className="mb-8">
-              <blockquote className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium text-white leading-relaxed mb-4 tracking-wide drop-shadow-md px-2">
-                When a man marries he has fulfilled half of the religion, so let
-                him fear God regarding the remaining half.
-              </blockquote>
-            </div>
-            <div className="text-center">
-              <div className="bg-white/20 px-6 py-3 rounded-full inline-block ring-1 ring-white/20 shadow-sm">
-                <cite className="text-lg text-white font-semibold not-italic tracking-wide drop-shadow-sm">
-                  Mishkat al-Masabih 3096
-                </cite>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Login Form - Overlay on mobile, side panel on desktop */}

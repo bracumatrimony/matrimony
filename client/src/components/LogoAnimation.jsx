@@ -63,7 +63,7 @@ export default function LogoAnimation({ onComplete }) {
             }`}
           >
             <img
-              src="https://res.cloudinary.com/dtv7wldhe/image/upload/v1759526635/icon_mauemy.png"
+              src="https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg"
               alt="BRACU Matrimony"
               className="h-16 w-16 md:h-20 md:w-20 object-contain"
             />

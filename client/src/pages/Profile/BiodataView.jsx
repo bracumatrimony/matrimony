@@ -558,7 +558,7 @@ export default function BiodataView() {
                 description: `Matrimonial profile on BRACU Matrimony. Age: ${profile.age}, Location: ${profile.district}`,
                 image:
                   profile.profilePicture ||
-                  "https://res.cloudinary.com/dtv7wldhe/image/upload/v1759526635/icon_mauemy.png",
+                  "https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg",
                 url: `https://bracumatrimony.vercel.app/profile/${profileId}`,
                 address: {
                   "@type": "PostalAddress",
@@ -732,8 +732,8 @@ export default function BiodataView() {
                       <img
                         src={
                           profile.gender.toLowerCase() === "male"
-                            ? "https://res.cloudinary.com/dtv7wldhe/image/upload/v1759583572/male_d4wuwd.png"
-                            : "https://res.cloudinary.com/dtv7wldhe/image/upload/v1759583575/female_p0k4x3.png"
+                            ? "https://res.cloudinary.com/dkir6pztp/image/upload/v1761749493/Male_psqwq6.png"
+                            : "https://res.cloudinary.com/dkir6pztp/image/upload/v1761749492/Female_l2vxzs.png"
                         }
                         alt={`${profile.gender} avatar`}
                         className="w-full h-full object-cover"

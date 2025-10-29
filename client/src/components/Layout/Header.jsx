@@ -60,7 +60,7 @@ export default function Header() {
           {/* Large Brand Text with Icon */}
           <Link to="/" className="flex items-center space-x-3">
             <img
-              src="https://res.cloudinary.com/dtv7wldhe/image/upload/v1759526635/icon_mauemy.png"
+              src="https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg"
               alt="BRACU Matrimony"
               className="h-12 w-12 md:h-14 md:w-14 lg:h-16 lg:w-16 object-contain"
             />

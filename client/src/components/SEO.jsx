@@ -14,7 +14,7 @@ const SEO = ({
 }) => {
   const siteName = "BRACU Matrimony";
   const defaultImage =
-    "https://res.cloudinary.com/dtv7wldhe/image/upload/v1759526635/icon_mauemy.png";
+    "https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg";
   const defaultUrl = "https://bracumatrimony.vercel.app";
   const defaultDescription =
     "BRACU Matrimony - The premier matrimonial platform for BRACU community. Find your perfect life partner with advanced search, verified profiles, and secure communication.";
@@ -30,7 +30,7 @@ const SEO = ({
     "@type": "Organization",
     name: "BRACU Matrimony",
     url: "https://bracumatrimony.vercel.app",
-    logo: "https://res.cloudinary.com/dtv7wldhe/image/upload/v1759526635/icon_mauemy.png",
+    logo: "https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg",
     description:
       "The premier matrimonial platform for BRACU community. Find your perfect life partner with advanced search, verified profiles, and secure communication.",
     sameAs: [

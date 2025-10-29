@@ -34,13 +34,13 @@ const ProfileCard = memo(function ProfileCard({
               <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-white shadow-lg group-hover:ring-blue-200 transition-all duration-300">
                 {profile.gender === "Male" ? (
                   <img
-                    src="https://res.cloudinary.com/dtv7wldhe/image/upload/v1759583572/male_d4wuwd.png"
+                    src="https://res.cloudinary.com/dkir6pztp/image/upload/v1761749493/Male_psqwq6.png"
                     alt="Male Profile"
                     className="w-full h-full object-cover transition-all duration-300"
                   />
                 ) : profile.gender === "Female" ? (
                   <img
-                    src="https://res.cloudinary.com/dtv7wldhe/image/upload/v1759583575/female_p0k4x3.png"
+                    src="https://res.cloudinary.com/dkir6pztp/image/upload/v1761749492/Female_l2vxzs.png"
                     alt="Female Profile"
                     className="w-full h-full object-cover transition-all duration-300"
                   />
