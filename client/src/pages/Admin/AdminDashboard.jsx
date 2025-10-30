@@ -32,6 +32,8 @@ import Reports from "./Reports";
 import VerificationRequests from "./VerificationRequests";
 import PendingTransactions from "./PendingTransactions";
 import AllTransactions from "./AllTransactions";
+import RestrictedUsers from "./RestrictedUsers";
+import BannedUsers from "./BannedUsers";
 import { monetizationConfig } from "../../config/monetization";
 import "../../styles/admin.css";
 
@@ -493,6 +495,50 @@ export default function AdminDashboard() {
 
             <button
               onClick={() => {
+                setActiveTab("restricted");
+                if (window.innerWidth < 1024) setSidebarOpen(false);
+              }}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer group ${
+                activeTab === "restricted"
+                  ? "bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-lg"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <Shield
+                className={`h-5 w-5 ${
+                  activeTab === "restricted"
+                    ? "text-white"
+                    : "text-gray-500 group-hover:text-gray-700"
+                }`}
+              />
+              {sidebarOpen && (
+                <span className="font-medium">Restricted Users</span>
+              )}
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveTab("banned");
+                if (window.innerWidth < 1024) setSidebarOpen(false);
+              }}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 cursor-pointer group ${
+                activeTab === "banned"
+                  ? "bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-lg"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <AlertTriangle
+                className={`h-5 w-5 ${
+                  activeTab === "banned"
+                    ? "text-white"
+                    : "text-gray-500 group-hover:text-gray-700"
+                }`}
+              />
+              {sidebarOpen && <span className="font-medium">Banned Users</span>}
+            </button>
+
+            <button
+              onClick={() => {
                 setActiveTab("reports");
                 if (window.innerWidth < 1024) setSidebarOpen(false);
               }}
@@ -661,6 +707,18 @@ export default function AdminDashboard() {
             )}
             {activeTab === "all-transactions" && (
               <AllTransactions
+                onViewProfile={handleViewProfile}
+                showNotification={showNotification}
+              />
+            )}
+            {activeTab === "restricted" && (
+              <RestrictedUsers
+                onViewProfile={handleViewProfile}
+                showNotification={showNotification}
+              />
+            )}
+            {activeTab === "banned" && (
+              <BannedUsers
                 onViewProfile={handleViewProfile}
                 showNotification={showNotification}
               />

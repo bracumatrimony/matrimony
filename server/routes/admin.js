@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const Profile = require("../models/Profile");
 const User = require("../models/User");
 const Report = require("../models/Report");
@@ -575,6 +576,15 @@ router.get("/users", [auth, adminAuth], async (req, res) => {
 router.put("/users/:userId/restrict", [auth, adminAuth], async (req, res) => {
   try {
     const { userId } = req.params;
+    console.log("Restrict user request for userId:", userId);
+
+    // Validate userId
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+      });
+    }
 
     // Update user
     const user = await User.findByIdAndUpdate(
@@ -582,6 +592,7 @@ router.put("/users/:userId/restrict", [auth, adminAuth], async (req, res) => {
       { isRestricted: true },
       { new: true }
     );
+    console.log("User found and updated:", user ? "yes" : "no");
 
     if (!user) {
       return res.status(404).json({
@@ -590,8 +601,17 @@ router.put("/users/:userId/restrict", [auth, adminAuth], async (req, res) => {
       });
     }
 
+    // Prevent restricting admin users
+    if (user.role === "admin") {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot restrict admin users",
+      });
+    }
+
     // Hide their profile if exists
     if (user.profileId) {
+      console.log("Hiding profile for profileId:", user.profileId);
       await Profile.findOneAndUpdate(
         { profileId: user.profileId },
         { status: "hidden" }
@@ -618,13 +638,23 @@ router.put("/users/:userId/restrict", [auth, adminAuth], async (req, res) => {
 router.put("/users/:userId/ban", [auth, adminAuth], async (req, res) => {
   try {
     const { userId } = req.params;
+    console.log("Ban user request for userId:", userId);
+
+    // Validate userId
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+      });
+    }
 
     // Update user
     const user = await User.findByIdAndUpdate(
       userId,
-      { isBanned: true },
+      { isBanned: true, isRestricted: false },
       { new: true }
     );
+    console.log("User found and updated:", user ? "yes" : "no");
 
     if (!user) {
       return res.status(404).json({
@@ -633,14 +663,24 @@ router.put("/users/:userId/ban", [auth, adminAuth], async (req, res) => {
       });
     }
 
+    // Prevent banning admin users
+    if (user.role === "admin") {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot ban admin users",
+      });
+    }
+
     // Delete their profile if exists
     if (user.profileId) {
+      console.log("Deleting profile for profileId:", user.profileId);
       await Profile.findOneAndDelete({ profileId: user.profileId });
       // Update user to remove profileId
       await User.findByIdAndUpdate(userId, {
-        profileId: null,
+        $unset: { profileId: 1 },
         hasProfile: false,
       });
+      console.log("Profile deleted and user updated");
     }
 
     res.json({
@@ -653,6 +693,199 @@ router.put("/users/:userId/ban", [auth, adminAuth], async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to ban user",
+    });
+  }
+});
+
+// @route   GET /api/admin/users/restricted
+// @desc    Get all restricted users
+// @access  Private (Admin only)
+router.get("/users/restricted", [auth, adminAuth], async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Build search query
+    let query = { isRestricted: true };
+    if (search) {
+      query = {
+        isRestricted: true,
+        $or: [
+          { name: new RegExp(search, "i") },
+          { email: new RegExp(search, "i") },
+          { profileId: new RegExp(search, "i") },
+        ],
+      };
+    }
+
+    const users = await User.find(query)
+      .select("-password")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await User.countDocuments(query);
+
+    res.json({
+      success: true,
+      users,
+      pagination: {
+        current: parseInt(page),
+        pages: Math.ceil(total / parseInt(limit)),
+        total,
+      },
+    });
+  } catch (error) {
+    console.error("Get restricted users error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get restricted users",
+    });
+  }
+});
+
+// @route   GET /api/admin/users/banned
+// @desc    Get all banned users
+// @access  Private (Admin only)
+router.get("/users/banned", [auth, adminAuth], async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Build search query
+    let query = { isBanned: true };
+    if (search) {
+      query = {
+        isBanned: true,
+        $or: [
+          { name: new RegExp(search, "i") },
+          { email: new RegExp(search, "i") },
+          { profileId: new RegExp(search, "i") },
+        ],
+      };
+    }
+
+    const users = await User.find(query)
+      .select("-password")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await User.countDocuments(query);
+
+    res.json({
+      success: true,
+      users,
+      pagination: {
+        current: parseInt(page),
+        pages: Math.ceil(total / parseInt(limit)),
+        total,
+      },
+    });
+  } catch (error) {
+    console.error("Get banned users error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get banned users",
+    });
+  }
+});
+
+// @route   PUT /api/admin/users/:userId/unrestrict
+// @desc    Unrestrict a user (restore their biodata visibility and viewing access)
+// @access  Private (Admin only)
+router.put("/users/:userId/unrestrict", [auth, adminAuth], async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("Unrestrict user request for userId:", userId);
+
+    // Validate userId
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+      });
+    }
+
+    // Update user
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { isRestricted: false },
+      { new: true }
+    );
+    console.log("User found and updated:", user ? "yes" : "no");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Restore their profile if exists
+    if (user.profileId) {
+      console.log("Restoring profile for profileId:", user.profileId);
+      await Profile.findOneAndUpdate(
+        { profileId: user.profileId },
+        { status: "approved" }
+      );
+    }
+
+    res.json({
+      success: true,
+      message: "User unrestricted successfully",
+      user,
+    });
+  } catch (error) {
+    console.error("Unrestrict user error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to unrestrict user",
+    });
+  }
+});
+
+// @route   PUT /api/admin/users/:userId/unban
+// @desc    Unban a user (restore their access)
+// @access  Private (Admin only)
+router.put("/users/:userId/unban", [auth, adminAuth], async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("Unban user request for userId:", userId);
+
+    // Validate userId
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+      });
+    }
+
+    // Update user
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { isBanned: false },
+      { new: true }
+    );
+    console.log("User found and updated:", user ? "yes" : "no");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "User unbanned successfully",
+      user,
+    });
+  } catch (error) {
+    console.error("Unban user error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to unban user",
     });
   }
 });

@@ -35,6 +35,11 @@ export default function SearchProfiles() {
     const user = authService.getCurrentUser();
     if (user) {
       setCurrentUser(user);
+      // Redirect restricted or banned users away from search
+      if (user.isRestricted || user.isBanned) {
+        navigate("/");
+        return;
+      }
     }
 
     // Load profiles from API

@@ -193,6 +193,38 @@ class AdminService {
       method: "PUT",
     });
   }
+
+  async getRestrictedUsers(page = 1, limit = 30, search = "") {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (search) params.append("search", search);
+
+    return this.makeRequest(`/admin/users/restricted?${params}`);
+  }
+
+  async getBannedUsers(page = 1, limit = 30, search = "") {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (search) params.append("search", search);
+
+    return this.makeRequest(`/admin/users/banned?${params}`);
+  }
+
+  async unrestrictUser(userId) {
+    return this.makeRequest(`/admin/users/${userId}/unrestrict`, {
+      method: "PUT",
+    });
+  }
+
+  async unbanUser(userId) {
+    return this.makeRequest(`/admin/users/${userId}/unban`, {
+      method: "PUT",
+    });
+  }
 }
 
 export default new AdminService();

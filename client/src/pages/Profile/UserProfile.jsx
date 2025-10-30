@@ -351,280 +351,289 @@ export default function UserProfile() {
               </div>
 
               <div className="p-6">
-                {profile ? (
-                  <div className="space-y-4">
-                    {/* Status Indicator */}
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
-                      <div className="flex items-center space-x-3">
-                        <div
-                          className={`w-3 h-3 rounded-full ${
-                            profile.status === "approved"
-                              ? "bg-green-500"
-                              : profile.status === "pending_approval"
-                              ? "bg-yellow-500"
-                              : profile.status === "rejected"
-                              ? "bg-red-500"
-                              : "bg-gray-500"
-                          }`}
-                        />
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {profile.status === "approved"
-                              ? "Biodata Approved"
-                              : profile.status === "pending_approval"
-                              ? "Pending Approval"
-                              : profile.status === "rejected"
-                              ? "Biodata Rejected"
-                              : "Under Review"}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => navigate("/profile/view")}
-                          className="flex items-center bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          <span>View</span>
-                        </button>
-                        <button
-                          onClick={() => navigate("/profile/edit")}
-                          className="flex items-center bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          <span>Edit</span>
-                        </button>
-                      </div>
+                {/* Ban/Restriction Messages - Show regardless of profile status */}
+                {user.isBanned && (
+                  <div className="bg-red-50 border-4 border-black rounded-lg p-4 mb-6">
+                    <div>
+                      <h3 className="text-lg font-semibold text-red-800 mb-2">
+                        Account Banned
+                      </h3>
+                      <p className="text-red-700 text-sm">
+                        Your account has been banned by the administrators. You
+                        no longer have access to the platform. If you believe
+                        this is an error, please contact support.
+                      </p>
                     </div>
+                  </div>
+                )}
 
-                    {/* Status Messages */}
-                    {profile.status === "pending_approval" && (
-                      <div className="bg-yellow-50 border-4 border-black rounded-lg p-4">
-                        <div className="flex items-center">
-                          <p className="text-yellow-800 text-sm">
-                            {profile.editCount > 0
-                              ? "Your biodata changes are being reviewed by our admin team. We'll notify you via email once it's approved and live on the platform."
-                              : "Your biodata is currently under review by our admin team. We'll notify you via email once it's approved and live on the platform."}
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                {user.isRestricted && !user.isBanned && (
+                  <div className="bg-yellow-50 border-4 border-black rounded-lg p-4 mb-6">
+                    <div>
+                      <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+                        Profile Under Investigation
+                      </h3>
+                      <p className="text-yellow-700 text-sm">
+                        Your profile is currently under investigation by our
+                        administrators. During this period, your biodata is
+                        hidden from public view and you cannot view other
+                        profiles. This is a temporary measure to ensure
+                        compliance with our community guidelines. You will be
+                        notified once the investigation is complete.
+                      </p>
+                    </div>
+                  </div>
+                )}
 
-                    {profile.status === "approved" && (
-                      <div className="bg-green-50 border-4 border-black rounded-lg p-4">
-                        <div className="flex items-center">
-                          <p className="text-green-800 text-sm center mx-auto">
-                            Congratulations! Your biodata is approved and
-                            visible to other users.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {profile.status === "rejected" && (
-                      <div className="bg-red-50 border-4 border-black rounded-lg p-4">
-                        <div className="space-y-2">
-                          <p className="text-red-800 text-sm font-medium">
-                            Your biodata has been rejected by the admin team.
-                          </p>
-                          {profile.rejectionReason && (
-                            <div className="mt-2 pt-2 border-t border-red-200">
-                              <p className="text-red-700 text-sm">
-                                <strong>Reason:</strong>{" "}
-                                {profile.rejectionReason}
+                {/* Only show profile-related content if user is not banned */}
+                {!user.isBanned && (
+                  <>
+                    {profile ? (
+                      <div className="space-y-4">
+                        {/* Status Indicator */}
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
+                          <div className="flex items-center space-x-3">
+                            <div
+                              className={`w-3 h-3 rounded-full ${
+                                profile.status === "approved"
+                                  ? "bg-green-500"
+                                  : profile.status === "pending_approval"
+                                  ? "bg-yellow-500"
+                                  : profile.status === "rejected"
+                                  ? "bg-red-500"
+                                  : "bg-gray-500"
+                              }`}
+                            />
+                            <div>
+                              <p className="font-medium text-gray-900">
+                                {profile.status === "approved"
+                                  ? "Biodata Approved"
+                                  : profile.status === "pending_approval"
+                                  ? "Pending Approval"
+                                  : profile.status === "rejected"
+                                  ? "Biodata Rejected"
+                                  : "Under Review"}
                               </p>
                             </div>
-                          )}
-                          <p className="text-red-600 text-xs mt-2">
-                            Please review the reason and edit your biodata to
-                            address the issues.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Restriction/Ban Messages */}
-                    {user.isBanned && (
-                      <div className="bg-red-50 border-4 border-black rounded-lg p-4">
-                        <div>
-                          <h3 className="text-lg font-semibold text-red-800 mb-2">
-                            Account Banned
-                          </h3>
-                          <p className="text-red-700 text-sm">
-                            Your account has been banned by the administrators.
-                            You no longer have access to the platform. If you
-                            believe this is an error, please contact support.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {user.isRestricted && !user.isBanned && (
-                      <div className="bg-yellow-50 border-4 border-black rounded-lg p-4">
-                        <div>
-                          <h3 className="text-lg font-semibold text-yellow-800 mb-2">
-                            Profile Under Investigation
-                          </h3>
-                          <p className="text-yellow-700 text-sm">
-                            Your profile is currently under investigation by our
-                            administrators. During this period, your biodata is
-                            hidden from public view and you cannot view other
-                            profiles. This is a temporary measure to ensure
-                            compliance with our community guidelines. You will
-                            be notified once the investigation is complete.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  /* No Profile State */
-                  <div className="text-center py-12">
-                    {/* Check if user has BRACU email or is verified alumni */}
-                    {user &&
-                    user.email &&
-                    !user.email.endsWith("@g.bracu.ac.bd") &&
-                    !user.email.endsWith("@bracu.ac.bd") &&
-                    !user.alumniVerified ? (
-                      /* Non-BRACU user message */
-                      <div className="max-w-lg mx-auto">
-                        <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Shield className="h-8 w-8 text-rose-600" />
-                        </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-3">
-                          Biodata Creation Policy
-                        </h3>
-                        <div className="bg-rose-50 border border-rose-200 rounded-lg p-6 mb-6">
-                          <p className="text-rose-800 text-sm leading-relaxed">
-                            To maintain the authenticity and integrity of our
-                            platform,
-                            <strong>only BRACU students</strong> with
-                            institutional email addresses (@g.bracu.ac.bd or
-                            @bracu.ac.bd) are permitted to create biodata.
-                          </p>
-                          <p className="text-rose-700 text-sm mt-3">
-                            This policy ensures that our matrimony platform
-                            serves only BRACU students, alumni, and faculty
-                            members while maintaining high standards of
-                            verification.
-                          </p>
-                        </div>
-                        {verificationRequested ? (
-                          /* Verification requested */
-                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
-                            <div className="flex items-center justify-center mb-3">
-                              <h4 className="text-lg font-medium text-yellow-900">
-                                Verification Request Submitted
-                              </h4>
-                            </div>
-                            <p className="text-yellow-800 text-sm leading-relaxed text-center">
-                              Your verification request has been submitted.
-                              Please send a photo of your past ID card or proof
-                              of your BRACU affiliation to our Facebook page for
-                              review.
-                            </p>
                           </div>
-                        ) : (
-                          /* Request verification button */
-                          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+
+                          {/* Action Buttons */}
+                          <div className="flex space-x-2">
                             <button
-                              onClick={handleRequestVerification}
-                              disabled={requestingVerification}
-                              className="bg-white text-black border border-black px-6 py-3 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                              onClick={() => navigate("/profile/view")}
+                              className="flex items-center bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
                             >
-                              {requestingVerification ? (
-                                <ButtonSpinner />
-                              ) : (
-                                "Request Alumni Verification"
+                              <Eye className="h-4 w-4 mr-1" />
+                              <span>View</span>
+                            </button>
+                            <button
+                              onClick={() => navigate("/profile/edit")}
+                              className="flex items-center bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              <span>Edit</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Status Messages */}
+                        {profile.status === "pending_approval" && (
+                          <div className="bg-yellow-50 border-4 border-black rounded-lg p-4">
+                            <div className="flex items-center">
+                              <p className="text-yellow-800 text-sm">
+                                {profile.editCount > 0
+                                  ? "Your biodata changes are being reviewed by our admin team. We'll notify you via email once it's approved and live on the platform."
+                                  : "Your biodata is currently under review by our admin team. We'll notify you via email once it's approved and live on the platform."}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {profile.status === "approved" && (
+                          <div className="bg-green-50 border-4 border-black rounded-lg p-4">
+                            <div className="flex items-center">
+                              <p className="text-green-800 text-sm center mx-auto">
+                                Congratulations! Your biodata is approved and
+                                visible to other users.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {profile.status === "rejected" && (
+                          <div className="bg-red-50 border-4 border-black rounded-lg p-4">
+                            <div className="space-y-2">
+                              <p className="text-red-800 text-sm font-medium">
+                                Your biodata has been rejected by the admin
+                                team.
+                              </p>
+                              {profile.rejectionReason && (
+                                <div className="mt-2 pt-2 border-t border-red-200">
+                                  <p className="text-red-700 text-sm">
+                                    <strong>Reason:</strong>{" "}
+                                    {profile.rejectionReason}
+                                  </p>
+                                </div>
                               )}
-                            </button>
-                            <button
-                              onClick={() => navigate("/search")}
-                              className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
-                            >
-                              Browse Biodata's
-                            </button>
+                              <p className="text-red-600 text-xs mt-2">
+                                Please review the reason and edit your biodata
+                                to address the issues.
+                              </p>
+                            </div>
                           </div>
                         )}
                       </div>
                     ) : (
-                      /* BRACU user - normal biodata creation flow */
-                      <>
-                        {draft ? (
-                          /* Draft exists - show "View Draft" */
-                          <>
-                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                              <FileText className="h-8 w-8 text-gray-600" />
+                      /* No Profile State */
+                      <div className="text-center py-12">
+                        {/* Check if user has BRACU email or is verified alumni */}
+                        {user &&
+                        user.email &&
+                        !user.email.endsWith("@g.bracu.ac.bd") &&
+                        !user.email.endsWith("@bracu.ac.bd") &&
+                        !user.alumniVerified ? (
+                          /* Non-BRACU user message */
+                          <div className="max-w-lg mx-auto">
+                            <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                              <Shield className="h-8 w-8 text-rose-600" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">
-                              Continue Your Biodata
+                            <h3 className="text-lg font-medium text-gray-900 mb-3">
+                              Biodata Creation Policy
                             </h3>
-                            <p className="text-gray-600 mb-4 max-w-md mx-auto">
-                              You have a saved draft of your biodata. Continue
-                              where you left off to complete your profile.
-                            </p>
-                            <div className="bg-gray-50 border-4 border-black rounded-lg p-4 mb-6 max-w-sm mx-auto">
-                              <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-800 font-medium">
-                                  Progress:
-                                </span>
-                                <span className="text-gray-600">
-                                  Step {draft.currentStep} of 4
-                                </span>
-                              </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                <div
-                                  className="bg-gray-600 h-2 rounded-full transition-all duration-300"
-                                  style={{
-                                    width: `${(draft.currentStep / 4) * 100}%`,
-                                  }}
-                                ></div>
-                              </div>
+                            <div className="bg-rose-50 border border-rose-200 rounded-lg p-6 mb-6">
+                              <p className="text-rose-800 text-sm leading-relaxed">
+                                To maintain the authenticity and integrity of
+                                our platform,
+                                <strong>only BRACU students</strong> with
+                                institutional email addresses (@g.bracu.ac.bd or
+                                @bracu.ac.bd) are permitted to create biodata.
+                              </p>
+                              <p className="text-rose-700 text-sm mt-3">
+                                This policy ensures that our matrimony platform
+                                serves only BRACU students, alumni, and faculty
+                                members while maintaining high standards of
+                                verification.
+                              </p>
                             </div>
-                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                              <button
-                                onClick={() => navigate("/profile/create")}
-                                className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
-                              >
-                                View Draft & Continue
-                              </button>
-                              <button
-                                onClick={() =>
-                                  navigate("/profile/create?new=true")
-                                }
-                                className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
-                              >
-                                Start Fresh
-                              </button>
-                            </div>
-                          </>
+                            {verificationRequested ? (
+                              /* Verification requested */
+                              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+                                <div className="flex items-center justify-center mb-3">
+                                  <h4 className="text-lg font-medium text-yellow-900">
+                                    Verification Request Submitted
+                                  </h4>
+                                </div>
+                                <p className="text-yellow-800 text-sm leading-relaxed text-center">
+                                  Your verification request has been submitted.
+                                  Please send a photo of your past ID card or
+                                  proof of your BRACU affiliation to our
+                                  Facebook page for review.
+                                </p>
+                              </div>
+                            ) : (
+                              /* Request verification button */
+                              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                <button
+                                  onClick={handleRequestVerification}
+                                  disabled={requestingVerification}
+                                  className="bg-white text-black border border-black px-6 py-3 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                                >
+                                  {requestingVerification ? (
+                                    <ButtonSpinner />
+                                  ) : (
+                                    "Request Alumni Verification"
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => navigate("/search")}
+                                  className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
+                                >
+                                  Browse Biodata's
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         ) : (
-                          /* No draft - show "Create Your Biodata" */
+                          /* BRACU user - normal biodata creation flow */
                           <>
-                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                              <User className="h-8 w-8 text-gray-400" />
-                            </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">
-                              Create Your Biodata
-                            </h3>
-                            <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                              Start your journey in the BRACU community by
-                              creating a detailed biodata to find your perfect
-                              match.
-                            </p>
-                            <button
-                              onClick={() => navigate("/profile/create")}
-                              className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
-                            >
-                              Create Biodata
-                            </button>
+                            {draft ? (
+                              /* Draft exists - show "View Draft" */
+                              <>
+                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                  <FileText className="h-8 w-8 text-gray-600" />
+                                </div>
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                  Continue Your Biodata
+                                </h3>
+                                <p className="text-gray-600 mb-4 max-w-md mx-auto">
+                                  You have a saved draft of your biodata.
+                                  Continue where you left off to complete your
+                                  profile.
+                                </p>
+                                <div className="bg-gray-50 border-4 border-black rounded-lg p-4 mb-6 max-w-sm mx-auto">
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-800 font-medium">
+                                      Progress:
+                                    </span>
+                                    <span className="text-gray-600">
+                                      Step {draft.currentStep} of 4
+                                    </span>
+                                  </div>
+                                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                    <div
+                                      className="bg-gray-600 h-2 rounded-full transition-all duration-300"
+                                      style={{
+                                        width: `${
+                                          (draft.currentStep / 4) * 100
+                                        }%`,
+                                      }}
+                                    ></div>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                  <button
+                                    onClick={() => navigate("/profile/create")}
+                                    className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
+                                  >
+                                    View Draft & Continue
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      navigate("/profile/create?new=true")
+                                    }
+                                    className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
+                                  >
+                                    Start Fresh
+                                  </button>
+                                </div>
+                              </>
+                            ) : (
+                              /* No draft - show "Create Your Biodata" */
+                              <>
+                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                  <User className="h-8 w-8 text-gray-400" />
+                                </div>
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                  Create Your Biodata
+                                </h3>
+                                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                                  Start your journey in the BRACU community by
+                                  creating a detailed biodata to find your
+                                  perfect match.
+                                </p>
+                                <button
+                                  onClick={() => navigate("/profile/create")}
+                                  className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
+                                >
+                                  Create Biodata
+                                </button>
+                              </>
+                            )}
                           </>
                         )}
-                      </>
+                      </div>
                     )}
-                  </div>
+                  </>
                 )}
               </div>
             </div>

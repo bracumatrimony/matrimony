@@ -178,7 +178,7 @@ router.post(
 // @access  Public (only approved profiles)
 router.get("/search", async (req, res) => {
   try {
-    // Check if user is authenticated and restricted
+    // Check if user is authenticated and restricted/banned
     let currentUser = null;
     if (req.headers.authorization) {
       try {
@@ -186,15 +186,15 @@ router.get("/search", async (req, res) => {
         const jwt = require("jsonwebtoken");
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         currentUser = await User.findById(decoded.userId).select(
-          "isRestricted"
+          "isRestricted isBanned"
         );
       } catch (error) {
         // Invalid token, treat as unauthenticated
       }
     }
 
-    // If user is restricted, return empty results
-    if (currentUser && currentUser.isRestricted) {
+    // If user is restricted or banned, return empty results
+    if (currentUser && (currentUser.isRestricted || currentUser.isBanned)) {
       return res.json({
         success: true,
         profiles: [],
@@ -430,7 +430,9 @@ router.get("/:profileId", async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         currentUser = await require("../models/User")
           .findById(decoded.userId)
-          .select("name email profileId isActive role credits isRestricted")
+          .select(
+            "name email profileId isActive role credits isRestricted isBanned"
+          )
           .lean();
       }
     } catch (authError) {
@@ -479,8 +481,8 @@ router.get("/:profileId", async (req, res) => {
       });
     }
 
-    // Check if current user is restricted
-    if (currentUser && currentUser.isRestricted) {
+    // Check if current user is restricted or banned
+    if (currentUser && (currentUser.isRestricted || currentUser.isBanned)) {
       return res.status(404).json({
         success: false,
         message: "Profile not found",
