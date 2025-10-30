@@ -351,7 +351,7 @@ export default function UserProfile() {
               </div>
 
               <div className="p-6">
-                {/* Ban/Restriction Messages - Show regardless of profile status */}
+                {/* Ban Message - Show regardless of profile status */}
                 {user.isBanned && (
                   <div className="bg-red-50 border-4 border-black rounded-lg p-4 mb-6">
                     <div>
@@ -362,24 +362,6 @@ export default function UserProfile() {
                         Your account has been banned by the administrators. You
                         no longer have access to the platform. If you believe
                         this is an error, please contact support.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {user.isRestricted && !user.isBanned && (
-                  <div className="bg-yellow-50 border-4 border-black rounded-lg p-4 mb-6">
-                    <div>
-                      <h3 className="text-lg font-semibold text-yellow-800 mb-2">
-                        Profile Under Investigation
-                      </h3>
-                      <p className="text-yellow-700 text-sm">
-                        Your profile is currently under investigation by our
-                        administrators. During this period, your biodata is
-                        hidden from public view and you cannot view other
-                        profiles. This is a temporary measure to ensure
-                        compliance with our community guidelines. You will be
-                        notified once the investigation is complete.
                       </p>
                     </div>
                   </div>
@@ -444,6 +426,25 @@ export default function UserProfile() {
                                 {profile.editCount > 0
                                   ? "Your biodata changes are being reviewed by our admin team. We'll notify you via email once it's approved and live on the platform."
                                   : "Your biodata is currently under review by our admin team. We'll notify you via email once it's approved and live on the platform."}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Restriction Message - Show below under review */}
+                        {user.isRestricted && (
+                          <div className="bg-yellow-50 border-4 border-black rounded-lg p-4">
+                            <div>
+                              <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+                                Profile Under Investigation
+                              </h3>
+                              <p className="text-yellow-700 text-sm">
+                                Your profile is currently under investigation by
+                                our administrators. During this period, your
+                                biodata is hidden from public view and you
+                                cannot view other profiles. This is a temporary
+                                measure to ensure compliance with our community
+                                guidelines.
                               </p>
                             </div>
                           </div>
