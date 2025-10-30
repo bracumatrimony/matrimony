@@ -12,7 +12,10 @@ const { detectUniversityFromEmail } = require("../config/universities");
 const router = express.Router();
 
 // Initialize Google OAuth client
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const googleClient = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET
+);
 
 // Helper function to set JWT cookie
 const setTokenCookie = (res, token) => {
