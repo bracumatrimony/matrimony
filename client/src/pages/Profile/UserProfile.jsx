@@ -444,6 +444,40 @@ export default function UserProfile() {
                         </div>
                       </div>
                     )}
+
+                    {/* Restriction/Ban Messages */}
+                    {user.isBanned && (
+                      <div className="bg-red-50 border-4 border-black rounded-lg p-4">
+                        <div>
+                          <h3 className="text-lg font-semibold text-red-800 mb-2">
+                            Account Banned
+                          </h3>
+                          <p className="text-red-700 text-sm">
+                            Your account has been banned by the administrators.
+                            You no longer have access to the platform. If you
+                            believe this is an error, please contact support.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {user.isRestricted && !user.isBanned && (
+                      <div className="bg-yellow-50 border-4 border-black rounded-lg p-4">
+                        <div>
+                          <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+                            Profile Under Investigation
+                          </h3>
+                          <p className="text-yellow-700 text-sm">
+                            Your profile is currently under investigation by our
+                            administrators. During this period, your biodata is
+                            hidden from public view and you cannot view other
+                            profiles. This is a temporary measure to ensure
+                            compliance with our community guidelines. You will
+                            be notified once the investigation is complete.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   /* No Profile State */

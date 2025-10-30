@@ -11,6 +11,8 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [exporting, setExporting] = useState(false);
+  const [restricting, setRestricting] = useState(null);
+  const [banning, setBanning] = useState(null);
 
   // Debounce search query
   useEffect(() => {
@@ -93,6 +95,42 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
       showNotification?.("Failed to export emails.", "error");
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handleRestrictUser = async (userId) => {
+    try {
+      setRestricting(userId);
+      const response = await adminService.restrictUser(userId);
+      if (response.success) {
+        showNotification?.("User restricted successfully", "success");
+        loadProfiles(); // Reload the profiles list
+      } else {
+        showNotification?.("Failed to restrict user", "error");
+      }
+    } catch (error) {
+      console.error("Failed to restrict user:", error);
+      showNotification?.("Failed to restrict user", "error");
+    } finally {
+      setRestricting(null);
+    }
+  };
+
+  const handleBanUser = async (userId) => {
+    try {
+      setBanning(userId);
+      const response = await adminService.banUser(userId);
+      if (response.success) {
+        showNotification?.("User banned successfully", "success");
+        loadProfiles(); // Reload the profiles list
+      } else {
+        showNotification?.("Failed to ban user", "error");
+      }
+    } catch (error) {
+      console.error("Failed to ban user:", error);
+      showNotification?.("Failed to ban user", "error");
+    } finally {
+      setBanning(null);
     }
   };
 
@@ -256,6 +294,30 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
                           >
                             <Edit className="h-4 w-4" />
                             Edit
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleRestrictUser(profile.userId._id)
+                            }
+                            disabled={restricting === profile.userId._id}
+                            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-yellow-600 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 rounded-lg transition-colors duration-200 disabled:opacity-50"
+                            title="Restrict User"
+                          >
+                            <User className="h-4 w-4" />
+                            {restricting === profile.userId._id
+                              ? "Restricting..."
+                              : "Restrict"}
+                          </button>
+                          <button
+                            onClick={() => handleBanUser(profile.userId._id)}
+                            disabled={banning === profile.userId._id}
+                            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors duration-200 disabled:opacity-50"
+                            title="Ban User"
+                          >
+                            <User className="h-4 w-4" />
+                            {banning === profile.userId._id
+                              ? "Banning..."
+                              : "Ban"}
                           </button>
                         </div>
                       </td>

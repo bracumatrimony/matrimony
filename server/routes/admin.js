@@ -569,6 +569,94 @@ router.get("/users", [auth, adminAuth], async (req, res) => {
   }
 });
 
+// @route   PUT /api/admin/users/:userId/restrict
+// @desc    Restrict a user (hide their biodata and prevent viewing others)
+// @access  Private (Admin only)
+router.put("/users/:userId/restrict", [auth, adminAuth], async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Update user
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { isRestricted: true },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Hide their profile if exists
+    if (user.profileId) {
+      await Profile.findOneAndUpdate(
+        { profileId: user.profileId },
+        { status: "hidden" }
+      );
+    }
+
+    res.json({
+      success: true,
+      message: "User restricted successfully",
+      user,
+    });
+  } catch (error) {
+    console.error("Restrict user error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to restrict user",
+    });
+  }
+});
+
+// @route   PUT /api/admin/users/:userId/ban
+// @desc    Ban a user (remove biodata and prevent login)
+// @access  Private (Admin only)
+router.put("/users/:userId/ban", [auth, adminAuth], async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Update user
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { isBanned: true },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Delete their profile if exists
+    if (user.profileId) {
+      await Profile.findOneAndDelete({ profileId: user.profileId });
+      // Update user to remove profileId
+      await User.findByIdAndUpdate(userId, {
+        profileId: null,
+        hasProfile: false,
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "User banned successfully",
+      user,
+    });
+  } catch (error) {
+    console.error("Ban user error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to ban user",
+    });
+  }
+});
+
 // @route   GET /api/admin/reports
 // @desc    Get all reports
 // @access  Private (Admin only)

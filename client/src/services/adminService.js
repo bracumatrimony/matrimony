@@ -181,6 +181,18 @@ class AdminService {
       method: "PUT",
     });
   }
+
+  async restrictUser(userId) {
+    return this.makeRequest(`/admin/users/${userId}/restrict`, {
+      method: "PUT",
+    });
+  }
+
+  async banUser(userId) {
+    return this.makeRequest(`/admin/users/${userId}/ban`, {
+      method: "PUT",
+    });
+  }
 }
 
 export default new AdminService();

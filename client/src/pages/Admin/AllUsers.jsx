@@ -13,6 +13,8 @@ export default function AllUsers({ onViewProfile, showNotification }) {
   const [deleteConfirmModal, setDeleteConfirmModal] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [restricting, setRestricting] = useState(null);
+  const [banning, setBanning] = useState(null);
 
   // Debounce search query
   useEffect(() => {
@@ -125,6 +127,44 @@ export default function AllUsers({ onViewProfile, showNotification }) {
 
   const handleDeleteCancel = () => {
     setDeleteConfirmModal(null);
+  };
+
+  const handleRestrictUser = async (userId, e) => {
+    e.stopPropagation(); // Prevent row click
+    try {
+      setRestricting(userId);
+      const response = await adminService.restrictUser(userId);
+      if (response.success) {
+        showNotification?.("User restricted successfully", "success");
+        loadUsers(); // Reload the users list
+      } else {
+        showNotification?.("Failed to restrict user", "error");
+      }
+    } catch (error) {
+      console.error("Failed to restrict user:", error);
+      showNotification?.("Failed to restrict user", "error");
+    } finally {
+      setRestricting(null);
+    }
+  };
+
+  const handleBanUser = async (userId, e) => {
+    e.stopPropagation(); // Prevent row click
+    try {
+      setBanning(userId);
+      const response = await adminService.banUser(userId);
+      if (response.success) {
+        showNotification?.("User banned successfully", "success");
+        loadUsers(); // Reload the users list
+      } else {
+        showNotification?.("Failed to ban user", "error");
+      }
+    } catch (error) {
+      console.error("Failed to ban user:", error);
+      showNotification?.("Failed to ban user", "error");
+    } finally {
+      setBanning(null);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -334,16 +374,38 @@ export default function AllUsers({ onViewProfile, showNotification }) {
                         </div>
                       </td>
                       <td className="px-6 py-3 whitespace-nowrap">
-                        {user.profileId && (
+                        <div className="flex items-center gap-2">
+                          {user.profileId && (
+                            <button
+                              onClick={(e) => handleDeleteClick(user, e)}
+                              className="inline-flex items-center px-3 py-1.5 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                              title="Delete biodata"
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Delete
+                            </button>
+                          )}
                           <button
-                            onClick={(e) => handleDeleteClick(user, e)}
-                            className="inline-flex items-center px-3 py-1.5 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
-                            title="Delete biodata"
+                            onClick={(e) => handleRestrictUser(user._id, e)}
+                            disabled={restricting === user._id}
+                            className="inline-flex items-center px-3 py-1.5 border border-yellow-300 text-sm font-medium rounded-md text-yellow-700 bg-white hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors disabled:opacity-50"
+                            title="Restrict user"
                           >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            Delete
+                            <User className="h-4 w-4 mr-1" />
+                            {restricting === user._id
+                              ? "Restricting..."
+                              : "Restrict"}
                           </button>
-                        )}
+                          <button
+                            onClick={(e) => handleBanUser(user._id, e)}
+                            disabled={banning === user._id}
+                            className="inline-flex items-center px-3 py-1.5 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors disabled:opacity-50"
+                            title="Ban user"
+                          >
+                            <User className="h-4 w-4 mr-1" />
+                            {banning === user._id ? "Banning..." : "Ban"}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

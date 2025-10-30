@@ -355,6 +355,14 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // Check if user is banned
+    if (user.isBanned) {
+      return res.status(403).json({
+        success: false,
+        message: "Your account has been banned",
+      });
+    }
+
     // Update last login
     await user.updateLastLogin();
 

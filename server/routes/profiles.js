@@ -178,6 +178,33 @@ router.post(
 // @access  Public (only approved profiles)
 router.get("/search", async (req, res) => {
   try {
+    // Check if user is authenticated and restricted
+    let currentUser = null;
+    if (req.headers.authorization) {
+      try {
+        const token = req.headers.authorization.split(" ")[1];
+        const jwt = require("jsonwebtoken");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        currentUser = await User.findById(decoded.userId).select(
+          "isRestricted"
+        );
+      } catch (error) {
+        // Invalid token, treat as unauthenticated
+      }
+    }
+
+    // If user is restricted, return empty results
+    if (currentUser && currentUser.isRestricted) {
+      return res.json({
+        success: true,
+        profiles: [],
+        pagination: {
+          current: parseInt(req.query.page) || 1,
+          pages: 0,
+          total: 0,
+        },
+      });
+    }
     const {
       search,
       gender,
@@ -246,18 +273,28 @@ router.get("/search", async (req, res) => {
       }
     }
 
-    // Fetch all matching profiles
+    // Fetch all matching profiles, excluding those from restricted users
     const allProfiles = await Profile.find(filters)
+      .populate({
+        path: "userId",
+        select: "isRestricted",
+        match: { isRestricted: { $ne: true } }, // Exclude profiles where user is restricted
+      })
       .select("-privacy -contactInformation -personalContactInfo -__v")
       .lean();
 
+    // Filter out profiles where userId is null (due to populate match)
+    const filteredProfiles = allProfiles.filter(
+      (profile) => profile.userId !== null
+    );
+
     // Shuffle the entire result set to ensure all profiles get equal traffic
-    shuffleArray(allProfiles);
+    shuffleArray(filteredProfiles);
 
     // Calculate total and pagination
-    const total = allProfiles.length;
+    const total = filteredProfiles.length;
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const profiles = allProfiles.slice(skip, skip + parseInt(limit));
+    const profiles = filteredProfiles.slice(skip, skip + parseInt(limit));
 
     res.json({
       success: true,
@@ -393,7 +430,7 @@ router.get("/:profileId", async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         currentUser = await require("../models/User")
           .findById(decoded.userId)
-          .select("name email profileId isActive role credits")
+          .select("name email profileId isActive role credits isRestricted")
           .lean();
       }
     } catch (authError) {
@@ -408,7 +445,7 @@ router.get("/:profileId", async (req, res) => {
       profileId: req.params.profileId,
       status: "approved",
     })
-      .populate("userId", "name email")
+      .populate("userId", "name email isRestricted")
       .select("-__v"); // Exclude version key
 
     if (!profile) {
@@ -428,6 +465,22 @@ router.get("/:profileId", async (req, res) => {
         });
       }
 
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found",
+      });
+    }
+
+    // Check if profile is hidden or user is restricted
+    if (profile.status === "hidden" || profile.userId?.isRestricted) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found",
+      });
+    }
+
+    // Check if current user is restricted
+    if (currentUser && currentUser.isRestricted) {
       return res.status(404).json({
         success: false,
         message: "Profile not found",
