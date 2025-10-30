@@ -17,6 +17,16 @@ const profileSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    university: {
+      type: String,
+      required: true,
+      enum: {
+        values: Object.keys(
+          require("../config/universities").getAllUniversities()
+        ),
+        message: "Invalid university",
+      },
+    },
 
     // Status
     status: {

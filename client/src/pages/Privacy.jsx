@@ -6,8 +6,8 @@ export default function Privacy() {
     <>
       <SEO
         title="Privacy Policy"
-        description="Learn about BRACU Matrimony's privacy policy. Understand how we collect, use, and protect your personal information on our matrimonial platform."
-        keywords="privacy policy, data protection, BRACU matrimony privacy, personal information"
+        description="Learn about Campus Matrimony's privacy policy. Understand how we collect, use, and protect your personal information on our matrimonial platform."
+        keywords="privacy policy, data protection, Campus matrimony privacy, personal information"
       />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
@@ -33,7 +33,7 @@ export default function Privacy() {
                     Introduction
                   </h2>
                   <p className="text-gray-700 leading-relaxed mb-4">
-                    This Privacy Policy explains how BRACU Matrimony ("we,"
+                    This Privacy Policy explains how Campus Matrimony ("we,"
                     "us," or "our") collects, uses, discloses, and safeguards
                     your information when you use our matrimonial platform and
                     related services (collectively, the "Service").By using our

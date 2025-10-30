@@ -6,8 +6,8 @@ export default function Terms() {
     <>
       <SEO
         title="Terms of Service"
-        description="Read the terms of service for BRACU Matrimony. Understand our policies, user responsibilities, and legal agreements for using our matrimonial platform."
-        keywords="terms of service, legal terms, BRACU matrimony policies, user agreement"
+        description="Read the terms of service for Campus Matrimony. Understand our policies, user responsibilities, and legal agreements for using our matrimonial platform."
+        keywords="terms of service, legal terms, Campus matrimony policies, user agreement"
       />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
@@ -33,7 +33,7 @@ export default function Terms() {
                     Acceptance of Terms
                   </h2>
                   <p className="text-gray-700 leading-relaxed mb-4">
-                    Welcome to BRACU Matrimony ("we," "us," or "our"). These
+                    Welcome to Campus Matrimony ("we," "us," or "our"). These
                     Terms of Service ("Terms") govern your access to and use of
                     our matrimonial platform, including our website, mobile
                     applications, and related services (collectively, the
@@ -107,7 +107,7 @@ export default function Terms() {
                     retain ownership of the content you create, but you grant us
                     a worldwide, non-exclusive, royalty-free license to use,
                     display, and distribute your content in connection with the
-                    Service. All content on our Service is owned by BRACU
+                    Service. All content on our Service is owned by Campus
                     Matrimony or our licensors and is protected by copyright and
                     other intellectual property laws.
                   </p>
@@ -141,10 +141,10 @@ export default function Terms() {
                     Our Service is provided "as is" and "as available" without
                     warranties of any kind. We do not guarantee that the Service
                     will be uninterrupted, error-free, or secure. To the maximum
-                    extent permitted by law, BRACU Matrimony shall not be liable
-                    for any indirect, incidental, special, or consequential
-                    damages arising out of or in connection with your use of the
-                    Service.
+                    extent permitted by law, Campus Matrimony shall not be
+                    liable for any indirect, incidental, special, or
+                    consequential damages arising out of or in connection with
+                    your use of the Service.
                   </p>
                 </section>
 

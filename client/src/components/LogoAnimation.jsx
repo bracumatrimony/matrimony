@@ -64,11 +64,11 @@ export default function LogoAnimation({ onComplete }) {
           >
             <img
               src="https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg"
-              alt="BRACU Matrimony"
+              alt="Campus Matrimony"
               className="h-16 w-16 md:h-20 md:w-20 object-contain"
             />
             <h1 className="text-3xl md:text-4xl font-light text-gray-900 tracking-tight leading-tight">
-              BRACU{" "}
+              Campus{" "}
               <span className="font-medium bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
                 Matrimony
               </span>

@@ -55,8 +55,8 @@ export default function Home() {
     <>
       <SEO
         title="Find Your Perfect Match"
-        description="BRACU Matrimony - The premier matrimonial platform for BRACU community. Find your perfect life partner with advanced search, verified profiles, and secure communication."
-        keywords="BRACU matrimony, marriage, wedding, life partner, matrimonial, Bangladesh, BRAC University"
+        description="Campus Matrimony - The premier matrimonial platform for campus community. Find your perfect life partner with advanced search, verified profiles, and secure communication."
+        keywords="Campus matrimony, marriage, wedding, life partner, matrimonial, Bangladesh, campus"
       />
       <div className="min-h-screen bg-white">
         {/* Hero Section */}

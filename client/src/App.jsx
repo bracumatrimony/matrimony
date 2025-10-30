@@ -150,6 +150,10 @@ function App() {
                       }
                     />
                     <Route path="/search" element={<SearchProfiles />} />
+                    <Route
+                      path="/search/:university"
+                      element={<SearchProfiles />}
+                    />
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/privacy" element={<Privacy />} />
                     <Route

@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const {
+  getUniversityConfig,
+  getAllUniversities,
+} = require("../config/universities");
 
 const userSchema = new mongoose.Schema(
   {
@@ -51,6 +55,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       unique: true,
       sparse: true,
+    },
+    university: {
+      type: String,
+      required: true,
+      enum: {
+        values: Object.keys(getAllUniversities()),
+        message: "Invalid university",
+      },
     },
     picture: {
       type: String,
@@ -172,16 +184,36 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Static method to generate unique profile ID
-userSchema.statics.generateProfileId = async function () {
-  let profileId;
-  let exists = true;
+// Static method to generate unique profile ID based on university
+userSchema.statics.generateProfileId = async function (universityKey) {
+  const universityConfig = getUniversityConfig(universityKey);
+  if (!universityConfig) {
+    throw new Error(`Invalid university key: ${universityKey}`);
+  }
 
-  while (exists) {
-    profileId = `BRACU${Math.floor(Math.random() * 10000)
-      .toString()
-      .padStart(4, "0")}`;
-    exists = await this.findOne({ profileId });
+  const { idPrefix, startingID } = universityConfig;
+
+  // Find the highest existing ID for this university
+  const highestProfile = await this.findOne(
+    { university: universityKey, profileId: new RegExp(`^${idPrefix}\\d+$`) },
+    { profileId: 1 }
+  ).sort({ profileId: -1 });
+
+  let nextId = startingID;
+
+  if (highestProfile && highestProfile.profileId) {
+    // Extract the numeric part and increment
+    const currentId = parseInt(highestProfile.profileId.replace(idPrefix, ""));
+    nextId = Math.max(currentId + 1, startingID);
+  }
+
+  const profileId = `${idPrefix}${nextId}`;
+
+  // Ensure uniqueness (in case of concurrent requests)
+  const exists = await this.findOne({ profileId });
+  if (exists) {
+    // If it exists, try the next number
+    return this.generateProfileId(universityKey);
   }
 
   return profileId;

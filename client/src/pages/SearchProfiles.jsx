@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Search, Filter, X, Plus } from "lucide-react";
 import ProfileCard from "../components/Profile/ProfileCard";
 import profileService from "../services/profileService";
@@ -10,6 +10,7 @@ import SEO from "../components/SEO";
 
 export default function SearchProfiles() {
   const navigate = useNavigate();
+  const { university: urlUniversity } = useParams();
   const [profiles, setProfiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
@@ -26,9 +27,27 @@ export default function SearchProfiles() {
   const [limit, setLimit] = useState(12); // Show 12 per page
   const [totalPages, setTotalPages] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [universities, setUniversities] = useState({});
+  const [selectedUniversity, setSelectedUniversity] = useState(
+    urlUniversity || null
+  );
   const abortControllerRef = useRef(null);
-
   const isInitialLoadRef = useRef(true);
+
+  const loadUniversities = async () => {
+    try {
+      const universitiesData = await authService.getUniversities();
+      if (universitiesData) {
+        setUniversities(universitiesData);
+      }
+    } catch (error) {
+      console.error("Error loading universities:", error);
+    }
+  };
+
+  const handleUniversitySelect = (universityKey) => {
+    navigate(`/search/${universityKey}`);
+  };
 
   useEffect(() => {
     // Get current user
@@ -42,9 +61,23 @@ export default function SearchProfiles() {
       }
     }
 
-    // Load profiles from API
+    // Load universities and profiles
+    loadUniversities();
     loadProfiles();
   }, []);
+
+  // Update selectedUniversity when URL university parameter changes
+  useEffect(() => {
+    setSelectedUniversity(urlUniversity || null);
+    if (urlUniversity) {
+      setPage(1);
+      loadProfiles(
+        { ...filters, searchQuery, university: urlUniversity },
+        1,
+        limit
+      );
+    }
+  }, [urlUniversity]);
 
   // Optimize search with useMemo for filters
   const memoizedFilters = useMemo(
@@ -107,6 +140,10 @@ export default function SearchProfiles() {
         }
         if (searchFilters.religion)
           backendFilters.religion = searchFilters.religion;
+        if (searchFilters.university)
+          backendFilters.university = searchFilters.university;
+        else if (selectedUniversity)
+          backendFilters.university = selectedUniversity;
 
         const response = await profileService.searchProfiles(backendFilters, {
           signal,
@@ -150,8 +187,9 @@ export default function SearchProfiles() {
     };
     setFilters(clearedFilters);
     setSearchQuery("");
+    setSelectedUniversity(null);
     setPage(1);
-    await loadProfiles({ ...clearedFilters, searchQuery: "" }, 1, limit);
+    navigate("/search");
   };
 
   const handleUnlockProfile = (profileId) => {
@@ -185,158 +223,162 @@ export default function SearchProfiles() {
     <>
       <SEO
         title="Search Profiles"
-        description="Search and find compatible matches from BRACU Matrimony. Browse verified profiles with advanced filters for age, location, and preferences."
-        keywords="search profiles, find matches, BRACU matrimony search, biodata search"
+        description="Search and find compatible matches from Campus Matrimony. Browse verified profiles with advanced filters for age, location, and preferences."
+        keywords="search profiles, find matches, Campus matrimony search, biodata search"
       />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col">
-        {/* Mobile Filter Bar */}
-        <div className="block md:hidden bg-white border-b border-slate-200 shadow-sm">
-          <div className="px-4 py-3">
-            <button
-              onClick={() => setIsFilterOpen(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
-            >
-              <Filter className="h-5 w-5" />
-              <span className="font-medium">Filter Profiles</span>
-            </button>
+        {/* Mobile Filter Bar - Only show when university is selected */}
+        {selectedUniversity && (
+          <div className="block md:hidden bg-white border-b border-slate-200 shadow-sm">
+            <div className="px-4 py-3">
+              <button
+                onClick={() => setIsFilterOpen(true)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                <Filter className="h-5 w-5" />
+                <span className="font-medium">Filter Profiles</span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
         <div className="flex flex-1 min-h-0">
-          {/* Sidebar - Search and Filters (Desktop) */}
-          <div className="hidden md:flex w-80 bg-white border-r border-slate-200 min-h-full flex-col shadow-lg">
-            {/* Filters */}
-            <div className="p-6 flex-1 bg-white">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-medium text-slate-800">
-                  Refine Your Search
-                </h3>
-                <button
-                  onClick={clearFilters}
-                  className="text-sm text-slate-600 hover:text-slate-800 transition-colors cursor-pointer underline decoration-slate-300 hover:decoration-slate-600"
-                >
-                  Clear All
-                </button>
-              </div>
-
-              <div className="space-y-6">
-                {/* Gender Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-3">
-                    Looking for
-                  </label>
-                  <select
-                    value={filters.gender}
-                    onChange={(e) =>
-                      handleFilterChange("gender", e.target.value)
-                    }
-                    className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
-                  >
-                    <option value="">Any Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
-                </div>
-
-                {/* Age Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-3">
-                    Age Range
-                  </label>
-                  <div className="flex space-x-3">
-                    <input
-                      type="number"
-                      placeholder="Min age"
-                      value={filters.ageMin}
-                      onChange={(e) =>
-                        handleFilterChange("ageMin", e.target.value)
-                      }
-                      className="w-1/2 px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all shadow-sm hover:shadow-md"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Max age"
-                      value={filters.ageMax}
-                      onChange={(e) =>
-                        handleFilterChange("ageMax", e.target.value)
-                      }
-                      className="w-1/2 px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all shadow-sm hover:shadow-md"
-                    />
-                  </div>
-                </div>
-
-                {/* Location Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-3">
-                    Preferred Location
-                  </label>
-                  <select
-                    value={filters.district}
-                    onChange={(e) =>
-                      handleFilterChange("district", e.target.value)
-                    }
-                    className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
-                  >
-                    {locationsByDivision[""].map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                    {Object.entries(locationsByDivision).map(
-                      ([division, locations]) => {
-                        if (division === "") return null;
-                        return (
-                          <optgroup key={division} label={division}>
-                            {locations.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
-                          </optgroup>
-                        );
-                      }
-                    )}
-                  </select>
-                </div>
-
-                {/* Religion Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-3">
-                    Religion
-                  </label>
-                  <select
-                    value={filters.religion}
-                    onChange={(e) =>
-                      handleFilterChange("religion", e.target.value)
-                    }
-                    className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
-                  >
-                    <option value="">Any Religion</option>
-                    <option value="Muslim">Muslim</option>
-                    <option value="Hindu">Hindu</option>
-                    <option value="Christian">Christian</option>
-                    <option value="Buddhist">Buddhist</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                {/* Apply Filter Button */}
-                <div className="pt-6">
+          {/* Sidebar - Search and Filters (Desktop) - Only show when university is selected */}
+          {selectedUniversity && (
+            <div className="hidden md:flex w-80 bg-white border-r border-slate-200 min-h-full flex-col shadow-lg">
+              {/* Filters */}
+              <div className="p-6 flex-1 bg-white">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-medium text-slate-800">
+                    Refine Your Search
+                  </h3>
                   <button
-                    onClick={() => {
-                      setPage(1);
-                      loadProfiles({ ...filters, searchQuery }, 1, limit);
-                    }}
-                    className="w-full bg-slate-800 hover:bg-slate-900 text-white px-6 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"
+                    onClick={clearFilters}
+                    className="text-sm text-slate-600 hover:text-slate-800 transition-colors cursor-pointer underline decoration-slate-300 hover:decoration-slate-600"
                   >
-                    Apply Filters
+                    Clear All
                   </button>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Gender Filter */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-3">
+                      Looking for
+                    </label>
+                    <select
+                      value={filters.gender}
+                      onChange={(e) =>
+                        handleFilterChange("gender", e.target.value)
+                      }
+                      className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
+                    >
+                      <option value="">Any Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+
+                  {/* Age Filter */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-3">
+                      Age Range
+                    </label>
+                    <div className="flex space-x-3">
+                      <input
+                        type="number"
+                        placeholder="Min age"
+                        value={filters.ageMin}
+                        onChange={(e) =>
+                          handleFilterChange("ageMin", e.target.value)
+                        }
+                        className="w-1/2 px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all shadow-sm hover:shadow-md"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Max age"
+                        value={filters.ageMax}
+                        onChange={(e) =>
+                          handleFilterChange("ageMax", e.target.value)
+                        }
+                        className="w-1/2 px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all shadow-sm hover:shadow-md"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Location Filter */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-3">
+                      Preferred Location
+                    </label>
+                    <select
+                      value={filters.district}
+                      onChange={(e) =>
+                        handleFilterChange("district", e.target.value)
+                      }
+                      className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
+                    >
+                      {locationsByDivision[""].map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                      {Object.entries(locationsByDivision).map(
+                        ([division, locations]) => {
+                          if (division === "") return null;
+                          return (
+                            <optgroup key={division} label={division}>
+                              {locations.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </optgroup>
+                          );
+                        }
+                      )}
+                    </select>
+                  </div>
+
+                  {/* Religion Filter */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-3">
+                      Religion
+                    </label>
+                    <select
+                      value={filters.religion}
+                      onChange={(e) =>
+                        handleFilterChange("religion", e.target.value)
+                      }
+                      className="w-full px-4 py-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-white shadow-sm hover:shadow-md"
+                    >
+                      <option value="">Any Religion</option>
+                      <option value="Muslim">Muslim</option>
+                      <option value="Hindu">Hindu</option>
+                      <option value="Christian">Christian</option>
+                      <option value="Buddhist">Buddhist</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  {/* Apply Filter Button */}
+                  <div className="pt-6">
+                    <button
+                      onClick={() => {
+                        setPage(1);
+                        loadProfiles({ ...filters, searchQuery }, 1, limit);
+                      }}
+                      className="w-full bg-slate-800 hover:bg-slate-900 text-white px-6 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"
+                    >
+                      Apply Filters
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Mobile Filter Drawer */}
-          {isFilterOpen && (
+          {/* Mobile Filter Drawer - Only show when university is selected */}
+          {selectedUniversity && isFilterOpen && (
             <>
               {/* Backdrop */}
               <div
@@ -501,135 +543,187 @@ export default function SearchProfiles() {
 
           {/* Main Content */}
           <div className="flex-1">
-            {/* Profile Grid */}
+            {/* University Selection or Profile Grid */}
             <div className="px-6 sm:px-8 py-8">
               <div className="max-w-7xl mx-auto">
-                {loading ? (
-                  <div className="text-center py-20">
-                    <SectionSpinner text="Finding your perfect match..." />
-                  </div>
-                ) : error ? (
-                  <div className="text-center py-20">
-                    <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
-                      <span className="text-red-600 text-3xl">!</span>
-                    </div>
-                    <h3 className="text-2xl font-serif font-bold text-slate-800 mb-4">
-                      Unable to Load Profiles
-                    </h3>
-                    <p className="text-slate-600 mb-8 text-lg">{error}</p>
-                    <button
-                      onClick={loadProfiles}
-                      className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"
-                    >
-                      Try Again
-                    </button>
-                  </div>
-                ) : profiles.length > 0 ? (
+                {selectedUniversity ? (
+                  /* Show profiles for selected university */
                   <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
-                      {profiles.map((profile, index) => (
-                        <div
-                          key={profile._id || profile.id}
-                          className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden transition-all duration-300 animate-fadeInUp"
-                          style={{ animationDelay: `${index * 50}ms` }}
+                    {loading ? (
+                      <div className="text-center py-20">
+                        <SectionSpinner text="Finding your perfect match..." />
+                      </div>
+                    ) : error ? (
+                      <div className="text-center py-20">
+                        <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
+                          <span className="text-red-600 text-3xl">!</span>
+                        </div>
+                        <h3 className="text-2xl font-serif font-bold text-slate-800 mb-4">
+                          Unable to Load Profiles
+                        </h3>
+                        <p className="text-slate-600 mb-8 text-lg">{error}</p>
+                        <button
+                          onClick={() =>
+                            loadProfiles(
+                              { ...filters, searchQuery },
+                              page,
+                              limit
+                            )
+                          }
+                          className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"
                         >
-                          <ProfileCard
-                            profile={profile}
-                            onViewProfile={handleViewProfile}
-                          />
+                          Try Again
+                        </button>
+                      </div>
+                    ) : profiles.length > 0 ? (
+                      <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+                          {profiles.map((profile, index) => (
+                            <div
+                              key={profile._id || profile.id}
+                              className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden transition-all duration-300 animate-fadeInUp"
+                              style={{ animationDelay: `${index * 50}ms` }}
+                            >
+                              <ProfileCard
+                                profile={profile}
+                                onViewProfile={handleViewProfile}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        {/* Pagination Controls */}
+                        <div className="flex flex-wrap justify-center items-center mt-12 gap-2 sm:gap-3">
+                          <button
+                            onClick={handlePrevPage}
+                            disabled={page === 1}
+                            className={`px-4 sm:px-5 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base ${
+                              page === 1
+                                ? "opacity-50 cursor-not-allowed"
+                                : "cursor-pointer hover:shadow-md"
+                            }`}
+                          >
+                            &larr; Previous
+                          </button>
+                          {/* Page number buttons */}
+                          {Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                          ).map((num) => {
+                            // Show first, last, current, and neighbors; ellipsis for gaps
+                            if (
+                              num === 1 ||
+                              num === totalPages ||
+                              Math.abs(num - page) <= 1
+                            ) {
+                              return (
+                                <button
+                                  key={num}
+                                  onClick={() => {
+                                    if (num !== page) {
+                                      setPage(num);
+                                      loadProfiles(
+                                        { ...filters, searchQuery },
+                                        num,
+                                        limit
+                                      );
+                                    }
+                                  }}
+                                  className={`px-3.5 sm:px-4 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 ${
+                                    num === page
+                                      ? "bg-slate-800 text-white border-slate-800 shadow-md"
+                                      : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer hover:shadow-md"
+                                  }`}
+                                  disabled={num === page}
+                                >
+                                  {num}
+                                </button>
+                              );
+                            } else if (num === page - 2 || num === page + 2) {
+                              return (
+                                <span
+                                  key={num}
+                                  className="px-3 text-slate-400 select-none text-sm"
+                                >
+                                  ...
+                                </span>
+                              );
+                            }
+                            return null;
+                          })}
+                          <button
+                            onClick={handleNextPage}
+                            disabled={page === totalPages}
+                            className={`px-4 sm:px-5 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base ${
+                              page === totalPages
+                                ? "opacity-50 cursor-not-allowed"
+                                : "cursor-pointer hover:shadow-md"
+                            }`}
+                          >
+                            Next &rarr;
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="min-h-screen flex items-center justify-center">
+                        <div className="text-center py-12 max-w-md mx-auto">
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">
+                            No biodata found
+                          </h3>
+                          <p className="text-gray-600 mb-4">
+                            We couldn't find any biodata matching your criteria.
+                            Try adjusting your search filters to discover more
+                            potential matches.
+                          </p>
+                          <button
+                            onClick={clearFilters}
+                            className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"
+                          >
+                            Clear All Filters
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="py-8">
+                    <div className="text-center mb-12">
+                      <h1 className="text-4xl font-bold text-slate-800 mb-4">
+                        Select Your Institution
+                      </h1>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                      {Object.entries(universities).map(([key, university]) => (
+                        <div
+                          key={key}
+                          onClick={() => handleUniversitySelect(key)}
+                          className="bg-white rounded-lg shadow-md border border-slate-300 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-300"
+                        >
+                          <div className="aspect-video bg-slate-50 relative overflow-hidden">
+                            <img
+                              src={university.bannerImage}
+                              alt={university.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.src =
+                                  "https://via.placeholder.com/400x225/64748b/ffffff?text=University";
+                              }}
+                            />
+                          </div>
+                          <div className="p-6">
+                            <h3 className="text-xl font-semibold text-slate-800 mb-3">
+                              {university.name}
+                            </h3>
+                            <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+                              Explore verified biodata from {university.name}{" "}
+                              students, faculty and alumni
+                            </p>
+                            <div className="text-sm font-medium text-slate-700">
+                              Browse Biodata →
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
-                    {/* Pagination Controls */}
-                    <div className="flex flex-wrap justify-center items-center mt-12 gap-2 sm:gap-3">
-                      <button
-                        onClick={handlePrevPage}
-                        disabled={page === 1}
-                        className={`px-4 sm:px-5 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base ${
-                          page === 1
-                            ? "opacity-50 cursor-not-allowed"
-                            : "cursor-pointer hover:shadow-md"
-                        }`}
-                      >
-                        &larr; Previous
-                      </button>
-                      {/* Page number buttons */}
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                        (num) => {
-                          // Show first, last, current, and neighbors; ellipsis for gaps
-                          if (
-                            num === 1 ||
-                            num === totalPages ||
-                            Math.abs(num - page) <= 1
-                          ) {
-                            return (
-                              <button
-                                key={num}
-                                onClick={() => {
-                                  if (num !== page) {
-                                    setPage(num);
-                                    loadProfiles(
-                                      { ...filters, searchQuery },
-                                      num,
-                                      limit
-                                    );
-                                  }
-                                }}
-                                className={`px-3.5 sm:px-4 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 ${
-                                  num === page
-                                    ? "bg-slate-800 text-white border-slate-800 shadow-md"
-                                    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer hover:shadow-md"
-                                }`}
-                                disabled={num === page}
-                              >
-                                {num}
-                              </button>
-                            );
-                          } else if (num === page - 2 || num === page + 2) {
-                            return (
-                              <span
-                                key={num}
-                                className="px-3 text-slate-400 select-none text-sm"
-                              >
-                                ...
-                              </span>
-                            );
-                          }
-                          return null;
-                        }
-                      )}
-                      <button
-                        onClick={handleNextPage}
-                        disabled={page === totalPages}
-                        className={`px-4 sm:px-5 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base ${
-                          page === totalPages
-                            ? "opacity-50 cursor-not-allowed"
-                            : "cursor-pointer hover:shadow-md"
-                        }`}
-                      >
-                        Next &rarr;
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-center py-20">
-                    <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
-                      <Filter className="h-12 w-12 text-slate-400" />
-                    </div>
-                    <h3 className="text-2xl font-serif font-bold text-slate-800 mb-4">
-                      No Profiles Found
-                    </h3>
-                    <p className="text-slate-600 mb-8 text-lg max-w-md mx-auto">
-                      We couldn't find any profiles matching your criteria. Try
-                      adjusting your search filters to discover more potential
-                      matches.
-                    </p>
-                    <button
-                      onClick={clearFilters}
-                      className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"
-                    >
-                      Clear All Filters
-                    </button>
                   </div>
                 )}
               </div>

@@ -1,7 +1,30 @@
 const express = require("express");
 const monetizationConfig = require("../config/monetization");
+const { getAllUniversities } = require("../config/universities");
 
 const router = express.Router();
+
+// @route   GET /api/config/universities
+// @desc    Get university configuration
+// @access  Public
+router.get("/universities", (req, res) => {
+  try {
+    const universities = getAllUniversities();
+
+    res.json({
+      success: true,
+      universities,
+      serverTimestamp: global.SERVER_STARTUP_TIME || Date.now(),
+    });
+  } catch (error) {
+    console.error("Error getting university config:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get university configuration",
+      serverTimestamp: Date.now(),
+    });
+  }
+});
 
 // @route   GET /api/config/monetization
 // @desc    Get current monetization configuration status

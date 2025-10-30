@@ -9,7 +9,7 @@ export default function Footer() {
           {/* Large Brand Text */}
           <div className="flex flex-col items-center md:items-start">
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-light text-gray-900 tracking-tight leading-tight">
-              BRACU{" "}
+              Campus{" "}
               <span className="font-medium bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
                 Matrimony
               </span>

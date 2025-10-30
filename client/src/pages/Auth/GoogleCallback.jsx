@@ -49,13 +49,6 @@ export default function GoogleCallback() {
   }, [searchParams, navigate, login]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <div className="flex items-center justify-center space-x-2">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-rose-600"></div>
-          <span className="text-gray-700">Completing sign-in...</span>
-        </div>
-      </div>
-    </div>
+    <div className="min-h-screen bg-white flex items-center justify-center"></div>
   );
 }

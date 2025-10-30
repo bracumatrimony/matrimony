@@ -530,21 +530,21 @@ export default function BiodataView() {
       <SEO
         title={
           profile
-            ? `${profile.profileId || "Profile"} - BRACU Matrimony`
-            : "Profile - BRACU Matrimony"
+            ? `${profile.profileId || "Profile"} - Campus Matrimony`
+            : "Profile - Campus Matrimony"
         }
         description={
           profile
             ? `View ${
                 profile.profileId || "this"
-              } profile on BRACU Matrimony. Age: ${
+              } profile on Campus Matrimony. Age: ${
                 profile.age || "N/A"
               }, Location: ${
                 profile.district || "N/A"
               }. Find your perfect match.`
-            : "View profile details on BRACU Matrimony"
+            : "View profile details on Campus Matrimony"
         }
-        keywords={`BRACU matrimony profile, ${
+        keywords={`Campus matrimony profile, ${
           profile?.district || ""
         }, marriage biodata`}
         type="article"
@@ -555,7 +555,7 @@ export default function BiodataView() {
                 "@context": "https://schema.org",
                 "@type": "Person",
                 name: profile.profileId,
-                description: `Matrimonial profile on BRACU Matrimony. Age: ${profile.age}, Location: ${profile.district}`,
+                description: `Matrimonial profile on Campus Matrimony. Age: ${profile.age}, Location: ${profile.district}`,
                 image:
                   profile.profilePicture ||
                   "https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg",

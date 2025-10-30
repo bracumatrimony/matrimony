@@ -7,6 +7,7 @@ const {
   formatValidationError,
   getErrorStatusCode,
 } = require("../utils/errorFormatter");
+const { detectUniversityFromEmail } = require("../config/universities");
 
 const router = express.Router();
 
@@ -66,8 +67,18 @@ router.post("/google", async (req, res) => {
     let user = await User.findOne({ email });
 
     if (!user) {
-      // Generate unique profile ID
-      const profileId = await User.generateProfileId();
+      // Detect university from email
+      const universityInfo = detectUniversityFromEmail(email);
+      if (!universityInfo) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Email domain not recognized. Only verified university email addresses are allowed.",
+        });
+      }
+
+      // Generate unique profile ID based on university
+      const profileId = await User.generateProfileId(universityInfo.key);
 
       // Create new user
       user = new User({
@@ -78,6 +89,7 @@ router.post("/google", async (req, res) => {
         emailVerified: true,
         authProvider: "google",
         profileId,
+        university: universityInfo.key,
       });
       await user.save();
     } else if (!user.isGoogleUser) {
@@ -144,7 +156,7 @@ router.post("/google/callback", async (req, res) => {
       (isProduction
         ? "https://bracumatrimony.vercel.app"
         : "http://localhost:5173");
-    const redirectUri = `${baseUrl}/login`;
+    const redirectUri = `${baseUrl}/auth/google/callback`;
 
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
@@ -186,8 +198,18 @@ router.post("/google/callback", async (req, res) => {
     let user = await User.findOne({ email });
 
     if (!user) {
-      // Generate unique profile ID
-      const profileId = await User.generateProfileId();
+      // Detect university from email
+      const universityInfo = detectUniversityFromEmail(email);
+      if (!universityInfo) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Email domain not recognized. Only verified university email addresses are allowed.",
+        });
+      }
+
+      // Generate unique profile ID based on university
+      const profileId = await User.generateProfileId(universityInfo.key);
 
       // Create new user
       user = new User({
@@ -198,6 +220,7 @@ router.post("/google/callback", async (req, res) => {
         emailVerified: true,
         authProvider: "google",
         profileId,
+        university: universityInfo.key,
       });
       await user.save();
     } else if (!user.isGoogleUser) {
@@ -282,8 +305,18 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    // Generate unique profile ID
-    const profileId = await User.generateProfileId();
+    // Detect university from email
+    const universityInfo = detectUniversityFromEmail(email);
+    if (!universityInfo) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Email domain not recognized. Only verified university email addresses are allowed.",
+      });
+    }
+
+    // Generate unique profile ID based on university
+    const profileId = await User.generateProfileId(universityInfo.key);
 
     // Create new user
     const user = new User({
@@ -291,6 +324,7 @@ router.post("/register", async (req, res) => {
       email,
       password,
       profileId,
+      university: universityInfo.key,
       authProvider: "email",
       emailVerified: false,
     });

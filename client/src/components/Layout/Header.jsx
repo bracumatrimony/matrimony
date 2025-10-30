@@ -61,11 +61,11 @@ export default function Header() {
           <Link to="/" className="flex items-center space-x-3">
             <img
               src="https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg"
-              alt="BRACU Matrimony"
+              alt="Campus Matrimony"
               className="h-12 w-12 md:h-14 md:w-14 lg:h-16 lg:w-16 object-contain"
             />
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 tracking-tight leading-tight">
-              BRACU{" "}
+              Campus{" "}
               <span className="font-medium bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
                 Matrimony
               </span>

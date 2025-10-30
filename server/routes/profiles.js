@@ -9,23 +9,14 @@ const {
 const { asyncHandler } = require("../middleware/errorHandler");
 const monetizationConfig = require("../config/monetization");
 const { sendEmail } = require("../services/emailService");
+const { isValidUniversityEmail } = require("../config/universities");
 
 const router = express.Router();
 
 // Helper function to check if user can access contact information
 const canAccessContactInfo = (user) => {
-  // Allow if user has BRACU email domains
-  if (
-    user.email?.endsWith("@g.bracu.ac.bd") ||
-    user.email?.endsWith("@bracu.ac.bd")
-  ) {
-    return true;
-  }
-  // Allow if user is alumni verified
-  if (user.alumniVerified) {
-    return true;
-  }
-  return false;
+  // Allow if user has verified university email
+  return isValidUniversityEmail(user.email) || user.alumniVerified;
 };
 
 // Helper function to shuffle an array using Fisher-Yates algorithm
@@ -53,16 +44,12 @@ router.post(
       });
     }
 
-    // Check if user has BRACU email for biodata creation or is verified alumni
-    if (
-      !user.email.endsWith("@g.bracu.ac.bd") &&
-      !user.email.endsWith("@bracu.ac.bd") &&
-      !user.alumniVerified
-    ) {
+    // Check if user has verified university email for biodata creation or is verified alumni
+    if (!isValidUniversityEmail(user.email) && !user.alumniVerified) {
       return res.status(403).json({
         success: false,
         message:
-          "Only BRACU students and verified alumni (@g.bracu.ac.bd or @bracu.ac.bd) can create biodata. You can still browse profiles and unlock contacts with credits.",
+          "Only verified university students and verified alumni can create biodata. You can still browse profiles and unlock contacts with credits.",
       });
     }
 
@@ -131,7 +118,7 @@ router.post(
 
     // Generate profileId if not exists
     if (!user.profileId) {
-      user.profileId = await User.generateProfileId();
+      user.profileId = await User.generateProfileId(user.university);
       await user.save();
     }
 
@@ -140,6 +127,7 @@ router.post(
       userId: user._id,
       profileId: user.profileId,
       biodataId: user.profileId,
+      university: user.university,
       ...req.body,
     });
 
@@ -214,6 +202,7 @@ router.get("/search", async (req, res) => {
       profession,
       district,
       religion,
+      university,
       page = 1,
       limit = 10,
     } = req.query;
@@ -273,7 +262,8 @@ router.get("/search", async (req, res) => {
       }
     }
 
-    // Fetch all matching profiles, excluding those from restricted users
+    if (university)
+      filters.university = { $regex: new RegExp(`^${university}$`, "i") };
     const allProfiles = await Profile.find(filters)
       .populate({
         path: "userId",

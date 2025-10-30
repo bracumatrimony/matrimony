@@ -13,7 +13,7 @@ export default function GoogleSignIn() {
     setError("");
 
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    const redirectUri = window.location.origin + "/login";
+    const redirectUri = window.location.origin + "/auth/google/callback";
 
     const authUrl =
       `https://accounts.google.com/o/oauth2/auth?` +

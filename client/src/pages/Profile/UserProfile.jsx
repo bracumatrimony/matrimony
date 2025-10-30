@@ -504,14 +504,13 @@ export default function UserProfile() {
                             <div className="bg-rose-50 border border-rose-200 rounded-lg p-6 mb-6">
                               <p className="text-rose-800 text-sm leading-relaxed">
                                 To maintain the authenticity and integrity of
-                                our platform,
-                                <strong>only BRACU students</strong> with
-                                institutional email addresses (@g.bracu.ac.bd or
-                                @bracu.ac.bd) are permitted to create biodata.
+                                our platform, only verified students with
+                                institutional email addresses are permitted to
+                                create biodata.
                               </p>
                               <p className="text-rose-700 text-sm mt-3">
                                 This policy ensures that our matrimony platform
-                                serves only BRACU students, alumni, and faculty
+                                serves verified students, alumni, and faculty
                                 members while maintaining high standards of
                                 verification.
                               </p>
@@ -527,8 +526,9 @@ export default function UserProfile() {
                                 <p className="text-yellow-800 text-sm leading-relaxed text-center">
                                   Your verification request has been submitted.
                                   Please send a photo of your past ID card or
-                                  proof of your BRACU affiliation to our
-                                  Facebook page for review.
+                                  proof of your institutional affiliation or
+                                  student status to our Facebook page for
+                                  review.
                                 </p>
                               </div>
                             ) : (
@@ -618,9 +618,8 @@ export default function UserProfile() {
                                   Create Your Biodata
                                 </h3>
                                 <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                                  Start your journey in the BRACU community by
-                                  creating a detailed biodata to find your
-                                  perfect match.
+                                  Start your matrimonial journey by creating a
+                                  detailed biodata to find your perfect match.
                                 </p>
                                 <button
                                   onClick={() => navigate("/profile/create")}
@@ -825,7 +824,7 @@ export default function UserProfile() {
               <div className="p-6">
                 <div className="text-center">
                   <p className="text-gray-600 text-sm mb-4">
-                    Stay connected with BRACU Matrimony updates and community
+                    Stay connected with Campus Matrimony updates and community
                     news
                   </p>
                   <button

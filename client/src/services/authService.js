@@ -2,6 +2,7 @@
 class AuthService {
   constructor() {
     this.baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    this.universities = null;
   }
 
   // Store user data and token
@@ -65,9 +66,44 @@ class AuthService {
     }
   }
 
-  // Validate BRACU email (only for biodata creation)
-  isValidBRACUEmail(email) {
-    return email.endsWith("@g.bracu.ac.bd") || email.endsWith("@bracu.ac.bd");
+  // Fetch university configuration
+  async fetchUniversities() {
+    try {
+      const response = await this.makeRequest("/config/universities", {
+        method: "GET",
+      });
+      if (response.success) {
+        this.universities = response.universities;
+        return response.universities;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching universities:", error);
+      return null;
+    }
+  }
+
+  // Get universities (fetch if not cached)
+  async getUniversities() {
+    if (!this.universities) {
+      await this.fetchUniversities();
+    }
+    return this.universities;
+  }
+
+  // Validate university email (dynamic)
+  async isValidUniversityEmail(email) {
+    const universities = await this.getUniversities();
+    if (!universities) return false;
+
+    return Object.values(universities).some((config) =>
+      config.emailDomains.some((domain) => email.endsWith(domain))
+    );
+  }
+
+  // Legacy method for backward compatibility - now uses dynamic validation
+  async isValidBRACUEmail(email) {
+    return this.isValidUniversityEmail(email);
   }
 
   // Make API request with authentication
