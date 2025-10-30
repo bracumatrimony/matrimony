@@ -149,6 +149,14 @@ router.delete("/account", auth, async (req, res) => {
       });
     }
 
+    // Check if user is banned
+    if (user.isBanned) {
+      return res.status(403).json({
+        success: false,
+        message: "Your account has been banned",
+      });
+    }
+
     // Delete user's profile if it exists
     await Profile.findOneAndDelete({ userId: req.user.id });
 

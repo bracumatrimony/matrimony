@@ -721,11 +721,19 @@ router.delete(
       });
     }
 
+    // Check if user is banned
+    const user = await User.findById(req.user.id);
+    if (user && user.isBanned) {
+      return res.status(403).json({
+        success: false,
+        message: "Your account has been banned",
+      });
+    }
+
     // Delete the profile
     await Profile.findByIdAndDelete(profile._id);
 
     // Update user hasProfile flag
-    const user = await User.findById(req.user.id);
     if (user) {
       user.hasProfile = false;
       await user.save();

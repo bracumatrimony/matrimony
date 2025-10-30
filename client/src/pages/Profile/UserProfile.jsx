@@ -677,31 +677,34 @@ export default function UserProfile() {
                     </div>
                   )}
 
-                  <div className="border border-red-300 rounded-md p-4">
-                    <h4 className="font-medium text-gray-900 mb-2">
-                      Delete Account
-                    </h4>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Permanently delete your account and all associated data.
-                      This action cannot be undone.
-                    </p>
-                    <button
-                      onClick={handleDeleteAccount}
-                      disabled={loading}
-                      className={`flex items-center px-4 py-2 text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 transition-colors ${
-                        loading
-                          ? "opacity-50 cursor-not-allowed"
-                          : "cursor-pointer"
-                      }`}
-                    >
-                      {loading ? (
-                        <ButtonSpinner color="rose" className="mr-2" />
-                      ) : (
-                        <Trash2 className="h-4 w-4 mr-2" />
-                      )}
-                      {loading ? "Deleting..." : "Delete Account"}
-                    </button>
-                  </div>
+                  {/* Delete Account - Only show for non-banned users */}
+                  {!user.isBanned && (
+                    <div className="border border-red-300 rounded-md p-4">
+                      <h4 className="font-medium text-gray-900 mb-2">
+                        Delete Account
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Permanently delete your account and all associated data.
+                        This action cannot be undone.
+                      </p>
+                      <button
+                        onClick={handleDeleteAccount}
+                        disabled={loading}
+                        className={`flex items-center px-4 py-2 text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 transition-colors ${
+                          loading
+                            ? "opacity-50 cursor-not-allowed"
+                            : "cursor-pointer"
+                        }`}
+                      >
+                        {loading ? (
+                          <ButtonSpinner color="rose" className="mr-2" />
+                        ) : (
+                          <Trash2 className="h-4 w-4 mr-2" />
+                        )}
+                        {loading ? "Deleting..." : "Delete Account"}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
