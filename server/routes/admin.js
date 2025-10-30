@@ -5,6 +5,7 @@ const User = require("../models/User");
 const Report = require("../models/Report");
 const Bookmark = require("../models/Bookmark");
 const Transaction = require("../models/Transaction");
+const Draft = require("../models/Draft");
 const auth = require("../middleware/auth");
 const adminAuth = require("../middleware/adminAuth");
 const { sendEmail } = require("../services/emailService");
@@ -681,6 +682,21 @@ router.put("/users/:userId/ban", [auth, adminAuth], async (req, res) => {
         hasProfile: false,
       });
       console.log("Profile deleted and user updated");
+    }
+
+    // Delete their draft if exists
+    const draft = await Draft.findOneAndDelete({ userId: userId });
+    if (draft) {
+      console.log("Draft deleted for userId:", userId);
+    }
+
+    // Delete their bookmarks
+    const bookmarksDeleted = await Bookmark.deleteMany({ userId: userId });
+    if (bookmarksDeleted.deletedCount > 0) {
+      console.log(
+        `Deleted ${bookmarksDeleted.deletedCount} bookmarks for userId:`,
+        userId
+      );
     }
 
     res.json({
