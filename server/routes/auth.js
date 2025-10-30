@@ -157,7 +157,7 @@ router.post("/google/callback", async (req, res) => {
     const baseUrl =
       process.env.CLIENT_URL ||
       (isProduction
-        ? "https://bracumatrimony.vercel.app"
+        ? "https://campusmatrimony.vercel.app"
         : "http://localhost:5173");
     const redirectUri = `${baseUrl}/auth/google/callback`;
 

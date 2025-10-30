@@ -34,8 +34,7 @@ app.use(
 
 // Middleware
 const allowedOrigins = [
-  "https://bracumatrimony.vercel.app",
-  "https://bracumatrimony2.vercel.app",
+  "https://campusmatrimony.vercel.app",
   "https://bracu-matrimony-backend.vercel.app",
   "http://localhost:5173",
   "http://localhost:3000",
@@ -176,7 +175,7 @@ app.get("/", (req, res) => {
         "/api/config",
       ],
     },
-    frontend: "https://bracumatrimony.vercel.app",
+    frontend: "https://campusmatrimony.vercel.app",
     timestamp: new Date().toISOString(),
   });
 });

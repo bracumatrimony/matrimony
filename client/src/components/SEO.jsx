@@ -15,7 +15,7 @@ const SEO = ({
   const siteName = "Campus Matrimony";
   const defaultImage =
     "https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg";
-  const defaultUrl = "https://bracumatrimony.vercel.app";
+  const defaultUrl = "https://campusmatrimony.vercel.app";
   const defaultDescription =
     "Campus Matrimony - The premier matrimonial platform for BRACU community. Find your perfect life partner with advanced search, verified profiles, and secure communication.";
 
@@ -29,7 +29,7 @@ const SEO = ({
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Campus Matrimony",
-    url: "https://bracumatrimony.vercel.app",
+    url: "https://campusmatrimony.vercel.app",
     logo: "https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg",
     description:
       "The premier matrimonial platform for BRACU community. Find your perfect life partner with advanced search, verified profiles, and secure communication.",

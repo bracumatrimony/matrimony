@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bracumatrimony.vercel.app/sitemap.xml
+Sitemap: https://campusmatrimony.vercel.app/sitemap.xml

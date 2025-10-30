@@ -548,7 +548,9 @@ export default function BiodataView() {
           profile?.district || ""
         }, marriage biodata`}
         type="article"
-        url={`https://bracumatrimony.vercel.app/profile/${profileId || "view"}`}
+        url={`https://campusmatrimony.vercel.app/profile/${
+          profileId || "view"
+        }`}
         structuredData={
           profile
             ? {
@@ -559,7 +561,7 @@ export default function BiodataView() {
                 image:
                   profile.profilePicture ||
                   "https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg",
-                url: `https://bracumatrimony.vercel.app/profile/${profileId}`,
+                url: `https://campusmatrimony.vercel.app/profile/${profileId}`,
                 address: {
                   "@type": "PostalAddress",
                   addressLocality: profile.district,

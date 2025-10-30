@@ -220,7 +220,7 @@ const emailTemplates = {
 
             <div style="text-align: center;">
               <a href="${
-                process.env.FRONTEND_URL || "https://bracu-matrimony.vercel.app"
+                process.env.FRONTEND_URL || "https://campusmatrimony.vercel.app"
               }/profile" class="cta-button" style="color: white !important;">
                 View My Profile
               </a>
@@ -445,7 +445,7 @@ const emailTemplates = {
             </div>
 
             <div style="text-align: center;">
-              <a href="https://bracumatrimony.vercel.app/profile/edit" class="cta-button" style="color: white !important;">
+              <a href="https://campusmatrimony.vercel.app/profile/edit" class="cta-button" style="color: white !important;">
                 Edit My Profile
               </a>
             </div>
