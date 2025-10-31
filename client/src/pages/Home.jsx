@@ -74,7 +74,7 @@ export default function Home() {
             }}
           >
             <source
-              src="https://res.cloudinary.com/dkir6pztp/video/upload/v1761749346/Wedding_Video_t1ebjj.mp4"
+              src="https://res.cloudinary.com/dkir6pztp/video/upload/v1761911054/Wedding_Video_tpkutp.mp4"
               type="video/mp4"
             />
           </video>
