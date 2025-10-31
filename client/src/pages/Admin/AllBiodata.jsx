@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Users, Search, Edit, Eye, Download } from "lucide-react";
+import { User, Users, Search, Download, Trash2 } from "lucide-react";
 import adminService from "../../services/adminService";
 
 export default function AllBiodata({ onViewProfile, showNotification }) {
@@ -12,7 +12,7 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
   const [searchInput, setSearchInput] = useState("");
   const [exporting, setExporting] = useState(false);
   const [restricting, setRestricting] = useState(null);
-  const [banning, setBanning] = useState(null);
+  const [deleting, setDeleting] = useState(null);
 
   // Debounce search query
   useEffect(() => {
@@ -52,12 +52,6 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
     if (onViewProfile) {
       onViewProfile(profileId);
     }
-  };
-
-  const handleEditProfile = (profileId) => {
-    // Open edit page in new tab with admin parameter
-    const url = `/profile/edit/${profileId}?admin=true`;
-    window.open(url, "_blank");
   };
 
   const handleExportEmails = async () => {
@@ -116,21 +110,29 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
     }
   };
 
-  const handleBanUser = async (userId) => {
+  const handleDeleteProfile = async (profileId) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this biodata? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
     try {
-      setBanning(userId);
-      const response = await adminService.banUser(userId);
+      setDeleting(profileId);
+      const response = await adminService.deleteProfile(profileId);
       if (response.success) {
-        showNotification?.("User banned successfully", "success");
+        showNotification?.("Biodata deleted successfully", "success");
         loadProfiles(); // Reload the profiles list
       } else {
-        showNotification?.("Failed to ban user", "error");
+        showNotification?.("Failed to delete biodata", "error");
       }
     } catch (error) {
-      console.error("Failed to ban user:", error);
-      showNotification?.("Failed to ban user", "error");
+      console.error("Failed to delete biodata:", error);
+      showNotification?.("Failed to delete biodata", "error");
     } finally {
-      setBanning(null);
+      setDeleting(null);
     }
   };
 
@@ -223,29 +225,30 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
                       Profile ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-64">
                       User
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
                       Created
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
                       Profile Views
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Bookmarks
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48">
                       Actions
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {profiles.map((profile) => (
-                    <tr key={profile._id} className="hover:bg-gray-50">
+                    <tr
+                      key={profile._id}
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handleViewProfile(profile.profileId)}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
                           {profile.profileId}
@@ -274,27 +277,8 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {profile.viewCount || 0}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {profile.bookmarkCount || 0}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleViewProfile(profile.profileId)}
-                            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors duration-200"
-                            title="View Profile"
-                          >
-                            <Eye className="h-4 w-4" />
-                            View
-                          </button>
-                          <button
-                            onClick={() => handleEditProfile(profile.profileId)}
-                            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-green-600 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-colors duration-200"
-                            title="Edit Profile"
-                          >
-                            <Edit className="h-4 w-4" />
-                            Edit
-                          </button>
+                      <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+                        <div className="flex items-center justify-start gap-2">
                           <button
                             onClick={() =>
                               handleRestrictUser(profile.userId._id)
@@ -309,15 +293,15 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
                               : "Restrict"}
                           </button>
                           <button
-                            onClick={() => handleBanUser(profile.userId._id)}
-                            disabled={banning === profile.userId._id}
+                            onClick={() => handleDeleteProfile(profile._id)}
+                            disabled={deleting === profile._id}
                             className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors duration-200 disabled:opacity-50"
-                            title="Ban User"
+                            title="Delete Biodata"
                           >
-                            <User className="h-4 w-4" />
-                            {banning === profile.userId._id
-                              ? "Banning..."
-                              : "Ban"}
+                            <Trash2 className="h-4 w-4" />
+                            {deleting === profile._id
+                              ? "Deleting..."
+                              : "Delete"}
                           </button>
                         </div>
                       </td>
