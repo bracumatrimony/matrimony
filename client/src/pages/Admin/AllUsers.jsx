@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Users, Search, Trash2, Download } from "lucide-react";
+import { User, Users, Search, Download } from "lucide-react";
 import adminService from "../../services/adminService";
 
 export default function AllUsers({ onViewProfile, showNotification }) {
@@ -10,8 +10,6 @@ export default function AllUsers({ onViewProfile, showNotification }) {
   const [totalUsers, setTotalUsers] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [deleteConfirmModal, setDeleteConfirmModal] = useState(null);
-  const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [restricting, setRestricting] = useState(null);
   const [banning, setBanning] = useState(null);
@@ -90,43 +88,6 @@ export default function AllUsers({ onViewProfile, showNotification }) {
 
   const handleSearch = (e) => {
     setSearchInput(e.target.value);
-  };
-
-  const handleDeleteClick = (user, e) => {
-    e.stopPropagation(); // Prevent row click
-    setDeleteConfirmModal(user);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!deleteConfirmModal?.profileId) {
-      showNotification?.("No profile to delete", "error");
-      return;
-    }
-
-    try {
-      setDeleting(true);
-      const response = await adminService.deleteProfile(
-        deleteConfirmModal.profileId
-      );
-
-      if (response.success) {
-        showNotification?.("Biodata deleted successfully", "success");
-        setDeleteConfirmModal(null);
-        loadUsers(); // Reload the users list
-      }
-    } catch (error) {
-      console.error("Failed to delete profile:", error);
-      showNotification?.(
-        "Failed to delete biodata. " + (error.message || ""),
-        "error"
-      );
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteConfirmModal(null);
   };
 
   const handleRestrictUser = async (userId, e) => {
@@ -375,16 +336,6 @@ export default function AllUsers({ onViewProfile, showNotification }) {
                       </td>
                       <td className="px-6 py-3 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          {user.profileId && (
-                            <button
-                              onClick={(e) => handleDeleteClick(user, e)}
-                              className="inline-flex items-center px-3 py-1.5 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
-                              title="Delete biodata"
-                            >
-                              <Trash2 className="h-4 w-4 mr-1" />
-                              Delete
-                            </button>
-                          )}
                           <button
                             onClick={(e) => handleRestrictUser(user._id, e)}
                             disabled={restricting === user._id}
@@ -495,55 +446,6 @@ export default function AllUsers({ onViewProfile, showNotification }) {
             No users found
           </h3>
           <p className="text-gray-600 text-lg">No users have registered yet.</p>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {deleteConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
-            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
-              <Trash2 className="h-6 w-6 text-red-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
-              Delete Biodata
-            </h3>
-            <p className="text-gray-600 text-center mb-6">
-              Are you sure you want to delete the biodata for{" "}
-              <strong>{deleteConfirmModal.name}</strong>?
-              <br />
-              <span className="text-sm text-gray-500">
-                Profile ID: {deleteConfirmModal.profileId}
-              </span>
-              <br />
-              <span className="text-red-600 text-sm font-medium">
-                This action cannot be undone.
-              </span>
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={handleDeleteCancel}
-                disabled={deleting}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                disabled={deleting}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-              >
-                {deleting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Deleting...
-                  </>
-                ) : (
-                  "Delete"
-                )}
-              </button>
-            </div>
-          </div>
         </div>
       )}
     </div>
