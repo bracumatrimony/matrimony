@@ -9,7 +9,10 @@ const {
 const { asyncHandler } = require("../middleware/errorHandler");
 const monetizationConfig = require("../config/monetization");
 const { sendEmail } = require("../services/emailService");
-const { isValidUniversityEmail } = require("../config/universities");
+const {
+  isValidUniversityEmail,
+  detectUniversityFromEmail,
+} = require("../config/universities");
 
 const router = express.Router();
 
@@ -118,8 +121,33 @@ router.post(
 
     // Generate profileId if not exists
     if (!user.profileId) {
+      // Dynamically detect university from current email to ensure accuracy
+      const universityInfo = detectUniversityFromEmail(user.email);
+      if (universityInfo) {
+        await User.findByIdAndUpdate(
+          user._id,
+          { university: universityInfo.key },
+          { runValidators: false }
+        );
+        user.university = universityInfo.key;
+      }
       user.profileId = await User.generateProfileId(user.university);
-      await user.save();
+      await User.findByIdAndUpdate(
+        user._id,
+        { profileId: user.profileId },
+        { runValidators: false }
+      );
+    } else {
+      // Even if profileId exists, ensure university is correct based on current email
+      const universityInfo = detectUniversityFromEmail(user.email);
+      if (universityInfo && user.university !== universityInfo.key) {
+        await User.findByIdAndUpdate(
+          user._id,
+          { university: universityInfo.key },
+          { runValidators: false }
+        );
+        user.university = universityInfo.key;
+      }
     }
 
     // Create new profile
@@ -135,8 +163,11 @@ router.post(
       await profile.save();
 
       // Update user hasProfile flag
-      user.hasProfile = true;
-      await user.save();
+      await User.findByIdAndUpdate(
+        user._id,
+        { hasProfile: true },
+        { runValidators: false }
+      );
 
       res.status(201).json({
         success: true,
@@ -262,8 +293,13 @@ router.get("/search", async (req, res) => {
       }
     }
 
-    if (university)
-      filters.university = { $regex: new RegExp(`^${university}$`, "i") };
+    if (university) {
+      filters.university = university;
+      console.log(`Filtering profiles by university: ${university}`);
+    }
+
+    console.log("Search filters:", JSON.stringify(filters, null, 2));
+
     const allProfiles = await Profile.find(filters)
       .populate({
         path: "userId",
@@ -272,6 +308,14 @@ router.get("/search", async (req, res) => {
       })
       .select("-privacy -contactInformation -personalContactInfo -__v")
       .lean();
+
+    console.log(`Found ${allProfiles.length} profiles before filtering`);
+    console.log(
+      "Sample profiles:",
+      allProfiles
+        .slice(0, 3)
+        .map((p) => ({ id: p.profileId, university: p.university }))
+    );
 
     // Filter out profiles where userId is null (due to populate match)
     const filteredProfiles = allProfiles.filter(
@@ -358,12 +402,12 @@ router.get(
       });
     }
 
-    // Check if user can access contact information (BRACU email or alumni verified)
+    // Check if user can access contact information (university email or alumni verified)
     if (!canAccessContactInfo(user)) {
       return res.status(403).json({
         success: false,
         message:
-          "Access denied. Only BRACU students and verified alumni can view unlocked profiles.",
+          "Access denied. Only verified university students and alumni can view unlocked profiles.",
       });
     }
 
@@ -725,8 +769,11 @@ router.delete(
 
     // Update user hasProfile flag
     if (user) {
-      user.hasProfile = false;
-      await user.save();
+      await User.findByIdAndUpdate(
+        user._id,
+        { hasProfile: false },
+        { runValidators: false }
+      );
     }
 
     res.json({
@@ -801,7 +848,7 @@ router.post(
       return res.status(403).json({
         success: false,
         message:
-          "Contact information is restricted to BRACU students and verified alumni only.",
+          "Contact information is restricted to verified university students and alumni only.",
       });
     }
 
@@ -838,12 +885,14 @@ router.post(
     }
 
     // Deduct credits and add to unlocked contacts
-    user.credits -= unlockCost;
-    if (!user.unlockedContacts) {
-      user.unlockedContacts = [];
-    }
-    user.unlockedContacts.push(profileId);
-    await user.save();
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        $inc: { credits: -unlockCost },
+        $addToSet: { unlockedContacts: profileId },
+      },
+      { new: true, runValidators: false }
+    );
 
     // Record the transaction
     if (monetizationConfig.shouldRecordTransactions()) {
@@ -862,7 +911,7 @@ router.post(
       message: "Contact information unlocked successfully",
       contactInfo:
         profile.contactInformation || "No contact information provided.",
-      remainingCredits: user.credits,
+      remainingCredits: user.credits - unlockCost,
     });
   })
 );
@@ -933,13 +982,13 @@ router.get(
       });
     }
 
-    // Check if user can unlock this contact (verified alumni or BRACU email)
+    // Check if user can unlock this contact (verified alumni or university email)
     const canUnlock = canAccessContactInfo(user);
     if (!canUnlock) {
       return res.status(403).json({
         success: false,
         message:
-          "Contact information is restricted to BRACU students and verified alumni only.",
+          "Contact information is restricted to verified university students and alumni only.",
         isUnlocked: false,
         canUnlock: false,
       });
@@ -982,8 +1031,11 @@ router.delete(
     }
 
     // Update user's hasProfile status
-    user.hasProfile = false;
-    await user.save();
+    await User.findByIdAndUpdate(
+      user._id,
+      { hasProfile: false },
+      { runValidators: false }
+    );
 
     res.json({
       success: true,
@@ -1008,14 +1060,12 @@ router.post(
       });
     }
 
-    // Check if user already has BRACU email
-    if (
-      user.email.endsWith("@g.bracu.ac.bd") ||
-      user.email.endsWith("@bracu.ac.bd")
-    ) {
+    // Check if user already has a valid university email
+    const universityConfig = detectUniversityFromEmail(user.email);
+    if (universityConfig) {
       return res.status(400).json({
         success: false,
-        message: "You already have a BRACU email address.",
+        message: `You already have a ${universityConfig.name} email address.`,
       });
     }
 
@@ -1037,13 +1087,33 @@ router.post(
     }
 
     // Set verification request flag
-    user.verificationRequest = true;
-    await user.save();
+    await User.findByIdAndUpdate(
+      user._id,
+      { verificationRequest: true },
+      { runValidators: false }
+    );
 
     res.json({
       success: true,
       message:
         "Verification request submitted successfully. Please send your proof to our Facebook page.",
+    });
+  })
+);
+
+// @route   POST /api/profiles/migrate-universities
+// @desc    Migrate existing profiles to have correct university field
+// @access  Public (temporary - should be admin only)
+router.post(
+  "/migrate-universities",
+  asyncHandler(async (req, res) => {
+    const {
+      migrateProfileUniversities,
+    } = require("../utils/migrateUniversities");
+    await migrateProfileUniversities();
+    res.json({
+      success: true,
+      message: "University migration completed",
     });
   })
 );

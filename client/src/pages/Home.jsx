@@ -32,8 +32,7 @@ export default function Home() {
     {
       step: 1,
       title: "Create Profile",
-      description:
-        "Sign up and create your biodata with BRACU email verification",
+      description: "Sign up with your university email and create your biodata",
       icon: <UserPlus className="w-6 h-6" />,
     },
     {

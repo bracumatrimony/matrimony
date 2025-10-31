@@ -521,16 +521,32 @@ const profileSchema = new mongoose.Schema(
 // Note: profileId already has unique: true, so no need for separate index
 profileSchema.index({ userId: 1 });
 profileSchema.index({ status: 1 });
+profileSchema.index({ university: 1 }); // Add index for university filtering
 profileSchema.index({ familyEconomicCondition: 1, status: 1 });
 profileSchema.index({ partnerEconomicCondition: 1, status: 1 });
 // PERFORMANCE: Compound index for the most common query pattern
 profileSchema.index({ profileId: 1, status: 1 });
+profileSchema.index({ university: 1, status: 1 }); // Add compound index for university filtering
 
-// Pre-save middleware to update lastUpdated and ensure biodataId
+// Pre-save middleware to update lastUpdated and ensure biodataId and university
 profileSchema.pre("save", function (next) {
   if (this.profileId && !this.biodataId) {
     this.biodataId = this.profileId;
   }
+
+  // Ensure university is set correctly based on profileId prefix
+  if (this.profileId && !this.university) {
+    const { getAllUniversities } = require("../config/universities");
+    const universities = getAllUniversities();
+
+    for (const [key, config] of Object.entries(universities)) {
+      if (this.profileId.startsWith(config.idPrefix)) {
+        this.university = key;
+        break;
+      }
+    }
+  }
+
   this.lastUpdated = new Date();
   next();
 });

@@ -39,6 +39,7 @@ export default function UserProfile() {
   const [monetizationEnabled, setMonetizationEnabled] = useState(
     monetizationConfig.isEnabled()
   );
+  const [isValidUniversityEmail, setIsValidUniversityEmail] = useState(false);
   const [verificationRequested, setVerificationRequested] = useState(false);
   const [requestingVerification, setRequestingVerification] = useState(false);
   const navigate = useNavigate();
@@ -50,15 +51,24 @@ export default function UserProfile() {
     }
   }, [user]);
 
-  // Refresh user data on component mount to get latest verification status
+  // Check if user email is from a valid university
   useEffect(() => {
-    const refreshUserData = async () => {
-      if (user) {
-        await refreshUser();
+    const checkUniversityEmail = async () => {
+      if (user && user.email) {
+        try {
+          const isValid = await authService.isValidUniversityEmail(user.email);
+          setIsValidUniversityEmail(isValid);
+        } catch (error) {
+          console.error("Error checking university email:", error);
+          setIsValidUniversityEmail(false);
+        }
+      } else {
+        setIsValidUniversityEmail(false);
       }
     };
-    refreshUserData();
-  }, []); // Only run once on mount
+
+    checkUniversityEmail();
+  }, [user]);
 
   useEffect(() => {
     loadUserData();
@@ -305,10 +315,18 @@ export default function UserProfile() {
                     {user.email}
                   </p>
                   <div className="flex items-center space-x-4 text-gray-600">
-                    {profile && (
+                    {user.profileId && (
                       <div className="flex items-center">
                         <Shield className="h-4 w-4 mr-1" />
-                        <span className="text-sm">ID: {profile.profileId}</span>
+                        <span className="text-sm">ID: {user.profileId}</span>
+                      </div>
+                    )}
+                    {profile && (
+                      <div className="flex items-center">
+                        <FileText className="h-4 w-4 mr-1" />
+                        <span className="text-sm">
+                          Profile: {profile.status}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -317,7 +335,7 @@ export default function UserProfile() {
 
               {/* Credits Badge - Show only when monetization is enabled and user is verified */}
               {monetizationEnabled &&
-                (!user.email.endsWith("@gmail.com") || user.alumniVerified) && (
+                (isValidUniversityEmail || user.alumniVerified) && (
                   <div className="text-left sm:text-right w-full sm:w-auto">
                     <div className="bg-gray-900 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md w-full sm:w-auto">
                       <div className="flex items-center justify-center space-x-2">
@@ -487,13 +505,12 @@ export default function UserProfile() {
                     ) : (
                       /* No Profile State */
                       <div className="text-center py-12">
-                        {/* Check if user has BRACU email or is verified alumni */}
+                        {/* Check if user has university email or is verified alumni */}
                         {user &&
                         user.email &&
-                        !user.email.endsWith("@g.bracu.ac.bd") &&
-                        !user.email.endsWith("@bracu.ac.bd") &&
+                        !isValidUniversityEmail &&
                         !user.alumniVerified ? (
-                          /* Non-BRACU user message */
+                          /* Non-university user message */
                           <div className="max-w-lg mx-auto">
                             <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
                               <Shield className="h-8 w-8 text-rose-600" />
@@ -555,7 +572,7 @@ export default function UserProfile() {
                             )}
                           </div>
                         ) : (
-                          /* BRACU user - normal biodata creation flow */
+                          /* University user - normal biodata creation flow */
                           <>
                             {draft ? (
                               /* Draft exists - show "View Draft" */

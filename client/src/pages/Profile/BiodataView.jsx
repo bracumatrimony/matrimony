@@ -49,6 +49,7 @@ export default function BiodataView() {
   const [isUnlockingContact, setIsUnlockingContact] = useState(false);
   const [userCredits, setUserCredits] = useState(0);
   const [canUnlockContact, setCanUnlockContact] = useState(false);
+  const [canViewContactInfo, setCanViewContactInfo] = useState(false);
   const [monetizationEnabled, setMonetizationEnabled] = useState(
     monetizationConfig.isEnabled()
   );
@@ -83,20 +84,36 @@ export default function BiodataView() {
   ];
 
   // Check if current user can view contact information
-  const canViewContactInfo = useMemo(() => {
-    if (!currentUser) return false;
-    // Allow if user has BRACU email domains
-    if (
-      currentUser.email?.endsWith("@g.bracu.ac.bd") ||
-      currentUser.email?.endsWith("@bracu.ac.bd")
-    ) {
-      return true;
-    }
-    // Allow if user is alumni verified
-    if (currentUser.alumniVerified) {
-      return true;
-    }
-    return false;
+  useEffect(() => {
+    const checkContactViewPermission = async () => {
+      if (!currentUser) {
+        setCanViewContactInfo(false);
+        return;
+      }
+
+      // Check if user has any university email dynamically
+      try {
+        const isValid = await authService.isValidUniversityEmail(
+          currentUser.email
+        );
+        if (isValid) {
+          setCanViewContactInfo(true);
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking university email:", error);
+      }
+
+      // Allow if user is alumni verified
+      if (currentUser.alumniVerified) {
+        setCanViewContactInfo(true);
+        return;
+      }
+
+      setCanViewContactInfo(false);
+    };
+
+    checkContactViewPermission();
   }, [currentUser]);
 
   const scrollToSection = (sectionId) => {
@@ -1287,8 +1304,8 @@ export default function BiodataView() {
                         Contact Information Restricted
                       </h3>
                       <p className="text-base text-rose-700 mb-4 leading-relaxed">
-                        You cannot see the contact information without
-                        (g.bracu.ac.bd) or (bracu.ac.bd). If you are alumni,
+                        You cannot see the contact information without a
+                        verified institutional email address. If you are alumni,
                         make a request for verification.
                       </p>
                       {!currentUser?.verificationRequest ? (

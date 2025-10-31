@@ -49,10 +49,15 @@ router.put("/profile", auth, async (req, res) => {
     }
 
     // Update fields
-    if (name) user.name = name;
-    if (picture) user.picture = picture;
+    const updateFields = {};
+    if (name) updateFields.name = name;
+    if (picture) updateFields.picture = picture;
 
-    await user.save();
+    if (Object.keys(updateFields).length > 0) {
+      await User.findByIdAndUpdate(user._id, updateFields, {
+        runValidators: false,
+      });
+    }
 
     res.json({
       success: true,

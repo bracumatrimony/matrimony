@@ -63,7 +63,9 @@ export default function SearchProfiles() {
 
     // Load universities and profiles
     loadUniversities();
-    loadProfiles();
+    if (!urlUniversity) {
+      loadProfiles();
+    }
   }, []);
 
   // Update selectedUniversity when URL university parameter changes
@@ -84,6 +86,7 @@ export default function SearchProfiles() {
     () => ({
       ...filters,
       searchQuery,
+      university: selectedUniversity,
     }),
     [
       filters.gender,
@@ -92,6 +95,7 @@ export default function SearchProfiles() {
       filters.district,
       filters.religion,
       searchQuery,
+      selectedUniversity,
     ]
   );
 
@@ -140,10 +144,14 @@ export default function SearchProfiles() {
         }
         if (searchFilters.religion)
           backendFilters.religion = searchFilters.religion;
-        if (searchFilters.university)
-          backendFilters.university = searchFilters.university;
-        else if (selectedUniversity)
+        // Always include university filter if selectedUniversity exists
+        if (selectedUniversity) {
           backendFilters.university = selectedUniversity;
+        }
+        // Override with searchFilters university if specified
+        if (searchFilters.university) {
+          backendFilters.university = searchFilters.university;
+        }
 
         const response = await profileService.searchProfiles(backendFilters, {
           signal,
@@ -208,14 +216,22 @@ export default function SearchProfiles() {
     if (page > 1) {
       const newPage = page - 1;
       setPage(newPage);
-      await loadProfiles({ ...filters, searchQuery }, newPage, limit);
+      await loadProfiles(
+        { ...filters, searchQuery, university: selectedUniversity },
+        newPage,
+        limit
+      );
     }
   };
   const handleNextPage = async () => {
     if (page < totalPages) {
       const newPage = page + 1;
       setPage(newPage);
-      await loadProfiles({ ...filters, searchQuery }, newPage, limit);
+      await loadProfiles(
+        { ...filters, searchQuery, university: selectedUniversity },
+        newPage,
+        limit
+      );
     }
   };
 
@@ -365,7 +381,15 @@ export default function SearchProfiles() {
                     <button
                       onClick={() => {
                         setPage(1);
-                        loadProfiles({ ...filters, searchQuery }, 1, limit);
+                        loadProfiles(
+                          {
+                            ...filters,
+                            searchQuery,
+                            university: selectedUniversity,
+                          },
+                          1,
+                          limit
+                        );
                       }}
                       className="w-full bg-slate-800 hover:bg-slate-900 text-white px-6 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"
                     >
@@ -529,7 +553,15 @@ export default function SearchProfiles() {
                   <button
                     onClick={() => {
                       setPage(1);
-                      loadProfiles({ ...filters, searchQuery }, 1, limit);
+                      loadProfiles(
+                        {
+                          ...filters,
+                          searchQuery,
+                          university: selectedUniversity,
+                        },
+                        1,
+                        limit
+                      );
                       setIsFilterOpen(false);
                     }}
                     className="w-full bg-slate-800 hover:bg-slate-900 text-white px-6 py-4 rounded-lg transition-all duration-200 cursor-pointer font-medium shadow-sm hover:shadow-lg transform hover:-translate-y-0.5"

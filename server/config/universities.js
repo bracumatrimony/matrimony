@@ -48,6 +48,8 @@ const getAllUniversities = () => {
 const detectUniversityFromEmail = (email) => {
   if (!email) return null;
 
+  email = email.toLowerCase().trim();
+
   for (const [key, config] of Object.entries(universities)) {
     if (config.emailDomains.some((domain) => email.endsWith(domain))) {
       return { key, ...config };

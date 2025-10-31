@@ -6,12 +6,7 @@ import GoogleSignIn from "../../components/Auth/GoogleSignIn";
 import SEO from "../../components/SEO";
 
 export default function Login() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -34,46 +29,6 @@ export default function Login() {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setErrors({});
-
-    try {
-      const result = await authService.authenticateWithEmail(
-        formData.email,
-        formData.password,
-        "login"
-      );
-
-      if (result.success) {
-        login(result.user);
-        navigate("/profile");
-      }
-    } catch (error) {
-      setErrors({
-        general: error.message || "Login failed. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <>
@@ -129,42 +84,40 @@ export default function Login() {
                   </span>
                 </h2>
                 <p className="text-white md:text-slate-700 text-sm sm:text-base leading-relaxed px-2 font-medium">
-                  Sign in to your account or create a new one
+                  Sign in to your account
                 </p>
               </div>
 
               <div className="h-px bg-white/20 md:bg-gray-100 my-4" />
 
-              {/* Form Content */}
-              <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-                {errors.general && (
-                  <div className="bg-red-50 border border-red-200 p-3 sm:p-4 rounded-md">
-                    <div className="flex">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="h-5 w-5 text-red-400"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm text-red-700 font-medium">
-                          {errors.general}
-                        </p>
-                      </div>
+              {/* Sign In Content */}
+              {errors.general && (
+                <div className="bg-red-50 border border-red-200 p-3 sm:p-4 rounded-md mb-6">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-5 w-5 text-red-400"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-red-700 font-medium">
+                        {errors.general}
+                      </p>
                     </div>
                   </div>
-                )}
-              </form>
+                </div>
+              )}
 
               {/* Google Sign-In */}
-              <div className="mt-6">
+              <div>
                 <GoogleSignIn />
               </div>
 

@@ -1097,9 +1097,11 @@ router.put(
         });
       }
 
-      user.alumniVerified = true;
-      user.verificationRequest = false;
-      await user.save();
+      await User.findByIdAndUpdate(
+        user._id,
+        { alumniVerified: true, verificationRequest: false },
+        { runValidators: false }
+      );
 
       res.json({
         success: true,
@@ -1139,8 +1141,11 @@ router.put(
         });
       }
 
-      user.verificationRequest = false;
-      await user.save();
+      await User.findByIdAndUpdate(
+        user._id,
+        { verificationRequest: false },
+        { runValidators: false }
+      );
 
       res.json({
         success: true,

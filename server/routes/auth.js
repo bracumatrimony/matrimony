@@ -97,13 +97,16 @@ router.post("/google", async (req, res) => {
       await user.save();
     } else if (!user.isGoogleUser) {
       // Update existing user to mark as Google user
-      user.isGoogleUser = true;
-      user.emailVerified = true;
-      user.authProvider = "google";
-      if (picture && !user.avatar) {
-        user.avatar = picture;
-      }
-      await user.save();
+      await User.findByIdAndUpdate(
+        user._id,
+        {
+          isGoogleUser: true,
+          emailVerified: true,
+          authProvider: "google",
+          ...(picture && !user.avatar && { avatar: picture }),
+        },
+        { runValidators: false }
+      );
     }
 
     // Generate JWT token
@@ -121,6 +124,8 @@ router.post("/google", async (req, res) => {
       isGoogleUser: user.isGoogleUser,
       credits: user.credits,
       alumniVerified: user.alumniVerified,
+      profileId: user.profileId,
+      university: user.university,
       token: token, // Include token in response for cross-domain compatibility
     };
 
@@ -228,13 +233,16 @@ router.post("/google/callback", async (req, res) => {
       await user.save();
     } else if (!user.isGoogleUser) {
       // Update existing user to mark as Google user
-      user.isGoogleUser = true;
-      user.emailVerified = true;
-      user.authProvider = "google";
-      if (picture && !user.avatar) {
-        user.avatar = picture;
-      }
-      await user.save();
+      await User.findByIdAndUpdate(
+        user._id,
+        {
+          isGoogleUser: true,
+          emailVerified: true,
+          authProvider: "google",
+          ...(picture && !user.avatar && { avatar: picture }),
+        },
+        { runValidators: false }
+      );
     }
 
     // Generate JWT token
@@ -252,6 +260,8 @@ router.post("/google/callback", async (req, res) => {
       isGoogleUser: user.isGoogleUser,
       credits: user.credits,
       alumniVerified: user.alumniVerified,
+      profileId: user.profileId,
+      university: user.university,
       token: token, // Include token in response for cross-domain compatibility
     };
 
@@ -448,11 +458,17 @@ router.get("/me", async (req, res) => {
     // Sync hasProfile with actual profile existence
     const existingProfile = await Profile.findOne({ userId: user._id });
     if (existingProfile && !user.hasProfile) {
-      user.hasProfile = true;
-      await user.save();
+      await User.findByIdAndUpdate(
+        user._id,
+        { hasProfile: true },
+        { runValidators: false }
+      );
     } else if (!existingProfile && user.hasProfile) {
-      user.hasProfile = false;
-      await user.save();
+      await User.findByIdAndUpdate(
+        user._id,
+        { hasProfile: false },
+        { runValidators: false }
+      );
     }
 
     res.json({
