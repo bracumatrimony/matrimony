@@ -195,6 +195,12 @@ class AdminService {
     });
   }
 
+  async deleteUser(userId) {
+    return this.makeRequest(`/admin/users/${userId}`, {
+      method: "DELETE",
+    });
+  }
+
   async getRestrictedUsers(page = 1, limit = 30, search = "") {
     const params = new URLSearchParams({
       page: page.toString(),

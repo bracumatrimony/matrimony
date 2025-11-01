@@ -1188,4 +1188,96 @@ router.put(
   }
 );
 
+router.delete("/users/:userId", [auth, adminAuth], async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("Delete user request for userId:", userId);
+
+    // Validate userId
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+      });
+    }
+
+    // Find user first
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Prevent deleting admin users
+    if (user.role === "admin") {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete admin users",
+      });
+    }
+
+    // Delete their profile if exists
+    if (user.profileId) {
+      console.log("Deleting profile for profileId:", user.profileId);
+      await Profile.findOneAndDelete({ profileId: user.profileId });
+      console.log("Profile deleted");
+    }
+
+    // Delete their draft if exists
+    const draft = await Draft.findOneAndDelete({ userId: userId });
+    if (draft) {
+      console.log("Draft deleted for userId:", userId);
+    }
+
+    // Delete their bookmarks
+    const bookmarksDeleted = await Bookmark.deleteMany({ userId: userId });
+    if (bookmarksDeleted.deletedCount > 0) {
+      console.log(
+        `Deleted ${bookmarksDeleted.deletedCount} bookmarks for userId:`,
+        userId
+      );
+    }
+
+    // Delete their transactions
+    const transactionsDeleted = await Transaction.deleteMany({
+      userId: userId,
+    });
+    if (transactionsDeleted.deletedCount > 0) {
+      console.log(
+        `Deleted ${transactionsDeleted.deletedCount} transactions for userId:`,
+        userId
+      );
+    }
+
+    // Delete profile views
+    const profileViewsDeleted =
+      await require("../models/ProfileView").deleteMany({
+        $or: [{ viewerId: userId }, { viewedProfileId: userId }],
+      });
+    if (profileViewsDeleted.deletedCount > 0) {
+      console.log(
+        `Deleted ${profileViewsDeleted.deletedCount} profile views for userId:`,
+        userId
+      );
+    }
+
+    // Finally, delete the user
+    await User.findByIdAndDelete(userId);
+    console.log("User deleted successfully:", userId);
+
+    res.json({
+      success: true,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete user",
+    });
+  }
+});
+
 module.exports = router;

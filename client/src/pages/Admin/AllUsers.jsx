@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Users, Search, Download } from "lucide-react";
+import { User, Users, Search, Download, Trash2 } from "lucide-react";
 import adminService from "../../services/adminService";
 
 export default function AllUsers({ onViewProfile, showNotification }) {
@@ -13,6 +13,7 @@ export default function AllUsers({ onViewProfile, showNotification }) {
   const [exporting, setExporting] = useState(false);
   const [restricting, setRestricting] = useState(null);
   const [banning, setBanning] = useState(null);
+  const [deleting, setDeleting] = useState(null);
 
   // Debounce search query
   useEffect(() => {
@@ -125,6 +126,32 @@ export default function AllUsers({ onViewProfile, showNotification }) {
       showNotification?.("Failed to ban user", "error");
     } finally {
       setBanning(null);
+    }
+  };
+
+  const handleDeleteUser = async (userId, e) => {
+    e.stopPropagation(); // Prevent row click
+    if (
+      !window.confirm(
+        "Are you sure you want to permanently delete this user? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+    try {
+      setDeleting(userId);
+      const response = await adminService.deleteUser(userId);
+      if (response.success) {
+        showNotification?.("User deleted successfully", "success");
+        loadUsers(); // Reload the users list
+      } else {
+        showNotification?.("Failed to delete user", "error");
+      }
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      showNotification?.("Failed to delete user", "error");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -334,27 +361,31 @@ export default function AllUsers({ onViewProfile, showNotification }) {
                           {formatDate(user.createdAt)}
                         </div>
                       </td>
-                      <td className="px-6 py-3 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center gap-1">
                           <button
                             onClick={(e) => handleRestrictUser(user._id, e)}
                             disabled={restricting === user._id}
-                            className="inline-flex items-center px-3 py-1.5 border border-yellow-300 text-sm font-medium rounded-md text-yellow-700 bg-white hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors disabled:opacity-50"
+                            className="inline-flex items-center px-2 py-1 border border-yellow-300 text-xs font-medium rounded text-yellow-700 bg-white hover:bg-yellow-50 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-yellow-500 transition-colors disabled:opacity-50"
                             title="Restrict user"
                           >
-                            <User className="h-4 w-4 mr-1" />
-                            {restricting === user._id
-                              ? "Restricting..."
-                              : "Restrict"}
+                            <User className="h-5 w-5" />
                           </button>
                           <button
                             onClick={(e) => handleBanUser(user._id, e)}
                             disabled={banning === user._id}
-                            className="inline-flex items-center px-3 py-1.5 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors disabled:opacity-50"
+                            className="inline-flex items-center px-2 py-1 border border-red-300 text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-red-500 transition-colors disabled:opacity-50"
                             title="Ban user"
                           >
-                            <User className="h-4 w-4 mr-1" />
-                            {banning === user._id ? "Banning..." : "Ban"}
+                            <User className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={(e) => handleDeleteUser(user._id, e)}
+                            disabled={deleting === user._id}
+                            className="inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-gray-500 transition-colors disabled:opacity-50"
+                            title="Delete user permanently"
+                          >
+                            <Trash2 className="h-5 w-5" />
                           </button>
                         </div>
                       </td>
