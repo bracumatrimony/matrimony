@@ -90,3 +90,6 @@ client/public/wedding.mp4
 
 # Icon files
 client/public/icon.png
+
+#scripts
+server/count_characters.js

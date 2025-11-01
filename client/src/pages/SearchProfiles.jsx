@@ -86,7 +86,6 @@ export default function SearchProfiles() {
     () => ({
       ...filters,
       searchQuery,
-      university: selectedUniversity,
     }),
     [
       filters.gender,
@@ -95,7 +94,6 @@ export default function SearchProfiles() {
       filters.district,
       filters.religion,
       searchQuery,
-      selectedUniversity,
     ]
   );
 
@@ -109,7 +107,11 @@ export default function SearchProfiles() {
 
     const timeoutId = setTimeout(() => {
       setPage(1);
-      loadProfiles(memoizedFilters, 1, limit);
+      loadProfiles(
+        { ...memoizedFilters, university: selectedUniversity },
+        1,
+        limit
+      );
     }, 800); // Increased to 800ms for better debouncing
 
     return () => clearTimeout(timeoutId);
@@ -135,7 +137,8 @@ export default function SearchProfiles() {
           limit: lim,
         };
 
-        if (searchQuery.trim()) backendFilters.search = searchQuery.trim();
+        if (searchFilters.searchQuery && searchFilters.searchQuery.trim())
+          backendFilters.search = searchFilters.searchQuery.trim();
         if (searchFilters.gender) backendFilters.gender = searchFilters.gender;
         if (searchFilters.ageMin) backendFilters.minAge = searchFilters.ageMin;
         if (searchFilters.ageMax) backendFilters.maxAge = searchFilters.ageMax;
@@ -175,7 +178,7 @@ export default function SearchProfiles() {
         setLoading(false);
       }
     },
-    [page, limit, searchQuery]
+    [page, limit, selectedUniversity]
   );
 
   const handleFilterChange = useCallback((name, value) => {
