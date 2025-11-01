@@ -519,37 +519,39 @@ export default function UserProfile() {
                               Biodata Creation Policy
                             </h3>
                             <div className="bg-rose-50 border border-rose-200 rounded-lg p-6 mb-6">
-                              <p className="text-rose-800 text-sm leading-relaxed">
-                                To maintain the authenticity and integrity of
-                                our platform, only verified students with
-                                institutional email addresses are permitted to
-                                create biodata.
-                              </p>
-                              <p className="text-rose-700 text-sm mt-3">
-                                This policy ensures that our matrimony platform
-                                serves verified students, alumni, and faculty
-                                members while maintaining high standards of
-                                verification.
-                              </p>
+                              {verificationRequested ? (
+                                <>
+                                  <div className="flex items-center justify-center mb-3">
+                                    <h4 className="text-lg font-medium text-rose-900">
+                                      Verification Request Submitted
+                                    </h4>
+                                  </div>
+                                  <p className="text-rose-800 text-sm leading-relaxed text-center">
+                                    Your verification request has been
+                                    submitted. Please send a photo of your past
+                                    ID card or proof of your institutional
+                                    affiliation or student status to our
+                                    Facebook page for review.
+                                  </p>
+                                </>
+                              ) : (
+                                <>
+                                  <p className="text-rose-800 text-sm leading-relaxed">
+                                    To maintain the authenticity and integrity
+                                    of our platform, only verified students with
+                                    institutional email addresses are permitted
+                                    to create biodata.
+                                  </p>
+                                  <p className="text-rose-700 text-sm mt-3">
+                                    This policy ensures that our matrimony
+                                    platform serves verified students, alumni,
+                                    and faculty members while maintaining high
+                                    standards of verification.
+                                  </p>
+                                </>
+                              )}
                             </div>
-                            {verificationRequested ? (
-                              /* Verification requested */
-                              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
-                                <div className="flex items-center justify-center mb-3">
-                                  <h4 className="text-lg font-medium text-yellow-900">
-                                    Verification Request Submitted
-                                  </h4>
-                                </div>
-                                <p className="text-yellow-800 text-sm leading-relaxed text-center">
-                                  Your verification request has been submitted.
-                                  Please send a photo of your past ID card or
-                                  proof of your institutional affiliation or
-                                  student status to our Facebook page for
-                                  review.
-                                </p>
-                              </div>
-                            ) : (
-                              /* Request verification button */
+                            {!verificationRequested && (
                               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                 <button
                                   onClick={handleRequestVerification}
