@@ -75,6 +75,16 @@ router.post("/google", async (req, res) => {
       const universityInfo = detectUniversityFromEmail(email);
       let universityKey, profileId, alumniVerified, verificationRequest;
 
+      let initialCredits = 0;
+      if (universityInfo && universityInfo.key === "NSU") {
+        const alreadyCredited = await CreditedEmail.findOne({
+          email: email.toLowerCase(),
+        });
+        if (!alreadyCredited) {
+          initialCredits = 5;
+        }
+      }
+
       if (universityInfo) {
         // University student
         universityKey = universityInfo.key;
@@ -109,6 +119,10 @@ router.post("/google", async (req, res) => {
 
       user = new User(userData);
       await user.save();
+
+      if (initialCredits > 0) {
+        await CreditedEmail.create({ email: email.toLowerCase() });
+      }
     } else if (!user.isGoogleUser) {
       // Update existing user to mark as Google user
       await User.findByIdAndUpdate(

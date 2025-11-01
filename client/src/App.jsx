@@ -18,6 +18,7 @@ import { Analytics } from "@vercel/analytics/react";
 // Lazy load all page components for code splitting
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Auth/Login"));
+const SignUp = lazy(() => import("./pages/Auth/SignUp"));
 const GoogleCallback = lazy(() => import("./pages/Auth/GoogleCallback"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
@@ -116,6 +117,14 @@ function App() {
               element={
                 <PublicRoute>
                   <Login />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <PublicRoute>
+                  <SignUp />
                 </PublicRoute>
               }
             />
