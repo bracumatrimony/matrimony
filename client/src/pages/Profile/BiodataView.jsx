@@ -511,6 +511,42 @@ export default function BiodataView() {
   };
 
   // Removed loading spinner - component renders immediately
+  // Show a lightweight skeleton while profile is loading to avoid
+  // flashing default "not available" placeholders before data arrives.
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-6xl mx-auto px-4 space-y-6">
+          {/* Header skeleton */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-pulse">
+            <div className="px-4 py-6 flex gap-4 items-center">
+              <div className="w-20 h-20 bg-gray-200 rounded-full flex-shrink-0"></div>
+              <div className="flex-1">
+                <div className="h-6 bg-gray-200 rounded w-1/3 mb-3"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* A few section skeletons to represent page content */}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse"
+            >
+              <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     const isPending = error.toLowerCase().includes("under review");

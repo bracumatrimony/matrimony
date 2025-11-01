@@ -585,8 +585,34 @@ export default function SearchProfiles() {
                   /* Show profiles for selected university */
                   <>
                     {loading ? (
-                      <div className="text-center py-20">
-                        <SectionSpinner text="Finding your perfect match..." />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+                        {/* Skeleton loading cards */}
+                        {Array.from({ length: 12 }).map((_, index) => (
+                          <div
+                            key={index}
+                            className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden animate-pulse"
+                          >
+                            {/* Profile image skeleton */}
+                            <div className="p-6 bg-gradient-to-r from-blue-50/30 to-purple-50/30 pt-8">
+                              <div className="flex items-center space-x-4 mb-4">
+                                <div className="w-14 h-14 bg-gray-200 rounded-full"></div>
+                                <div>
+                                  <div className="h-5 bg-gray-200 rounded w-20 mb-2"></div>
+                                  <div className="h-4 bg-gray-200 rounded w-16"></div>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <div className="h-4 bg-gray-200 rounded w-full"></div>
+                                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                              </div>
+                            </div>
+                            {/* Action button skeleton */}
+                            <div className="p-4 bg-gray-50">
+                              <div className="h-10 bg-gray-200 rounded"></div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     ) : error ? (
                       <div className="text-center py-20">
