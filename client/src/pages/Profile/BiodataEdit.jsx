@@ -17,7 +17,6 @@ import {
   Contact,
   Check,
 } from "lucide-react";
-import { SectionSpinner } from "../../components/LoadingSpinner";
 import profileService from "../../services/profileService";
 import adminService from "../../services/adminService";
 import authService from "../../services/authService";
@@ -718,8 +717,91 @@ export default function BiodataEdit() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <SectionSpinner text="Loading profile..." />
+      <div className="min-h-screen bg-gray-50">
+        {/* Sidebar Skeleton - Hidden on mobile */}
+        <aside className="hidden lg:block fixed mt-20 ml-8 top-20 left-6 z-50 w-80 bg-white shadow-xl border border-gray-200 rounded-lg animate-pulse">
+          <div className="p-4 border-b border-gray-200">
+            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          </div>
+          <div className="p-4 space-y-2">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-8 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </aside>
+
+        {/* Main content skeleton */}
+        <main className="w-full">
+          <div className="py-4 sm:py-6 md:py-8 px-4 sm:px-6 max-w-6xl mx-auto space-y-4 sm:space-y-6 lg:pl-72">
+            {/* Admin warning skeleton */}
+            <div className="border-4 border-gray-200 rounded-lg p-4 bg-gray-100 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+            </div>
+
+            {/* Profile Header Banner Skeleton */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-pulse">
+              <div className="bg-gradient-to-r from-gray-50 to-stone-50 px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                  {/* Profile Photo Skeleton */}
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-full flex-shrink-0 mx-auto sm:mx-0"></div>
+
+                  {/* Profile Information Skeleton */}
+                  <div className="flex-1 w-full">
+                    <div className="flex flex-col gap-3 sm:gap-4">
+                      {/* Top Row Skeleton */}
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+                        <div className="flex-1 text-center sm:text-left">
+                          <div className="h-8 bg-gray-200 rounded w-1/3 mb-3 mx-auto sm:mx-0"></div>
+                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-4">
+                            <div className="h-4 bg-gray-200 rounded w-20"></div>
+                            <div className="h-4 bg-gray-200 rounded w-16"></div>
+                          </div>
+                        </div>
+                        {/* Cancel Button Skeleton */}
+                        <div className="h-10 bg-gray-200 rounded w-20 mx-auto sm:mx-0"></div>
+                      </div>
+
+                      {/* Bottom Row Skeleton */}
+                      <div className="flex flex-wrap gap-4 text-center sm:text-left">
+                        <div className="h-4 bg-gray-200 rounded w-24"></div>
+                        <div className="h-4 bg-gray-200 rounded w-32"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Form sections skeleton */}
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse"
+              >
+                <div className="h-6 bg-gray-200 rounded w-1/4 mb-6"></div>
+                <div className="space-y-4">
+                  {Array.from({ length: 4 }).map((_, j) => (
+                    <div
+                      key={j}
+                      className="grid grid-cols-1 md:grid-cols-3 gap-3"
+                    >
+                      <div className="h-5 bg-gray-200 rounded w-1/2"></div>
+                      <div className="md:col-span-2 h-10 bg-gray-200 rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {/* Submit button skeleton */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
+              <div className="flex justify-center">
+                <div className="h-12 bg-gray-200 rounded w-32"></div>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
