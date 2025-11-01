@@ -19,15 +19,30 @@ const ProfileCard = memo(function ProfileCard({
   showBookmarkDate = false,
 }) {
   const handleViewProfile = () => {
-    // Open biodata in a new tab
-    const url = `/profile/view/${profile.profileId}`;
-    window.open(url, "_blank");
+    if (onViewProfile) {
+      onViewProfile(profile.profileId);
+    } else {
+      // Fallback to direct navigation if no prop provided
+      const url = `/profile/view/${profile.profileId}`;
+      window.open(url, "_blank");
+    }
   };
 
   return (
-    <div className="bg-gradient-to-br from-white via-gray-50 to-white rounded-2xl shadow-lg border-2 border-gray-300 overflow-hidden hover:shadow-2xl transition-all duration-300 backdrop-blur-sm hover:border-gray-400 group">
+    <div className="bg-gradient-to-br from-white via-gray-50 to-white rounded-2xl shadow-lg border-2 border-gray-300 overflow-hidden hover:shadow-2xl transition-all duration-300 backdrop-blur-sm hover:border-gray-400 group relative flex flex-col h-full">
+      {/* Watched Badge - Conditionally rendered */}
+      {profile.isViewed && (
+        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white text-center py-2 px-4 shadow-md">
+          <span className="font-bold text-sm tracking-wide">WATCHED</span>
+        </div>
+      )}
+
       {/* Profile Header */}
-      <div className="p-6 bg-gradient-to-r from-blue-50/30 to-purple-50/30 border-b border-gray-100/50">
+      <div
+        className={`p-6 bg-gradient-to-r from-blue-50/30 to-purple-50/30 ${
+          profile.isViewed ? "" : "pt-8"
+        }`}
+      >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
             <div className="relative">
@@ -54,7 +69,7 @@ const ProfileCard = memo(function ProfileCard({
               <h3 className="font-bold text-gray-900 text-lg group-hover:text-blue-900 transition-colors duration-300">
                 {profile.profileId}
               </h3>
-              <div className="flex items-center text-sm text-gray-600 bg-blue-50 px-2 py-1 rounded-full">
+              <div className="flex items-center text-sm text-gray-600 bg-blue-50 px-2 py-1 rounded-full mt-1">
                 <CalendarDays className="h-3 w-3 mr-1 text-black" />
                 <span className="font-medium">{profile.age} years</span>
               </div>
@@ -80,8 +95,16 @@ const ProfileCard = memo(function ProfileCard({
           )}
         </div>
         <div className="space-y-2">
-          <div className="flex items-center text-sm text-gray-600">
-            <Navigation className="h-4 w-4 mr-2 text-black flex-shrink-0" />
+          <div
+            className={`flex items-center ${
+              profile.isViewed ? "text-sm" : "text-base"
+            } text-gray-600`}
+          >
+            <Navigation
+              className={`h-4 w-4 mr-2 text-black flex-shrink-0 ${
+                profile.isViewed ? "" : "h-5 w-5"
+              }`}
+            />
             <span className="truncate">
               {profile.presentAddressDistrict && profile.presentAddressDivision
                 ? `${profile.presentAddressDistrict}, ${profile.presentAddressDivision}`
@@ -90,14 +113,30 @@ const ProfileCard = memo(function ProfileCard({
                   "Location not specified"}
             </span>
           </div>
-          <div className="flex items-center text-sm text-gray-600">
-            <BookOpen className="h-4 w-4 mr-2 text-black flex-shrink-0" />
+          <div
+            className={`flex items-center ${
+              profile.isViewed ? "text-sm" : "text-base"
+            } text-gray-600`}
+          >
+            <BookOpen
+              className={`h-4 w-4 mr-2 text-black flex-shrink-0 ${
+                profile.isViewed ? "" : "h-5 w-5"
+              }`}
+            />
             <span className="truncate">
               {profile.graduationSubject || "Education not specified"}
             </span>
           </div>
-          <div className="flex items-center text-sm text-gray-600">
-            <Building2 className="h-4 w-4 mr-2 text-black flex-shrink-0" />
+          <div
+            className={`flex items-center ${
+              profile.isViewed ? "text-sm" : "text-base"
+            } text-gray-600`}
+          >
+            <Building2
+              className={`h-4 w-4 mr-2 text-black flex-shrink-0 ${
+                profile.isViewed ? "" : "h-5 w-5"
+              }`}
+            />
             <span className="truncate">
               {profile.profession || "Profession not specified"}
             </span>
@@ -106,7 +145,7 @@ const ProfileCard = memo(function ProfileCard({
       </div>
 
       {/* Actions */}
-      <div className="p-4 bg-gray-50">
+      <div className="p-4 bg-gray-50 mt-auto">
         <div className="flex space-x-2">
           <button
             onClick={handleViewProfile}

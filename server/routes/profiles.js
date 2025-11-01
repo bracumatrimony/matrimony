@@ -1,6 +1,7 @@
 const express = require("express");
 const Profile = require("../models/Profile");
 const User = require("../models/User");
+const ProfileView = require("../models/ProfileView");
 const auth = require("../middleware/auth");
 const {
   formatValidationError,
@@ -199,13 +200,14 @@ router.get("/search", async (req, res) => {
   try {
     // Check if user is authenticated and restricted/banned
     let currentUser = null;
-    if (req.headers.authorization) {
+    if (req.headers.authorization || req.cookies?.token) {
       try {
-        const token = req.headers.authorization.split(" ")[1];
+        const token =
+          req.headers.authorization?.split(" ")[1] || req.cookies.token;
         const jwt = require("jsonwebtoken");
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         currentUser = await User.findById(decoded.userId).select(
-          "isRestricted isBanned"
+          "_id isRestricted isBanned"
         );
       } catch (error) {
         // Invalid token, treat as unauthenticated
@@ -311,13 +313,31 @@ router.get("/search", async (req, res) => {
       (profile) => profile.userId !== null
     );
 
+    // Add view tracking information for authenticated users
+    let viewedProfileIds = new Set();
+    if (currentUser) {
+      const viewedProfiles = await ProfileView.find({
+        userId: currentUser._id,
+        profileId: { $in: filteredProfiles.map((p) => p._id) },
+      }).select("profileId");
+      viewedProfileIds = new Set(
+        viewedProfiles.map((v) => v.profileId.toString())
+      );
+    }
+
+    // Add isViewed flag to each profile
+    const profilesWithViewStatus = filteredProfiles.map((profile) => ({
+      ...profile,
+      isViewed: viewedProfileIds.has(profile._id.toString()),
+    }));
+
     // Shuffle the entire result set to ensure all profiles get equal traffic
-    shuffleArray(filteredProfiles);
+    shuffleArray(profilesWithViewStatus);
 
     // Calculate total and pagination
-    const total = filteredProfiles.length;
+    const total = profilesWithViewStatus.length;
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const profiles = filteredProfiles.slice(skip, skip + parseInt(limit));
+    const profiles = profilesWithViewStatus.slice(skip, skip + parseInt(limit));
 
     res.json({
       success: true,
@@ -521,6 +541,15 @@ router.get("/:profileId", async (req, res) => {
       Profile.findByIdAndUpdate(profile._id, { $inc: { viewCount: 1 } })
         .exec()
         .catch((err) => console.log("View count update failed:", err));
+
+      // Track individual user views
+      ProfileView.findOneAndUpdate(
+        { userId: currentUser._id, profileId: profile._id },
+        { viewedAt: new Date() },
+        { upsert: true, new: true }
+      )
+        .exec()
+        .catch((err) => console.log("User view tracking failed:", err));
     }
 
     // Filter sensitive information based on user permissions and privacy settings

@@ -145,11 +145,14 @@ class ProfileService {
         queryString ? `?${queryString}` : ""
       }`;
 
-      // Use public request since search is now public for approved profiles
-      const response = await this.makePublicRequest(endpoint, options);
+      // Use authenticated request for search to enable view tracking
+      const response = await this.makeRequest(endpoint, options);
       return response;
     } catch (error) {
-      console.error("Search profiles error:", error);
+      // Don't log AbortError as it's expected when requests are cancelled
+      if (error.name !== "AbortError") {
+        console.error("Search profiles error:", error);
+      }
       throw error;
     }
   }
