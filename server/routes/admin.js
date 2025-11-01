@@ -1081,6 +1081,25 @@ router.put(
   [auth, adminAuth],
   async (req, res) => {
     try {
+      const { university } = req.body;
+
+      if (!university) {
+        return res.status(400).json({
+          success: false,
+          message: "University is required for approval",
+        });
+      }
+
+      // Validate university
+      const { getUniversityConfig } = require("../config/universities");
+      const universityConfig = getUniversityConfig(university);
+      if (!universityConfig) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid university selected",
+        });
+      }
+
       const user = await User.findById(req.params.userId);
 
       if (!user) {
@@ -1097,9 +1116,17 @@ router.put(
         });
       }
 
+      // Generate new profile ID for the selected university
+      const newProfileId = await User.generateProfileId(university);
+
       await User.findByIdAndUpdate(
         user._id,
-        { alumniVerified: true, verificationRequest: false },
+        {
+          alumniVerified: true,
+          verificationRequest: false,
+          university: university,
+          profileId: newProfileId,
+        },
         { runValidators: false }
       );
 

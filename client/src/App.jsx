@@ -128,11 +128,6 @@ function App() {
                 </PublicRoute>
               }
             />
-            {/* Redirect old register route to login */}
-            <Route
-              path="/register"
-              element={<Navigate to="/login" replace />}
-            />
 
             <Route
               path="/*"

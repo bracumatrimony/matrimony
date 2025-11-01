@@ -2,6 +2,10 @@ const express = require("express");
 const User = require("../models/User");
 const Transaction = require("../models/Transaction");
 const Profile = require("../models/Profile");
+const Bookmark = require("../models/Bookmark");
+const Draft = require("../models/Draft");
+const ProfileView = require("../models/ProfileView");
+const Report = require("../models/Report");
 const auth = require("../middleware/auth");
 
 const router = express.Router();
@@ -141,7 +145,7 @@ router.put("/credits", auth, async (req, res) => {
 });
 
 // @route   DELETE /api/users/account
-// @desc    Delete user account and all associated data
+// @desc    Delete user account and all associated data except transactions
 // @access  Private
 router.delete("/account", auth, async (req, res) => {
   try {
@@ -160,6 +164,21 @@ router.delete("/account", auth, async (req, res) => {
         success: false,
         message: "Your account has been banned",
       });
+    }
+
+    // Get user's profile to get profileId for cleaning up related data
+    const profile = await Profile.findOne({ userId: req.user.id });
+
+    // Delete associated data (except transactions)
+    await Draft.deleteMany({ userId: req.user.id });
+    await Report.deleteMany({ reportedBy: req.user.id });
+    await Bookmark.deleteMany({ userId: req.user.id });
+    await ProfileView.deleteMany({ userId: req.user.id });
+
+    // If profile exists, delete related bookmarks and views by others
+    if (profile) {
+      await Bookmark.deleteMany({ profileId: profile.profileId });
+      await ProfileView.deleteMany({ profileId: profile._id });
     }
 
     // Delete user's profile if it exists

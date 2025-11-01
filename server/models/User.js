@@ -58,9 +58,9 @@ const userSchema = new mongoose.Schema(
     },
     university: {
       type: String,
-      required: true,
+      required: false,
       enum: {
-        values: Object.keys(getAllUniversities()),
+        values: [...Object.keys(getAllUniversities()), null],
         message: "Invalid university",
       },
     },

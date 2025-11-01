@@ -16,6 +16,10 @@ export default function VerificationRequests({
   const [totalRequests, setTotalRequests] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const [showUniversityModal, setShowUniversityModal] = useState(false);
+  const [selectedUserForApproval, setSelectedUserForApproval] = useState(null);
+  const [selectedUniversity, setSelectedUniversity] = useState("");
+  const [universities, setUniversities] = useState({});
 
   // Debounce search query
   useEffect(() => {
@@ -29,6 +33,7 @@ export default function VerificationRequests({
 
   useEffect(() => {
     loadVerificationRequests();
+    loadUniversities();
   }, [currentPage, itemsPerPage, searchQuery]);
 
   const loadVerificationRequests = async () => {
@@ -83,21 +88,49 @@ export default function VerificationRequests({
     }
   };
 
+  const loadUniversities = async () => {
+    try {
+      const response = await adminService.getUniversities();
+      if (response.success) {
+        setUniversities(response.universities);
+      }
+    } catch (error) {
+      console.error("Error loading universities:", error);
+    }
+  };
+
   const handleSearch = (e) => {
     setSearchInput(e.target.value);
   };
 
-  const handleApprove = async (userId) => {
+  const handleApprove = (userId) => {
+    setSelectedUserForApproval(userId);
+    setSelectedUniversity(""); // Reset selection
+    setShowUniversityModal(true);
+  };
+
+  const handleConfirmApprove = async () => {
+    if (!selectedUniversity) {
+      showNotification("Please select a university", "error");
+      return;
+    }
+
     try {
-      setProcessing(userId);
-      const response = await adminService.approveVerification(userId);
+      setProcessing(selectedUserForApproval);
+      setShowUniversityModal(false);
+      const response = await adminService.approveVerification(
+        selectedUserForApproval,
+        selectedUniversity
+      );
       if (response.success) {
         showNotification(
           "Verification request approved successfully",
           "success"
         );
         // Remove approved request from local list instead of reloading
-        setRequests((prev) => prev.filter((req) => req._id !== userId));
+        setRequests((prev) =>
+          prev.filter((req) => req._id !== selectedUserForApproval)
+        );
         setTotalRequests((prev) => Math.max(0, prev - 1));
         onActionComplete();
       } else {
@@ -111,6 +144,7 @@ export default function VerificationRequests({
       showNotification("Failed to approve verification request", "error");
     } finally {
       setProcessing(null);
+      setSelectedUserForApproval(null);
     }
   };
 
@@ -372,6 +406,58 @@ export default function VerificationRequests({
           </div>
         )}
       </div>
+
+      {/* University Selection Modal */}
+      {showUniversityModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Select University for Alumni Verification
+              </h3>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  University
+                </label>
+                <select
+                  value={selectedUniversity}
+                  onChange={(e) => setSelectedUniversity(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select a university</option>
+                  {Object.entries(universities).map(([key, config]) => (
+                    <option key={key} value={key}>
+                      {config.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowUniversityModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmApprove}
+                  disabled={
+                    !selectedUniversity ||
+                    processing === selectedUserForApproval
+                  }
+                  className="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {processing === selectedUserForApproval ? (
+                    <InlineSpinner />
+                  ) : (
+                    "Approve"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

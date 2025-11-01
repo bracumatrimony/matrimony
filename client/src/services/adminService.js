@@ -145,9 +145,10 @@ class AdminService {
   }
 
   // Approve verification request
-  async approveVerification(userId) {
+  async approveVerification(userId, university) {
     return this.makeRequest(`/admin/verification-requests/${userId}/approve`, {
       method: "PUT",
+      body: JSON.stringify({ university }),
     });
   }
 
@@ -223,6 +224,13 @@ class AdminService {
   async unbanUser(userId) {
     return this.makeRequest(`/admin/users/${userId}/unban`, {
       method: "PUT",
+    });
+  }
+
+  // Get universities configuration
+  async getUniversities() {
+    return this.makeRequest("/config/universities", {
+      method: "GET",
     });
   }
 }

@@ -1,14 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
-import authService from "../../services/authService";
+import { Link } from "react-router-dom";
 import GoogleSignIn from "../../components/Auth/GoogleSignIn";
 import SEO from "../../components/SEO";
 
 export default function Login() {
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
-  const { login } = useAuth();
 
   // Check for OAuth errors in URL params
   useEffect(() => {
@@ -34,8 +30,8 @@ export default function Login() {
     <>
       <SEO
         title="Login - Campus Matrimony"
-        description="Login to your Campus Matrimony account to find your perfect match. Access verified profiles and connect with potential partners."
-        keywords="login, sign in, Campus matrimony account, matrimonial login"
+        description="Sign in to your Campus Matrimony account using Google to find your perfect match. Access verified profiles and connect with potential partners."
+        keywords="login, sign in, google login, Campus matrimony account, matrimonial login"
       />
       <div className="min-h-screen bg-black flex overflow-hidden auth-page relative">
         {/* Background Video - Full screen for mobile, left side for desktop */}
@@ -84,7 +80,7 @@ export default function Login() {
                   </span>
                 </h2>
                 <p className="text-white md:text-slate-700 text-sm sm:text-base leading-relaxed px-2 font-medium">
-                  Sign in to your account
+                  Sign in with Google
                 </p>
               </div>
 
@@ -117,7 +113,7 @@ export default function Login() {
               )}
 
               {/* Google Sign-In */}
-              <div>
+              <div className="space-y-4">
                 <GoogleSignIn />
               </div>
 

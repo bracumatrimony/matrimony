@@ -72,28 +72,40 @@ router.post("/google", async (req, res) => {
     if (!user) {
       // Detect university from email
       const universityInfo = detectUniversityFromEmail(email);
-      if (!universityInfo) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Email domain not recognized. Only verified university email addresses are allowed.",
-        });
+      let universityKey, profileId, alumniVerified, verificationRequest;
+
+      if (universityInfo) {
+        // University student
+        universityKey = universityInfo.key;
+        profileId = await User.generateProfileId(universityKey);
+        alumniVerified = false;
+        verificationRequest = false;
+      } else {
+        // Alumni or external user - no university or profileId assigned initially
+        universityKey = null;
+        profileId = null;
+        alumniVerified = false;
+        verificationRequest = true; // Request verification
       }
 
-      // Generate unique profile ID based on university
-      const profileId = await User.generateProfileId(universityInfo.key);
-
       // Create new user
-      user = new User({
+      const userData = {
         name,
         email,
         avatar: picture,
         isGoogleUser: true,
         emailVerified: true,
         authProvider: "google",
-        profileId,
-        university: universityInfo.key,
-      });
+        alumniVerified,
+        verificationRequest,
+        university: universityKey,
+      };
+
+      if (profileId) {
+        userData.profileId = profileId;
+      }
+
+      user = new User(userData);
       await user.save();
     } else if (!user.isGoogleUser) {
       // Update existing user to mark as Google user
@@ -208,28 +220,42 @@ router.post("/google/callback", async (req, res) => {
     if (!user) {
       // Detect university from email
       const universityInfo = detectUniversityFromEmail(email);
-      if (!universityInfo) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Email domain not recognized. Only verified university email addresses are allowed.",
-        });
+      let universityKey, profileId, alumniVerified, verificationRequest;
+
+      if (universityInfo) {
+        // University student
+        universityKey = universityInfo.key;
+        profileId = await User.generateProfileId(universityKey);
+        alumniVerified = false;
+        verificationRequest = false;
+      } else {
+        // Alumni or external user - no university or profileId assigned initially
+        universityKey = null;
+        profileId = null;
+        alumniVerified = false;
+        verificationRequest = true; // Request verification
       }
 
-      // Generate unique profile ID based on university
-      const profileId = await User.generateProfileId(universityInfo.key);
-
       // Create new user
-      user = new User({
+      const userData = {
         name,
         email,
         avatar: picture,
         isGoogleUser: true,
         emailVerified: true,
         authProvider: "google",
-        profileId,
-        university: universityInfo.key,
-      });
+        alumniVerified,
+        verificationRequest,
+      };
+
+      // Only set profileId if it has a value (for university users)
+      if (profileId) {
+        userData.profileId = profileId;
+      }
+
+      userData.university = universityKey;
+
+      user = new User(userData);
       await user.save();
     } else if (!user.isGoogleUser) {
       // Update existing user to mark as Google user
@@ -260,6 +286,7 @@ router.post("/google/callback", async (req, res) => {
       isGoogleUser: user.isGoogleUser,
       credits: user.credits,
       alumniVerified: user.alumniVerified,
+      verificationRequest: user.verificationRequest,
       profileId: user.profileId,
       university: user.university,
       token: token, // Include token in response for cross-domain compatibility
@@ -320,28 +347,41 @@ router.post("/register", async (req, res) => {
 
     // Detect university from email
     const universityInfo = detectUniversityFromEmail(email);
-    if (!universityInfo) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Email domain not recognized. Only verified university email addresses are allowed.",
-      });
+    let universityKey, profileId, alumniVerified, verificationRequest;
+
+    if (universityInfo) {
+      // University student
+      universityKey = universityInfo.key;
+      profileId = await User.generateProfileId(universityKey);
+      alumniVerified = false;
+      verificationRequest = false;
+    } else {
+      // Alumni or external user - no university or profileId assigned initially
+      universityKey = null;
+      profileId = null;
+      alumniVerified = false;
+      verificationRequest = true; // Request verification
     }
 
-    // Generate unique profile ID based on university
-    const profileId = await User.generateProfileId(universityInfo.key);
-
     // Create new user
-    const user = new User({
+    const userData = {
       name,
       email,
       password,
-      profileId,
-      university: universityInfo.key,
       authProvider: "email",
       emailVerified: false,
-    });
+      alumniVerified,
+      verificationRequest,
+    };
 
+    // Only set profileId if it has a value (for university users)
+    if (profileId) {
+      userData.profileId = profileId;
+    }
+
+    userData.university = universityKey;
+
+    const user = new User(userData);
     await user.save();
 
     // Generate token and set cookie
