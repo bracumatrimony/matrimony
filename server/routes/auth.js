@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const User = require("../models/User");
 const Profile = require("../models/Profile");
+const CreditedEmail = require("../models/CreditedEmail");
 const {
   formatValidationError,
   getErrorStatusCode,
@@ -99,6 +100,7 @@ router.post("/google", async (req, res) => {
         alumniVerified,
         verificationRequest,
         university: universityKey,
+        credits: initialCredits,
       };
 
       if (profileId) {
@@ -347,6 +349,17 @@ router.post("/register", async (req, res) => {
 
     // Detect university from email
     const universityInfo = detectUniversityFromEmail(email);
+
+    let initialCredits = 0;
+    if (universityInfo && universityInfo.key === "NSU") {
+      const alreadyCredited = await CreditedEmail.findOne({
+        email: email.toLowerCase(),
+      });
+      if (!alreadyCredited) {
+        initialCredits = 5;
+      }
+    }
+
     let universityKey, profileId, alumniVerified, verificationRequest;
 
     if (universityInfo) {
@@ -372,6 +385,7 @@ router.post("/register", async (req, res) => {
       emailVerified: false,
       alumniVerified,
       verificationRequest,
+      credits: initialCredits,
     };
 
     // Only set profileId if it has a value (for university users)
@@ -383,6 +397,10 @@ router.post("/register", async (req, res) => {
 
     const user = new User(userData);
     await user.save();
+
+    if (initialCredits > 0) {
+      await CreditedEmail.create({ email: email.toLowerCase() });
+    }
 
     // Generate token and set cookie
     const token = generateToken(user._id);
