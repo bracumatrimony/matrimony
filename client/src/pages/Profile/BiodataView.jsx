@@ -1339,21 +1339,31 @@ export default function BiodataView() {
                           : "You cannot see the contact information without a verified institutional email address. If you are alumni, make a request for verification."}
                       </p>
                       {!currentUser?.verificationRequest ? (
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <button
+                            onClick={handleRequestVerification}
+                            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer flex-1 sm:flex-none"
+                          >
+                            <Shield className="w-4 h-4" />
+                            Request Alumni Verification
+                          </button>
+                          <button
+                            onClick={() => navigate("/profile")}
+                            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer flex-1 sm:flex-none"
+                          >
+                            <User className="w-4 h-4" />
+                            Go to Profile
+                          </button>
+                        </div>
+                      ) : (
                         <button
-                          onClick={handleRequestVerification}
-                          className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer mr-3"
+                          onClick={() => navigate("/profile")}
+                          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer w-full sm:w-auto"
                         >
-                          <Shield className="w-4 h-4" />
-                          Request Alumni Verification
+                          <User className="w-4 h-4" />
+                          Go to Profile
                         </button>
-                      ) : null}
-                      <button
-                        onClick={() => navigate("/profile")}
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
-                      >
-                        <User className="w-4 h-4" />
-                        Go to Profile
-                      </button>
+                      )}
                     </div>
                   </div>
                 ) : monetizationEnabled ? (

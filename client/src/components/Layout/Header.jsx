@@ -62,7 +62,7 @@ export default function Header() {
             <img
               src="https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg"
               alt="Campus Matrimony"
-              className="h-12 w-12 md:h-14 md:w-14 lg:h-16 lg:w-16 object-contain"
+              className="h-14 w-14 md:h-16 md:w-16 lg:h-18 lg:w-18 object-contain"
             />
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 tracking-tight leading-tight">
               Campus{" "}
