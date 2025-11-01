@@ -510,15 +510,7 @@ export default function BiodataView() {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="py-12 px-4">
-        <div className="max-w-5xl mx-auto">
-          <SectionSpinner text="Loading profile..." />
-        </div>
-      </div>
-    );
-  }
+  // Removed loading spinner - component renders immediately
 
   if (error) {
     const isPending = error.toLowerCase().includes("under review");

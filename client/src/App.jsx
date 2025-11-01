@@ -11,7 +11,6 @@ import PublicRoute from "./components/Auth/PublicRoute";
 import RouteLoadingFallback from "./components/RouteLoadingFallback";
 import LogoAnimation from "./components/LogoAnimation";
 import { useAuth } from "./contexts/AuthContext";
-import { PageSpinner } from "./components/LoadingSpinner";
 import { monetizationConfig } from "./config/monetization";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react";
@@ -41,7 +40,7 @@ function AdminProtectedRoute({ children }) {
   const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
-    return <PageSpinner text="Loading..." />;
+    return null; // Return null instead of spinner to avoid flash
   }
 
   if (!isAuthenticated) {

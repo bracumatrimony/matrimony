@@ -1,14 +1,13 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { PageSpinner } from "../LoadingSpinner";
 
 const ProtectedRoute = ({ children, requireProfile = false }) => {
   const { user, loading, isAuthenticated, hasCompletedProfile } = useAuth();
   const location = useLocation();
 
-  // Show a single unified loading state while auth is initializing
+  // Don't show loading spinner - let the page render immediately
   if (loading) {
-    return <PageSpinner text="Loading..." />;
+    return null; // Return null instead of spinner to avoid flash
   }
 
   if (!isAuthenticated) {

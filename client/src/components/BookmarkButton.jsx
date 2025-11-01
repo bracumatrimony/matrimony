@@ -86,9 +86,7 @@ export default function BookmarkButton({
       flex items-center justify-center transition-all duration-200 font-medium
       ${showText ? "space-x-2" : ""}
       ${currentSize.padding}
-      ${
-        loading || checking ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-      }
+      ${loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
       ${className}
     `;
 
@@ -114,7 +112,7 @@ export default function BookmarkButton({
       className={getButtonClass()}
       title={isBookmarked ? "Remove from bookmarks" : "Add to bookmarks"}
     >
-      {loading || checking ? (
+      {loading ? (
         <div
           className={`animate-spin rounded-full border-b-2 border-current ${currentSize.spinnerSize}`}
         ></div>
