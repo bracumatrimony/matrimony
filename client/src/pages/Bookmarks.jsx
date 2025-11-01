@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import bookmarkService from "../services/bookmarkService";
 import { useAuth } from "../contexts/AuthContext";
-import { SectionSpinner, InlineSpinner } from "../components/LoadingSpinner";
+import { InlineSpinner } from "../components/LoadingSpinner";
 
 export default function Bookmarks() {
   const [bookmarks, setBookmarks] = useState([]);
@@ -135,8 +135,49 @@ export default function Bookmarks() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <SectionSpinner />
+          {/* Header skeleton */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <div className="h-8 bg-gray-200 rounded w-48 animate-pulse"></div>
+              <div className="h-4 bg-gray-200 rounded w-64 animate-pulse"></div>
+            </div>
+          </div>
+          {/* Bookmarks Grid Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse"
+              >
+                {/* Profile Header Skeleton */}
+                <div className="p-6 border-b border-gray-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                      <div>
+                        <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
+                        <div className="h-3 bg-gray-200 rounded w-16"></div>
+                      </div>
+                    </div>
+                    <div className="w-8 h-8 bg-gray-200 rounded-md"></div>
+                  </div>
+                  {/* Basic Info Skeleton */}
+                  <div className="space-y-2">
+                    <div className="h-3 bg-gray-200 rounded w-full"></div>
+                    <div className="h-3 bg-gray-200 rounded w-4/5"></div>
+                    <div className="h-3 bg-gray-200 rounded w-3/5"></div>
+                  </div>
+                </div>
+                {/* Actions Skeleton */}
+                <div className="p-4 bg-gray-50">
+                  <div className="h-10 bg-gray-200 rounded"></div>
+                </div>
+                {/* Bookmark Date Skeleton */}
+                <div className="px-6 py-3 bg-gray-50 border-t">
+                  <div className="h-3 bg-gray-200 rounded w-24"></div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

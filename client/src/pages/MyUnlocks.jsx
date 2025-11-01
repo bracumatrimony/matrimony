@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import profileService from "../services/profileService";
-import { SectionSpinner } from "../components/LoadingSpinner";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function MyUnlocks() {
@@ -78,8 +77,47 @@ export default function MyUnlocks() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="flex justify-center items-center min-h-64">
-            <SectionSpinner text="Loading unlocked profiles..." />
+          {/* Header skeleton */}
+          <div className="mb-8">
+            <div className="bg-gradient-to-r from-gray-800 to-black rounded-lg p-6 text-white shadow-lg animate-pulse">
+              <div className="h-8 bg-gray-300 rounded w-32 mb-2"></div>
+              <div className="h-4 bg-gray-300 rounded w-64"></div>
+            </div>
+          </div>
+          {/* Unlocked Profiles Table Skeleton */}
+          <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gradient-to-r from-gray-800 to-black">
+                  <tr>
+                    <th className="py-4 px-4 md:px-6 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                      Biodata ID
+                    </th>
+                    <th className="py-4 px-4 md:px-6 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                      Unlocked Date
+                    </th>
+                    <th className="py-4 px-4 md:px-6 text-left text-xs md:text-sm font-semibold text-white uppercase tracking-wider">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <tr key={index} className="animate-pulse">
+                      <td className="py-4 px-4 md:px-6">
+                        <div className="h-4 bg-gray-200 rounded w-16"></div>
+                      </td>
+                      <td className="py-4 px-4 md:px-6">
+                        <div className="h-4 bg-gray-200 rounded w-24"></div>
+                      </td>
+                      <td className="py-4 px-4 md:px-6">
+                        <div className="h-8 bg-gray-200 rounded w-20"></div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
