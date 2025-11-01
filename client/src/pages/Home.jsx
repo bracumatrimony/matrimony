@@ -263,6 +263,49 @@ export default function Home() {
           </div>
         </motion.section>
 
+        {/* Our Mission Section */}
+        <motion.section
+          className="py-24 bg-white"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.35 }}
+        >
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              className="text-center mb-16"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: 0.08 }}
+            >
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-8">
+                Our Mission
+              </h2>
+            </motion.div>
+            <motion.div
+              className="prose prose-xl max-w-none text-center"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <p className="text-gray-700 leading-relaxed text-xl md:text-2xl">
+                Campus Matrimony is a secure, university focused matchmaking
+                platform that helps students, faculty, and recent graduates find
+                life partners and build lasting marriages. We provide a simple
+                and respectful environment where members can create detailed
+                profiles, search carefully and connect with honesty and mutual
+                consent. Campus Matrimony promotes the values of marriage,
+                encourages meaningful connections, and supports a culture of
+                dignity, responsibility, and respect. We welcome people of all
+                religions, backgrounds, and ethnicities, celebrating diversity
+                and inclusivity in every connection.
+              </p>
+            </motion.div>
+          </div>
+        </motion.section>
+
         {/* How It Works Section */}
         <motion.section
           className="py-24 bg-white"
