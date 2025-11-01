@@ -295,10 +295,7 @@ router.get("/search", async (req, res) => {
 
     if (university) {
       filters.university = university;
-      console.log(`Filtering profiles by university: ${university}`);
     }
-
-    console.log("Search filters:", JSON.stringify(filters, null, 2));
 
     const allProfiles = await Profile.find(filters)
       .populate({
@@ -308,14 +305,6 @@ router.get("/search", async (req, res) => {
       })
       .select("-privacy -contactInformation -personalContactInfo -__v")
       .lean();
-
-    console.log(`Found ${allProfiles.length} profiles before filtering`);
-    console.log(
-      "Sample profiles:",
-      allProfiles
-        .slice(0, 3)
-        .map((p) => ({ id: p.profileId, university: p.university }))
-    );
 
     // Filter out profiles where userId is null (due to populate match)
     const filteredProfiles = allProfiles.filter(

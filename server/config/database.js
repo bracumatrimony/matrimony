@@ -7,13 +7,11 @@ const connectDB = async () => {
   try {
     // Check if already connected (reuse connection for serverless)
     if (cachedConnection && mongoose.connection.readyState === 1) {
-      console.log("♻️  Reusing cached MongoDB connection");
       return cachedConnection;
     }
 
     // If connection exists but is not ready, wait for it
     if (mongoose.connection.readyState === 2) {
-      console.log("⏳ MongoDB connection in progress, waiting...");
       await new Promise((resolve) => {
         mongoose.connection.once("connected", resolve);
       });
@@ -34,16 +32,11 @@ const connectDB = async () => {
 
     const conn = await mongoose.connect(process.env.MONGODB_URI, options);
 
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    console.log(`📊 Database Name: ${conn.connection.name}`);
-
     // Cache the connection
     cachedConnection = conn.connection;
 
     // Handle connection events
-    mongoose.connection.on("connected", () => {
-      console.log("🔗 Mongoose connected to MongoDB");
-    });
+    mongoose.connection.on("connected", () => {});
 
     mongoose.connection.on("error", (err) => {
       console.error("❌ Mongoose connection error:", err);
@@ -51,7 +44,6 @@ const connectDB = async () => {
     });
 
     mongoose.connection.on("disconnected", () => {
-      console.log("⚠️ Mongoose disconnected from MongoDB");
       cachedConnection = null; // Clear cache on disconnect
     });
 
@@ -59,7 +51,6 @@ const connectDB = async () => {
     process.on("SIGINT", async () => {
       try {
         await mongoose.connection.close();
-        console.log("📴 MongoDB connection closed through app termination");
         process.exit(0);
       } catch (error) {
         console.error("Error closing MongoDB connection:", error);
