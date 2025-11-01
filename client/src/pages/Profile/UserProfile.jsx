@@ -21,7 +21,7 @@ import userService from "../../services/userService";
 import draftService from "../../services/draftService";
 import bookmarkService from "../../services/bookmarkService";
 import { useAuth } from "../../contexts/AuthContext";
-import { SectionSpinner, ButtonSpinner } from "../../components/LoadingSpinner";
+import { ButtonSpinner } from "../../components/LoadingSpinner";
 import monetizationConfig from "../../config/monetization";
 
 export default function UserProfile() {
@@ -253,8 +253,106 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <SectionSpinner text="Loading profile..." />
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          {/* Profile Header Skeleton */}
+          <div className="bg-white rounded-lg shadow-sm border overflow-hidden mb-6 animate-pulse">
+            <div className="px-4 sm:px-8 py-6 bg-gray-50 border-b">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-start space-x-4 sm:space-x-6 w-full sm:w-auto">
+                  {/* Profile Picture Skeleton */}
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-full"></div>
+
+                  {/* Basic Info Skeleton */}
+                  <div className="flex-1 text-left pt-2 min-w-0">
+                    <div className="h-6 bg-gray-200 rounded w-48 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-64 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-32"></div>
+                  </div>
+                </div>
+
+                {/* Credits Badge Skeleton */}
+                <div className="text-left sm:text-right w-full sm:w-auto">
+                  <div className="bg-gray-200 h-12 rounded-md w-full sm:w-32 mb-2"></div>
+                  <div className="bg-gray-200 h-10 rounded-md w-full sm:w-32"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Content Skeleton */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Profile Status Card Skeleton */}
+              <div className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse">
+                <div className="px-6 py-4 bg-gray-50 border-b">
+                  <div className="h-5 bg-gray-200 rounded w-32"></div>
+                </div>
+                <div className="p-6 space-y-4">
+                  <div className="h-4 bg-gray-200 rounded w-full"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-16 bg-gray-200 rounded w-full"></div>
+                </div>
+              </div>
+
+              {/* Stats Card Skeleton */}
+              <div className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse">
+                <div className="px-6 py-4 bg-gray-50 border-b">
+                  <div className="h-5 bg-gray-200 rounded w-24"></div>
+                </div>
+                <div className="p-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="text-center">
+                        <div className="h-8 bg-gray-200 rounded w-12 mx-auto mb-2"></div>
+                        <div className="h-4 bg-gray-200 rounded w-16 mx-auto"></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions Card Skeleton */}
+              <div className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse">
+                <div className="px-6 py-4 bg-gray-50 border-b">
+                  <div className="h-5 bg-gray-200 rounded w-28"></div>
+                </div>
+                <div className="p-6 space-y-3">
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar Skeleton */}
+            <div className="space-y-6">
+              {/* Quick Actions Card Skeleton */}
+              <div className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse">
+                <div className="px-6 py-4 bg-gray-50 border-b">
+                  <div className="h-5 bg-gray-200 rounded w-32"></div>
+                </div>
+                <div className="p-6 space-y-3">
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                </div>
+              </div>
+
+              {/* Account Settings Card Skeleton */}
+              <div className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse">
+                <div className="px-6 py-4 bg-gray-50 border-b">
+                  <div className="h-5 bg-gray-200 rounded w-36"></div>
+                </div>
+                <div className="p-6 space-y-3">
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
