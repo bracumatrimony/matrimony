@@ -1301,12 +1301,14 @@ export default function BiodataView() {
                     <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-lg p-6 border border-rose-200">
                       <Lock className="w-8 h-8 text-rose-500 mx-auto mb-3" />
                       <h3 className="text-lg font-semibold text-rose-800 mb-3">
-                        Contact Information Restricted
+                        {currentUser?.verificationRequest
+                          ? "Verification Under Review"
+                          : "Contact Information Restricted"}
                       </h3>
                       <p className="text-base text-rose-700 mb-4 leading-relaxed">
-                        You cannot see the contact information without a
-                        verified institutional email address. If you are alumni,
-                        make a request for verification.
+                        {currentUser?.verificationRequest
+                          ? "Your verification request has been submitted and is currently under review. We will notify you once the verification process is complete."
+                          : "You cannot see the contact information without a verified institutional email address. If you are alumni, make a request for verification."}
                       </p>
                       {!currentUser?.verificationRequest ? (
                         <button
@@ -1316,16 +1318,7 @@ export default function BiodataView() {
                           <Shield className="w-4 h-4" />
                           Request Alumni Verification
                         </button>
-                      ) : (
-                        <div className="text-center mb-4">
-                          <span className="text-lg font-bold text-green-800 block mb-2">
-                            Verification Request Submitted
-                          </span>
-                          <p className="text-base text-green-700 font-medium">
-                            Please send your proof to our Facebook page.
-                          </p>
-                        </div>
-                      )}
+                      ) : null}
                       <button
                         onClick={() => navigate("/profile")}
                         className="inline-flex items-center gap-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-6 py-3 rounded-md transition-colors cursor-pointer"
