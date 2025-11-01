@@ -176,9 +176,6 @@ router.get(
           "profile.graduationSubject": 1,
           "profile.profession": 1,
           "profile.userId._id": 1,
-          "profile.userId.name": 1,
-          "profile.userId.email": 1,
-          "profile.userId.picture": 1,
         },
       },
     ]);

@@ -247,7 +247,6 @@ router.get("/search", async (req, res) => {
     if (search && search.trim()) {
       const searchRegex = new RegExp(search.trim(), "i");
       filters.$or = [
-        { name: searchRegex },
         { educationLevel: searchRegex },
         { profession: searchRegex },
         { presentAddressDistrict: searchRegex },
@@ -434,7 +433,6 @@ router.get(
       profileId: { $in: user.unlockedContacts },
       status: "approved",
     })
-      .populate("userId", "name")
       .select("profileId biodataId age location contactInformation createdAt")
       .lean();
 
@@ -824,7 +822,7 @@ router.post(
     const profile = await Profile.findOne({
       profileId: profileId,
       status: "approved",
-    }).populate("userId", "name email");
+    });
 
     if (!profile) {
       return res.status(404).json({
@@ -946,9 +944,7 @@ router.get(
     const profile = await Profile.findOne({
       profileId: profileId,
       status: "approved",
-    })
-      .populate("userId", "name")
-      .lean();
+    }).lean();
 
     if (!profile) {
       return res.status(404).json({
