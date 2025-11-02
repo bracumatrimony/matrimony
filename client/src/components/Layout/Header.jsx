@@ -76,9 +76,9 @@ export default function Header() {
           <nav className="hidden md:flex items-center space-x-6">
             <Link
               to="/search"
-              className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors font-medium no-underline"
+              className="flex items-center space-x-2 text-gray-700 hover:text-rose-600 transition-all duration-300 font-medium no-underline px-3 py-2 rounded-lg border-2 border-transparent hover:border-rose-300 hover:bg-rose-50 hover:shadow-lg hover:shadow-rose-200/50 group"
             >
-              <Search className="h-4 w-4" />
+              <Search className="h-4 w-4 transition-all duration-300 group-hover:text-rose-600 group-hover:rotate-12 group-hover:scale-110" />
               <span>Search Biodata's</span>
             </Link>
 
@@ -113,7 +113,7 @@ export default function Header() {
                     )}
                     <span>{user?.name?.split(" ")[0] || "User"}</span>
                   </button>
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-sm border border-gray-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-1 group-hover:translate-y-0">
                     <Link
                       to="/profile"
                       className="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors no-underline"

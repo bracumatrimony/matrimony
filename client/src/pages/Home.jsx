@@ -86,47 +86,20 @@ export default function Home() {
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24 min-h-screen flex items-center">
             <div className="text-center w-full">
               {/* Main heading */}
-              <motion.h1
-                className="text-5xl md:text-7xl font-light text-white mb-6 tracking-tight leading-tight drop-shadow-lg"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-              >
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.8 }}
-                >
-                  Find Your
-                </motion.span>
-                <br />
-                <motion.span
-                  className="block font-medium bg-gradient-to-r from-rose-400 to-pink-400 bg-clip-text text-transparent"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
-                >
-                  Perfect Match
-                </motion.span>
-              </motion.h1>
+              <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight leading-tight drop-shadow-2xl">
+                <span>Campus </span>
+                <span className="bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
+                  Matrimony
+                </span>
+              </h1>
 
               {/* Subtitle */}
-              <motion.p
-                className="text-xl text-gray-100 mb-12 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-md"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9, duration: 0.6 }}
-              >
-                Connecting hearts within the BRAC University community
-              </motion.p>
+              <p className="text-3xl text-gray-100 mb-12 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-md">
+                Find your marriage partner from your own campus.
+              </p>
 
               {/* CTA Buttons */}
-              <motion.div
-                className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.2, duration: 0.6 }}
-              >
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
                 <Link
                   to="/search"
                   className="group inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 rounded-full font-medium transition-all duration-300 hover:bg-gray-100 hover:shadow-lg hover:-translate-y-0.5"
@@ -140,7 +113,7 @@ export default function Home() {
                 >
                   Login / Sign Up
                 </Link>
-              </motion.div>
+              </div>
             </div>
           </div>
         </section>
@@ -154,16 +127,16 @@ export default function Home() {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
-              className="text-center mb-12"
+              className="text-center mt-12 mb-16"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <h2 className="text-3xl md:text-4xl font-light text-gray-900 mb-4">
+              <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-6">
                 Community Statistics
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-xl text-gray-600">
                 Discover the growing community of verified biodatas
               </p>
             </motion.div>
@@ -177,10 +150,12 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
-                <div className="text-4xl font-bold text-rose-500 mb-2">
+                <div className="text-6xl font-bold text-rose-500 mb-2">
                   {loading ? "..." : stats.total.toLocaleString()}
                 </div>
-                <div className="text-gray-600 font-medium">Total Biodatas</div>
+                <div className="text-xl text-gray-600 font-medium">
+                  Total Biodatas
+                </div>
               </motion.div>
 
               {/* Male Biodatas */}
@@ -191,10 +166,12 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                <div className="text-4xl font-bold text-blue-500 mb-2">
+                <div className="text-6xl font-bold text-blue-500 mb-2">
                   {loading ? "..." : stats.male.toLocaleString()}
                 </div>
-                <div className="text-gray-600 font-medium">Male Biodatas</div>
+                <div className="text-xl text-gray-600 font-medium">
+                  Male Biodatas
+                </div>
               </motion.div>
 
               {/* Female Biodatas */}
@@ -205,10 +182,12 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.5 }}
               >
-                <div className="text-4xl font-bold text-pink-500 mb-2">
+                <div className="text-6xl font-bold text-pink-500 mb-2">
                   {loading ? "..." : stats.female.toLocaleString()}
                 </div>
-                <div className="text-gray-600 font-medium">Female Biodatas</div>
+                <div className="text-xl text-gray-600 font-medium">
+                  Female Biodatas
+                </div>
               </motion.div>
             </div>
           </div>
