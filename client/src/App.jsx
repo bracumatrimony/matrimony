@@ -8,7 +8,6 @@ import {
 import Layout from "./components/Layout/Layout";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import PublicRoute from "./components/Auth/PublicRoute";
-import RouteLoadingFallback from "./components/RouteLoadingFallback";
 import LogoAnimation from "./components/LogoAnimation";
 import { useAuth } from "./contexts/AuthContext";
 import { monetizationConfig } from "./config/monetization";
@@ -109,7 +108,7 @@ function App() {
         />
       )}
       <Router>
-        <Suspense fallback={<RouteLoadingFallback />}>
+        <Suspense>
           <Routes>
             <Route
               path="/login"
