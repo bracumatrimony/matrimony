@@ -305,10 +305,6 @@ export const validateStep = (step, formData) => {
         errors.hobbiesLikesDislikesDreams =
           "Hobbies, likes, dislikes, and dreams information is required";
       }
-      if (!formData.specificCharacteristics?.trim()) {
-        errors.specificCharacteristics =
-          "Specific characteristics or qualities expected in partner is required";
-      }
       break;
 
     case 4: // Expected Life Partner & Declaration
@@ -341,6 +337,10 @@ export const validateStep = (step, formData) => {
       if (!formData.partnerEconomicCondition) {
         errors.partnerEconomicCondition =
           "Partner economic condition preference is required";
+      }
+      if (!formData.specificCharacteristics?.trim()) {
+        errors.specificCharacteristics =
+          "Specific characteristics or qualities expected in partner is required";
       }
       if (!formData.guardianKnowledge) {
         errors.guardianKnowledge =

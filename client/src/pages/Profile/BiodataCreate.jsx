@@ -1690,10 +1690,6 @@ export default function BiodataCreate() {
                     helps potential matches understand your personality,
                     interests, and life goals.
                   </p>
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    Share your hobbies, favorite activities, things you dislike,
-                    and your dreams for the future.
-                  </p>
                 </div>
               </div>
 
