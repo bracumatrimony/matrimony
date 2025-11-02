@@ -873,7 +873,7 @@ export default function BiodataView() {
                       </div>
 
                       {/* Bottom Row: Additional Info */}
-                      <div className="pt-3 border-t border-gray-200">
+                      <div className="hidden sm:block pt-3 border-t border-gray-200">
                         <div className="flex flex-row flex-wrap items-center gap-3 sm:gap-4 text-sm sm:text-sm text-gray-600">
                           <span className="flex items-center gap-2 text-base sm:text-sm">
                             <MapPin className="h-5 w-5 sm:h-4 sm:w-4" />
