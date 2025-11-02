@@ -80,6 +80,30 @@ export const validateProfileData = (formData) => {
     errors.religion = "Religion is required";
   }
 
+  if (!formData.age) {
+    errors.age = "Age is required";
+  } else if (formData.age < 18 || formData.age > 60) {
+    errors.age = "Age must be between 18 and 60";
+  }
+
+  if (!formData.height?.trim()) {
+    errors.height = "Height is required";
+  }
+
+  if (!formData.weight) {
+    errors.weight = "Weight is required";
+  } else if (formData.weight < 30 || formData.weight > 200) {
+    errors.weight = "Weight must be between 30kg and 200kg";
+  }
+
+  if (!formData.skinTone) {
+    errors.skinTone = "Skin tone is required";
+  }
+
+  if (!formData.maritalStatus) {
+    errors.maritalStatus = "Marital status is required";
+  }
+
   if (!formData.religiousPractices?.trim()) {
     errors.religiousPractices = "Religious practices information is required";
   }
@@ -95,6 +119,11 @@ export const validateProfileData = (formData) => {
   if (!formData.hobbiesLikesDislikesDreams?.trim()) {
     errors.hobbiesLikesDislikesDreams =
       "Hobbies, likes, dislikes, and dreams information is required";
+  }
+
+  if (!formData.specificCharacteristics?.trim()) {
+    errors.specificCharacteristics =
+      "Specific characteristics or qualities expected in partner is required";
   }
 
   // Segment 4: Expected Life Partner & Declaration
@@ -275,6 +304,10 @@ export const validateStep = (step, formData) => {
       if (!formData.hobbiesLikesDislikesDreams?.trim()) {
         errors.hobbiesLikesDislikesDreams =
           "Hobbies, likes, dislikes, and dreams information is required";
+      }
+      if (!formData.specificCharacteristics?.trim()) {
+        errors.specificCharacteristics =
+          "Specific characteristics or qualities expected in partner is required";
       }
       break;
 
