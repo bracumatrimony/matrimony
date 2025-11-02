@@ -78,8 +78,6 @@ export default function Credits() {
       id: 1,
       credits: 1,
       price: 30,
-      originalPrice: 30,
-      discount: 0,
       popular: false,
     },
     {
