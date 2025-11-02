@@ -200,7 +200,7 @@ class ProfileService {
     }
   }
 
-  // Fetch transaction history for the current user
+  // Get user's transaction history
   async getTransactionHistory() {
     try {
       const response = await this.makeRequest("/users/transactions", {
@@ -209,19 +209,6 @@ class ProfileService {
       return response;
     } catch (error) {
       console.error("Fetch transaction history error:", error);
-      throw error;
-    }
-  }
-
-  // Fetch user's orders (purchase transactions)
-  async getUserOrders() {
-    try {
-      const response = await this.makeRequest("/transactions/orders", {
-        method: "GET",
-      });
-      return response;
-    } catch (error) {
-      console.error("Fetch user orders error:", error);
       throw error;
     }
   }
@@ -300,15 +287,15 @@ class ProfileService {
     }
   }
 
-  // Get user's transaction history
-  async getTransactionHistory() {
+  // Get unlocked profiles for current user
+  async getUnlockedProfiles() {
     try {
-      const response = await this.makeRequest("/transactions/history", {
+      const response = await this.makeRequest("/profiles/unlocked", {
         method: "GET",
       });
       return response;
     } catch (error) {
-      console.error("Get transaction history error:", error);
+      console.error("Get unlocked profiles error:", error);
       throw error;
     }
   }
@@ -336,6 +323,19 @@ class ProfileService {
       return response;
     } catch (error) {
       console.error("Request verification error:", error);
+      throw error;
+    }
+  }
+
+  // Fetch user's orders (purchase transactions)
+  async getUserOrders() {
+    try {
+      const response = await this.makeRequest("/transactions/orders", {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("Fetch user orders error:", error);
       throw error;
     }
   }

@@ -222,6 +222,8 @@ const Transaction = () => {
                           {tx.type === "contact_unlock" &&
                           (tx.credits === 0 || tx.credits === undefined)
                             ? "Free"
+                            : tx.type === "contact_unlock"
+                            ? Math.abs(tx.credits) || tx.amount
                             : tx.credits || tx.amount}
                         </td>
                         <td className="py-4 px-4 md:px-6 text-sm text-gray-600 max-w-xs md:max-w-none">
@@ -332,6 +334,8 @@ const Transaction = () => {
                         {tx.type === "contact_unlock" &&
                         (tx.credits === 0 || tx.credits === undefined)
                           ? "Free"
+                          : tx.type === "contact_unlock"
+                          ? Math.abs(tx.credits) || tx.amount
                           : tx.credits || tx.amount}
                       </div>
                     </div>
