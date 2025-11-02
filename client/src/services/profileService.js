@@ -286,19 +286,6 @@ class ProfileService {
       throw error;
     }
   }
-
-  // Get unlocked profiles for current user
-  async getUnlockedProfiles() {
-    try {
-      const response = await this.makeRequest("/profiles/unlocked", {
-        method: "GET",
-      });
-      return response;
-    } catch (error) {
-      console.error("Get unlocked profiles error:", error);
-      throw error;
-    }
-  }
   async getStats() {
     try {
       const response = await this.makePublicRequest("/profiles/stats", {
