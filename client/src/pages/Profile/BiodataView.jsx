@@ -874,22 +874,22 @@ export default function BiodataView() {
 
                       {/* Bottom Row: Additional Info */}
                       <div className="pt-3 border-t border-gray-200">
-                        <div className="flex flex-col sm:flex-row sm:flex-wrap items-center sm:items-start gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <div className="flex flex-row flex-wrap items-center gap-3 sm:gap-4 text-sm sm:text-sm text-gray-600">
+                          <span className="flex items-center gap-2 text-base sm:text-sm">
+                            <MapPin className="h-5 w-5 sm:h-4 sm:w-4" />
                             {profile?.presentAddressDivision &&
                             profile?.presentAddressDistrict
                               ? `${profile.presentAddressDistrict}, ${profile.presentAddressDivision}`
                               : "Location not provided"}
                           </span>
                           <span className="hidden sm:inline">•</span>
-                          <span className="flex items-center gap-1">
-                            <Briefcase className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="flex items-center gap-2 text-base sm:text-sm">
+                            <Briefcase className="h-5 w-5 sm:h-4 sm:w-4" />
                             {profile?.profession || "Profession not provided"}
                           </span>
                           <span className="hidden sm:inline">•</span>
-                          <span className="flex items-center gap-1">
-                            <GraduationCap className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="flex items-center gap-2 text-base sm:text-sm">
+                            <GraduationCap className="h-5 w-5 sm:h-4 sm:w-4" />
                             {profile?.graduationSubject ||
                               "Education not provided"}
                           </span>
