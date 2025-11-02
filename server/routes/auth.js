@@ -76,7 +76,7 @@ router.post("/google", async (req, res) => {
       let universityKey, profileId, alumniVerified, verificationRequest;
 
       let initialCredits = 0;
-      if (universityInfo && universityInfo.key === "NSU") {
+      if (universityInfo) {
         const alreadyCredited = await CreditedEmail.findOne({
           email: email.toLowerCase(),
         });
@@ -365,7 +365,7 @@ router.post("/register", async (req, res) => {
     const universityInfo = detectUniversityFromEmail(email);
 
     let initialCredits = 0;
-    if (universityInfo && universityInfo.key === "NSU") {
+    if (universityInfo) {
       const alreadyCredited = await CreditedEmail.findOne({
         email: email.toLowerCase(),
       });

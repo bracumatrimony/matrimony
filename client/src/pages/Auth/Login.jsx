@@ -2,17 +2,9 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import GoogleSignIn from "../../components/Auth/GoogleSignIn";
 import SEO from "../../components/SEO";
-import authService from "../../services/authService";
-import { useAuth } from "../../contexts/AuthContext";
 
 export default function Login() {
   const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
 
   // Check for OAuth errors in URL params
   useEffect(() => {
@@ -33,46 +25,6 @@ export default function Login() {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    // Clear field-specific errors when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: null,
-      }));
-    }
-  };
-
-  const handleLocalLogin = async (e) => {
-    e.preventDefault();
-    setErrors({});
-    setLoading(true);
-
-    try {
-      const response = await authService.authenticateWithEmail(
-        formData.email,
-        formData.password,
-        "login"
-      );
-
-      if (response.success) {
-        login(response.user);
-        // Redirect will be handled by the auth context or protected routes
-      }
-    } catch (error) {
-      setErrors({
-        general: error.message || "Login failed. Please try again.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <>
@@ -160,74 +112,6 @@ export default function Login() {
                 </div>
               )}
 
-              {/* Local Login Form */}
-              <form onSubmit={handleLocalLogin} className="space-y-4 mb-6">
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-white md:text-gray-700 mb-1"
-                  >
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-white/20 md:border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white/10 md:bg-white text-white md:text-gray-900"
-                    placeholder="Enter your email"
-                  />
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-white md:text-gray-700 mb-1"
-                  >
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-3 py-2 border border-white/20 md:border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white/10 md:bg-white text-white md:text-gray-900"
-                    placeholder="Enter your password"
-                  />
-                  {errors.password && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.password}
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? "Signing in..." : "Sign in"}
-                </button>
-              </form>
-
-              <div className="relative mb-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/20 md:border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-transparent text-white md:text-gray-500">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-
               {/* Google Sign-In */}
               <div className="space-y-4">
                 <GoogleSignIn />
@@ -235,15 +119,6 @@ export default function Login() {
 
               {/* Footer links */}
               <div className="text-center text-xs text-white md:text-gray-500 mt-6">
-                Don't have an account?
-                <span className="mx-1">·</span>
-                <Link
-                  to="/signup"
-                  className="text-white md:text-rose-500 hover:underline"
-                >
-                  Sign up
-                </Link>
-                <span className="mx-1">·</span>
                 <Link
                   to="/terms"
                   className="text-white md:text-rose-500 hover:underline"
