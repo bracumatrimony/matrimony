@@ -25,6 +25,7 @@ import {
   divisions,
   districtsByDivision,
 } from "../../utils/locationData";
+import { validateProfileData } from "../../utils/profileValidation";
 
 const DROPDOWN_OPTIONS = {
   height: [
@@ -579,6 +580,23 @@ export default function BiodataEdit() {
     try {
       setSaving(true);
       setValidationErrors({});
+
+      // Validate required fields
+      const errors = validateProfileData(formData);
+      if (Object.keys(errors).length > 0) {
+        setValidationErrors(errors);
+        setSaving(false);
+        // Scroll to the first error
+        const firstErrorField = Object.keys(errors)[0];
+        const errorElement = document.querySelector(
+          `[name="${firstErrorField}"]`
+        );
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          errorElement.focus();
+        }
+        return;
+      }
 
       // Prepare the data for submission by combining preferences
       const submissionData = { ...formData };
@@ -1589,6 +1607,7 @@ export default function BiodataEdit() {
                 value={formData.specificCharacteristics}
                 type="textarea"
                 rows={3}
+                required={true}
                 placeholder="Any specific characteristics you're looking for"
                 handleChange={handleChange}
                 validationErrors={validationErrors}
