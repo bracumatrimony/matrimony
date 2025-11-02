@@ -657,70 +657,169 @@ export default function SearchProfiles() {
                           <button
                             onClick={handlePrevPage}
                             disabled={page === 1}
-                            className={`px-4 sm:px-5 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base ${
+                            className={`px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base ${
                               page === 1
                                 ? "opacity-50 cursor-not-allowed"
                                 : "cursor-pointer hover:shadow-md"
                             }`}
                           >
-                            &larr; Previous
+                            <span className="hidden sm:inline">
+                              &larr; Previous
+                            </span>
+                            <span className="sm:hidden">&larr;</span>
                           </button>
                           {/* Page number buttons */}
-                          {Array.from(
-                            { length: totalPages },
-                            (_, i) => i + 1
-                          ).map((num) => {
-                            // Show first, last, current, and neighbors; ellipsis for gaps
-                            if (
-                              num === 1 ||
-                              num === totalPages ||
-                              Math.abs(num - page) <= 1
-                            ) {
-                              return (
-                                <button
-                                  key={num}
-                                  onClick={() => {
-                                    if (num !== page) {
-                                      setPage(num);
-                                      loadProfiles(
-                                        { ...filters, searchQuery },
-                                        num,
-                                        limit
-                                      );
-                                    }
-                                  }}
-                                  className={`px-3.5 sm:px-4 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 ${
-                                    num === page
-                                      ? "bg-slate-800 text-white border-slate-800 shadow-md"
-                                      : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer hover:shadow-md"
-                                  }`}
-                                  disabled={num === page}
-                                >
-                                  {num}
-                                </button>
-                              );
-                            } else if (num === page - 2 || num === page + 2) {
-                              return (
-                                <span
-                                  key={num}
-                                  className="px-3 text-slate-400 select-none text-sm"
-                                >
-                                  ...
-                                </span>
-                              );
-                            }
-                            return null;
-                          })}
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            {(() => {
+                              const pages = [];
+                              const showEllipsis = totalPages > 5;
+
+                              if (!showEllipsis) {
+                                // Show all pages if 5 or fewer
+                                for (let i = 1; i <= totalPages; i++) {
+                                  pages.push(
+                                    <button
+                                      key={i}
+                                      onClick={() => {
+                                        if (i !== page) {
+                                          setPage(i);
+                                          loadProfiles(
+                                            { ...filters, searchQuery },
+                                            i,
+                                            limit
+                                          );
+                                        }
+                                      }}
+                                      className={`px-2.5 sm:px-3.5 py-2.5 sm:py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 min-w-[40px] sm:min-w-[44px] ${
+                                        i === page
+                                          ? "bg-slate-800 text-white border-slate-800 shadow-md"
+                                          : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer hover:shadow-md"
+                                      }`}
+                                      disabled={i === page}
+                                    >
+                                      {i}
+                                    </button>
+                                  );
+                                }
+                              } else {
+                                // Show limited pages with ellipsis for larger page counts
+                                const startPage = Math.max(1, page - 1);
+                                const endPage = Math.min(totalPages, page + 1);
+
+                                // Always show first page
+                                if (startPage > 1) {
+                                  pages.push(
+                                    <button
+                                      key={1}
+                                      onClick={() => {
+                                        setPage(1);
+                                        loadProfiles(
+                                          { ...filters, searchQuery },
+                                          1,
+                                          limit
+                                        );
+                                      }}
+                                      className={`px-2.5 sm:px-3.5 py-2.5 sm:py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 min-w-[40px] sm:min-w-[44px] ${
+                                        1 === page
+                                          ? "bg-slate-800 text-white border-slate-800 shadow-md"
+                                          : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer hover:shadow-md"
+                                      }`}
+                                      disabled={1 === page}
+                                    >
+                                      1
+                                    </button>
+                                  );
+                                  if (startPage > 2) {
+                                    pages.push(
+                                      <span
+                                        key="start-ellipsis"
+                                        className="px-1 sm:px-2 text-slate-400 select-none text-sm"
+                                      >
+                                        ...
+                                      </span>
+                                    );
+                                  }
+                                }
+
+                                // Show current page range
+                                for (let i = startPage; i <= endPage; i++) {
+                                  pages.push(
+                                    <button
+                                      key={i}
+                                      onClick={() => {
+                                        if (i !== page) {
+                                          setPage(i);
+                                          loadProfiles(
+                                            { ...filters, searchQuery },
+                                            i,
+                                            limit
+                                          );
+                                        }
+                                      }}
+                                      className={`px-2.5 sm:px-3.5 py-2.5 sm:py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 min-w-[40px] sm:min-w-[44px] ${
+                                        i === page
+                                          ? "bg-slate-800 text-white border-slate-800 shadow-md"
+                                          : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer hover:shadow-md"
+                                      }`}
+                                      disabled={i === page}
+                                    >
+                                      {i}
+                                    </button>
+                                  );
+                                }
+
+                                // Always show last page
+                                if (endPage < totalPages) {
+                                  if (endPage < totalPages - 1) {
+                                    pages.push(
+                                      <span
+                                        key="end-ellipsis"
+                                        className="px-1 sm:px-2 text-slate-400 select-none text-sm"
+                                      >
+                                        ...
+                                      </span>
+                                    );
+                                  }
+                                  pages.push(
+                                    <button
+                                      key={totalPages}
+                                      onClick={() => {
+                                        setPage(totalPages);
+                                        loadProfiles(
+                                          { ...filters, searchQuery },
+                                          totalPages,
+                                          limit
+                                        );
+                                      }}
+                                      className={`px-2.5 sm:px-3.5 py-2.5 sm:py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 min-w-[40px] sm:min-w-[44px] ${
+                                        totalPages === page
+                                          ? "bg-slate-800 text-white border-slate-800 shadow-md"
+                                          : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer hover:shadow-md"
+                                      }`}
+                                      disabled={totalPages === page}
+                                    >
+                                      {totalPages}
+                                    </button>
+                                  );
+                                }
+                              }
+
+                              return pages;
+                            })()}
+                          </div>
                           <button
                             onClick={handleNextPage}
                             disabled={page === totalPages}
-                            className={`px-4 sm:px-5 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base ${
+                            className={`px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base ${
                               page === totalPages
                                 ? "opacity-50 cursor-not-allowed"
                                 : "cursor-pointer hover:shadow-md"
                             }`}
                           >
-                            Next &rarr;
+                            <span className="hidden sm:inline">
+                              Next &rarr;
+                            </span>
+                            <span className="sm:hidden">&rarr;</span>
                           </button>
                         </div>
                       </>
