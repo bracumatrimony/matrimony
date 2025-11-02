@@ -83,7 +83,7 @@ export default function Credits() {
     {
       id: 2,
       credits: 5,
-      price: 100,
+      price: 99,
       originalPrice: 150,
       discount: 33,
       popular: true,
@@ -91,7 +91,7 @@ export default function Credits() {
     {
       id: 3,
       credits: 10,
-      price: 150,
+      price: 149,
       originalPrice: 300,
       discount: 50,
       popular: false,
