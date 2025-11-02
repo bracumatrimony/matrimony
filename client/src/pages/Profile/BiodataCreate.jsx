@@ -2147,9 +2147,18 @@ export default function BiodataCreate() {
                   value={formData.specificCharacteristics}
                   onChange={handleChange}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500"
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-rose-500 focus:border-rose-500 ${
+                    errors.specificCharacteristics
+                      ? "border-red-300"
+                      : "border-gray-300"
+                  }`}
                   placeholder="Describe any specific qualities, characteristics, or requirements you seek in your partner"
                 />
+                {errors.specificCharacteristics && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.specificCharacteristics}
+                  </p>
+                )}
                 <div className="mt-3 p-4 border border-amber-300 rounded-md bg-amber-50 shadow-sm">
                   <p className="text-sm text-amber-800 leading-relaxed mb-2">
                     <span className="font-semibold">Compatibility Check:</span>{" "}
