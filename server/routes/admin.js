@@ -120,22 +120,28 @@ router.get("/profiles/approved", [auth, adminAuth], async (req, res) => {
 
     let query = { status: "approved" };
 
+    // Import sanitization utility
+    const { sanitizeSearchQuery } = require("../utils/sanitizeQuery");
+
     // Add search functionality
     if (search) {
-      // First get user IDs that match the search
-      const matchingUsers = await User.find({
-        $or: [
-          { name: { $regex: search, $options: "i" } },
-          { email: { $regex: search, $options: "i" } },
-        ],
-      }).select("_id");
+      const sanitizedSearch = sanitizeSearchQuery(search);
+      if (sanitizedSearch) {
+        // First get user IDs that match the search
+        const matchingUsers = await User.find({
+          $or: [
+            { name: { $regex: sanitizedSearch, $options: "i" } },
+            { email: { $regex: sanitizedSearch, $options: "i" } },
+          ],
+        }).select("_id");
 
-      const userIds = matchingUsers.map((user) => user._id);
+        const userIds = matchingUsers.map((user) => user._id);
 
-      query.$or = [
-        { profileId: { $regex: search, $options: "i" } },
-        { userId: { $in: userIds } },
-      ];
+        query.$or = [
+          { profileId: { $regex: sanitizedSearch, $options: "i" } },
+          { userId: { $in: userIds } },
+        ];
+      }
     }
 
     const profiles = await Profile.find(query)
@@ -533,16 +539,22 @@ router.get("/users", [auth, adminAuth], async (req, res) => {
     const { page = 1, limit = 10, search } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
+    // Import sanitization utility
+    const { sanitizeSearchQuery } = require("../utils/sanitizeQuery");
+
     // Build search query
     let query = {};
     if (search) {
-      query = {
-        $or: [
-          { name: new RegExp(search, "i") },
-          { email: new RegExp(search, "i") },
-          { profileId: new RegExp(search, "i") },
-        ],
-      };
+      const sanitizedSearch = sanitizeSearchQuery(search);
+      if (sanitizedSearch) {
+        query = {
+          $or: [
+            { name: new RegExp(sanitizedSearch, "i") },
+            { email: new RegExp(sanitizedSearch, "i") },
+            { profileId: new RegExp(sanitizedSearch, "i") },
+          ],
+        };
+      }
     }
 
     const users = await User.find(query)
@@ -721,17 +733,23 @@ router.get("/users/restricted", [auth, adminAuth], async (req, res) => {
     const { page = 1, limit = 10, search } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
+    // Import sanitization utility
+    const { sanitizeSearchQuery } = require("../utils/sanitizeQuery");
+
     // Build search query
     let query = { isRestricted: true };
     if (search) {
-      query = {
-        isRestricted: true,
-        $or: [
-          { name: new RegExp(search, "i") },
-          { email: new RegExp(search, "i") },
-          { profileId: new RegExp(search, "i") },
-        ],
-      };
+      const sanitizedSearch = sanitizeSearchQuery(search);
+      if (sanitizedSearch) {
+        query = {
+          isRestricted: true,
+          $or: [
+            { name: new RegExp(sanitizedSearch, "i") },
+            { email: new RegExp(sanitizedSearch, "i") },
+            { profileId: new RegExp(sanitizedSearch, "i") },
+          ],
+        };
+      }
     }
 
     const users = await User.find(query)
@@ -768,17 +786,23 @@ router.get("/users/banned", [auth, adminAuth], async (req, res) => {
     const { page = 1, limit = 10, search } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
+    // Import sanitization utility
+    const { sanitizeSearchQuery } = require("../utils/sanitizeQuery");
+
     // Build search query
     let query = { isBanned: true };
     if (search) {
-      query = {
-        isBanned: true,
-        $or: [
-          { name: new RegExp(search, "i") },
-          { email: new RegExp(search, "i") },
-          { profileId: new RegExp(search, "i") },
-        ],
-      };
+      const sanitizedSearch = sanitizeSearchQuery(search);
+      if (sanitizedSearch) {
+        query = {
+          isBanned: true,
+          $or: [
+            { name: new RegExp(sanitizedSearch, "i") },
+            { email: new RegExp(sanitizedSearch, "i") },
+            { profileId: new RegExp(sanitizedSearch, "i") },
+          ],
+        };
+      }
     }
 
     const users = await User.find(query)

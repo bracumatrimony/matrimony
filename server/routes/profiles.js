@@ -240,63 +240,11 @@ router.get("/search", async (req, res) => {
       limit = 10,
     } = req.query;
 
-    // Build search filters with exact matches where possible
-    const filters = { status: "approved" };
+    // Import sanitization utility
+    const { sanitizeProfileSearchQuery } = require("../utils/sanitizeQuery");
 
-    // Text search across multiple fields
-    if (search && search.trim()) {
-      const searchRegex = new RegExp(search.trim(), "i");
-      filters.$or = [
-        { educationLevel: searchRegex },
-        { profession: searchRegex },
-        { presentAddressDistrict: searchRegex },
-        { permanentAddressDistrict: searchRegex },
-        { sscGroup: searchRegex },
-        { bracu_department: searchRegex },
-      ];
-    }
-
-    if (gender) filters.gender = gender;
-    if (minAge || maxAge) {
-      filters.age = {};
-      if (minAge) filters.age.$gte = parseInt(minAge);
-      if (maxAge) filters.age.$lte = parseInt(maxAge);
-    }
-    if (religion) filters.religion = religion;
-    // Use case-insensitive exact matches instead of regex where possible
-    if (education) {
-      filters.educationLevel = { $regex: new RegExp(`^${education}`, "i") };
-    }
-    if (profession) {
-      filters.profession = { $regex: new RegExp(`^${profession}`, "i") };
-    }
-    if (district && district !== "Any" && district !== "") {
-      // If search is already using $or, combine with $and
-      if (filters.$or) {
-        filters.$and = [
-          { $or: filters.$or },
-          {
-            $or: [
-              { presentAddressDistrict: { $regex: new RegExp(district, "i") } },
-              {
-                permanentAddressDistrict: { $regex: new RegExp(district, "i") },
-              },
-            ],
-          },
-        ];
-        delete filters.$or;
-      } else {
-        // Search in present and permanent address district fields
-        filters.$or = [
-          { presentAddressDistrict: { $regex: new RegExp(district, "i") } },
-          { permanentAddressDistrict: { $regex: new RegExp(district, "i") } },
-        ];
-      }
-    }
-
-    if (university) {
-      filters.university = university;
-    }
+    // Build sanitized search filters
+    const filters = sanitizeProfileSearchQuery(req.query);
 
     const allProfiles = await Profile.find(filters)
       .populate({
@@ -483,9 +431,21 @@ router.get("/:profileId", async (req, res) => {
       );
     }
 
+    // Import sanitization utility
+    const { sanitizeId } = require("../utils/sanitizeQuery");
+
+    // Sanitize profileId parameter
+    const profileId = sanitizeId(req.params.profileId);
+    if (!profileId) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid profile ID",
+      });
+    }
+
     // PERFORMANCE: Use .lean() for faster queries since we don't need Mongoose document methods
     const profile = await Profile.findOne({
-      profileId: req.params.profileId,
+      profileId: profileId,
       status: "approved",
     })
       .populate("userId", "name email isRestricted")
@@ -494,7 +454,7 @@ router.get("/:profileId", async (req, res) => {
     if (!profile) {
       // Check if profile exists but is pending
       const pendingProfile = await Profile.findOne({
-        profileId: req.params.profileId,
+        profileId: profileId,
         status: "pending_approval",
       })
         .select("status")

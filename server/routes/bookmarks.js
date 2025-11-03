@@ -20,16 +20,21 @@ router.post(
   asyncHandler(async (req, res) => {
     const { profileId } = req.body;
 
-    if (!profileId) {
+    // Import sanitization utility
+    const { sanitizeId } = require("../utils/sanitizeQuery");
+
+    // Sanitize profileId
+    const sanitizedProfileId = sanitizeId(profileId);
+    if (!sanitizedProfileId) {
       return res.status(400).json({
         success: false,
-        message: "Profile ID is required",
+        message: "Invalid profile ID",
       });
     }
 
     // Find the profile by profileId
     const profile = await Profile.findOne({
-      profileId: profileId,
+      profileId: sanitizedProfileId,
       status: "approved",
     });
 
@@ -51,7 +56,7 @@ router.post(
     // Check if bookmark already exists
     const existingBookmark = await Bookmark.findOne({
       userId: req.user.id,
-      profileId: profileId,
+      profileId: sanitizedProfileId,
     });
 
     if (existingBookmark) {
@@ -64,7 +69,7 @@ router.post(
     // Create bookmark
     const bookmark = new Bookmark({
       userId: req.user.id,
-      profileId: profileId,
+      profileId: sanitizedProfileId,
       profile: profile._id,
     });
 
@@ -87,9 +92,21 @@ router.delete(
   asyncHandler(async (req, res) => {
     const { profileId } = req.params;
 
+    // Import sanitization utility
+    const { sanitizeId } = require("../utils/sanitizeQuery");
+
+    // Sanitize profileId
+    const sanitizedProfileId = sanitizeId(profileId);
+    if (!sanitizedProfileId) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid profile ID",
+      });
+    }
+
     const bookmark = await Bookmark.findOneAndDelete({
       userId: req.user.id,
-      profileId: profileId,
+      profileId: sanitizedProfileId,
     });
 
     if (!bookmark) {
@@ -206,9 +223,21 @@ router.get(
   asyncHandler(async (req, res) => {
     const { profileId } = req.params;
 
+    // Import sanitization utility
+    const { sanitizeId } = require("../utils/sanitizeQuery");
+
+    // Sanitize profileId
+    const sanitizedProfileId = sanitizeId(profileId);
+    if (!sanitizedProfileId) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid profile ID",
+      });
+    }
+
     const bookmark = await Bookmark.findOne({
       userId: req.user.id,
-      profileId: profileId,
+      profileId: sanitizedProfileId,
     });
 
     res.json({
