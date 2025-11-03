@@ -419,14 +419,6 @@ export default function UserProfile() {
                         <span className="text-sm">ID: {user.profileId}</span>
                       </div>
                     )}
-                    {profile && (
-                      <div className="flex items-center">
-                        <FileText className="h-4 w-4 mr-1" />
-                        <span className="text-sm">
-                          Profile: {profile.status}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -505,9 +497,9 @@ export default function UserProfile() {
                             <div>
                               <p className="font-medium text-gray-900">
                                 {profile.status === "approved"
-                                  ? "Biodata Approved"
+                                  ? ""
                                   : profile.status === "pending_approval"
-                                  ? "Pending Approval"
+                                  ? ""
                                   : profile.status === "rejected"
                                   ? "Biodata Rejected"
                                   : "Under Review"}
