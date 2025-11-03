@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 // Email templates
 const emailTemplates = {
   biodataApproved: (userName) => ({
-    subject: "Your BRACU Matrimony Biodata Has Been Approved",
+    subject: "Your Campus Matrimony Biodata Has Been Approved",
     html: `
       <!DOCTYPE html>
       <html lang="en">
@@ -199,7 +199,7 @@ const emailTemplates = {
       <body>
         <div class="email-wrapper">
           <div class="header">
-            <div class="logo">BRACU Matrimony</div>
+            <div class="logo">Campus Matrimony</div>
           </div>
 
           <div class="content">
@@ -211,7 +211,7 @@ const emailTemplates = {
             </div>
 
             <div class="message">
-              Congratulations on completing the approval process. Your profile is now active on BRACU Matrimony, where you can connect with other members of the BRACU community who share similar values and backgrounds.
+              Congratulations on completing the approval process. Your profile is now active on Campus Matrimony, where you can connect with other members of the campus community who share similar values and backgrounds.
             </div>
 
             <div class="message">
@@ -230,7 +230,7 @@ const emailTemplates = {
           <div class="footer">
             <div class="footer-text">
               <p>If you have any questions, please don't hesitate to contact our support team.</p>
-              <p class="footer-copyright">© ${new Date().getFullYear()} BRACU Matrimony. All rights reserved.</p>
+              <p class="footer-copyright">© ${new Date().getFullYear()} Campus Matrimony. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -240,7 +240,7 @@ const emailTemplates = {
   }),
 
   biodataRejected: (userName, reason) => ({
-    subject: "Your BRACU Matrimony Biodata Has Been Rejected",
+    subject: "Your Campus Matrimony Biodata Has Been Rejected",
     html: `
       <!DOCTYPE html>
       <html lang="en">
@@ -427,7 +427,7 @@ const emailTemplates = {
       <body>
         <div class="email-wrapper">
           <div class="header">
-            <div class="logo">BRACU Matrimony</div>
+            <div class="logo">Campus Matrimony</div>
           </div>
 
           <div class="content">
@@ -454,7 +454,7 @@ const emailTemplates = {
           <div class="footer">
             <div class="footer-text">
               <p>If you have any questions, please don't hesitate to contact our support team.</p>
-              <p class="footer-copyright">© ${new Date().getFullYear()} BRACU Matrimony. All rights reserved.</p>
+              <p class="footer-copyright">© ${new Date().getFullYear()} Campus Matrimony. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -475,7 +475,7 @@ const sendEmail = async (to, templateName, userName, ...additionalParams) => {
     const emailContent = template(userName, ...additionalParams);
 
     const mailOptions = {
-      from: `"BRACU Matrimony" <${process.env.GMAIL_USER}>`,
+      from: `"Campus Matrimony" <${process.env.GMAIL_USER}>`,
       to,
       subject: emailContent.subject,
       html: emailContent.html,

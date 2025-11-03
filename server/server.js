@@ -160,7 +160,7 @@ app.get("/sitemap.xml", (req, res) => {
 // Root route - redirect to frontend or show API info
 app.get("/", (req, res) => {
   res.json({
-    message: "BRACU Matrimony API Server",
+    message: "Campus Matrimony API Server",
     status: "running",
     version: "1.0.0",
     documentation: {
@@ -183,7 +183,7 @@ app.get("/", (req, res) => {
 // Health check endpoint
 app.get("/api/health", (req, res) => {
   res.json({
-    message: "BRACU Matrimony API Server is running!",
+    message: "Campus Matrimony API Server is running!",
     status: "healthy",
     timestamp: new Date().toISOString(),
   });
