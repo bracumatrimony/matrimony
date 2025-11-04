@@ -182,19 +182,17 @@ app.use("*", notFound);
 
 app.use(errorHandler);
 
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    const monetizationConfig = require("./config/monetization");
-    const config = monetizationConfig.getConfigSummary();
+app.listen(PORT, () => {
+  const monetizationConfig = require("./config/monetization");
+  const config = monetizationConfig.getConfigSummary();
 
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Allowed Origins:`, allowedOrigins);
-    console.log(`Frontend URL: ${process.env.FRONTEND_URL}`);
-    console.log(`API Base URL: http://localhost:${PORT}/api`);
-    console.log(
-      `Monetization : ${config.monetization.toUpperCase()} - ${config.message}`
-    );
-  });
-}
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Allowed Origins:`, allowedOrigins);
+  console.log(`Frontend URL: ${process.env.FRONTEND_URL}`);
+  console.log(`API Base URL: http://localhost:${PORT}/api`);
+  console.log(
+    `Monetization : ${config.monetization.toUpperCase()} - ${config.message}`
+  );
+});
 
 module.exports = app;
