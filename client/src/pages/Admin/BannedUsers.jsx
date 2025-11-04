@@ -13,12 +13,12 @@ export default function BannedUsers({ onViewProfile, showNotification }) {
   const [exporting, setExporting] = useState(false);
   const [unbanning, setUnbanning] = useState(null);
 
-  // Debounce search query
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchQuery(searchInput);
-      setCurrentPage(1); // Reset to first page when searching
-    }, 800); // 500ms delay
+      setCurrentPage(1); 
+    }, 800); 
 
     return () => clearTimeout(timer);
   }, [searchInput]);
@@ -52,16 +52,16 @@ export default function BannedUsers({ onViewProfile, showNotification }) {
       setExporting(true);
       showNotification?.("Exporting emails...", "info");
 
-      // Fetch all banned users with a high limit
+      
       const response = await adminService.getBannedUsers(1, 10000, "");
       if (response.success && response.users) {
         const bannedUsers = response.users.filter((user) => user.isBanned);
         const emails = bannedUsers
           .map((user) => user.email)
-          .filter((email) => email) // Remove any null/undefined emails
+          .filter((email) => email) 
           .join("\n");
 
-        // Create and download the file
+        
         const blob = new Blob([emails], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -91,13 +91,13 @@ export default function BannedUsers({ onViewProfile, showNotification }) {
   };
 
   const handleUnbanUser = async (userId, e) => {
-    e.stopPropagation(); // Prevent row click
+    e.stopPropagation(); 
     try {
       setUnbanning(userId);
       const response = await adminService.unbanUser(userId);
       if (response.success) {
         showNotification?.("User unbanned successfully", "success");
-        // Reload the users list
+        
         loadUsers();
       } else {
         showNotification?.("Failed to unban user", "error");
@@ -129,7 +129,7 @@ export default function BannedUsers({ onViewProfile, showNotification }) {
     <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
       {users.length > 0 || searchInput ? (
         <div className="space-y-4">
-          {/* Header */}
+          {}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Banned Users</h1>
@@ -161,7 +161,7 @@ export default function BannedUsers({ onViewProfile, showNotification }) {
             </div>
           </div>
 
-          {/* Search bar */}
+          {}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div className="relative flex-1 max-w-md">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -177,7 +177,7 @@ export default function BannedUsers({ onViewProfile, showNotification }) {
             </div>
           </div>
 
-          {/* Items per page selector */}
+          {}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div className="flex items-center space-x-3">
               <span className="text-sm text-gray-600">Show:</span>
@@ -203,7 +203,7 @@ export default function BannedUsers({ onViewProfile, showNotification }) {
             </div>
           </div>
 
-          {/* Compact table */}
+          {}
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -347,7 +347,7 @@ export default function BannedUsers({ onViewProfile, showNotification }) {
             </div>
           </div>
 
-          {/* Pagination */}
+          {}
           {totalUsers > itemsPerPage && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-sm text-gray-600">
@@ -362,7 +362,7 @@ export default function BannedUsers({ onViewProfile, showNotification }) {
                   Previous
                 </button>
 
-                {/* Page numbers */}
+                {}
                 {[...Array(Math.ceil(totalUsers / itemsPerPage))].map(
                   (_, index) => {
                     const pageNum = index + 1;

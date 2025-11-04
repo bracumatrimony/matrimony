@@ -1,12 +1,6 @@
-/**
- * Utility functions for formatting error messages
- */
 
-/**
- * Format MongoDB validation errors into user-friendly messages
- * @param {Error} error - MongoDB validation error
- * @returns {Object} Formatted error response
- */
+
+
 const formatValidationError = (error) => {
   if (error.name === "ValidationError") {
     const errors = {};
@@ -69,7 +63,7 @@ const formatValidationError = (error) => {
     };
   }
 
-  // Handle duplicate key errors
+  
   if (error.code === 11000) {
     const field = Object.keys(error.keyPattern)[0];
     return {
@@ -79,7 +73,7 @@ const formatValidationError = (error) => {
     };
   }
 
-  // Handle cast errors
+  
   if (error.name === "CastError") {
     return {
       type: "cast",
@@ -88,18 +82,14 @@ const formatValidationError = (error) => {
     };
   }
 
-  // Default error
+  
   return {
     type: "unknown",
     message: "An unexpected error occurred. Please try again later",
   };
 };
 
-/**
- * Format field names to be more readable
- * @param {string} fieldName - Raw field name
- * @returns {string} Formatted field name
- */
+
 const formatFieldName = (fieldName) => {
   const fieldMappings = {
     fullName: "Full Name",
@@ -134,11 +124,7 @@ const formatFieldName = (fieldName) => {
   );
 };
 
-/**
- * Get appropriate HTTP status code for error type
- * @param {string} errorType - Type of error
- * @returns {number} HTTP status code
- */
+
 const getErrorStatusCode = (errorType) => {
   switch (errorType) {
     case "validation":

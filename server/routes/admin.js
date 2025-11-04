@@ -12,12 +12,12 @@ const { sendEmail } = require("../services/emailService");
 
 const router = express.Router();
 
-// @route   GET /api/admin/dashboard
-// @desc    Get admin dashboard statistics
-// @access  Private (Admin only)
+
+
+
 router.get("/dashboard", [auth, adminAuth], async (req, res) => {
   try {
-    // Get profile statistics using aggregation
+    
     const profileStats = await Profile.aggregate([
       {
         $group: {
@@ -38,20 +38,20 @@ router.get("/dashboard", [auth, adminAuth], async (req, res) => {
 
     const activeUsers = await User.countDocuments({ isActive: true });
 
-    // Calculate total revenue from approved purchase transactions
+    
     const revenueResult = await Transaction.aggregate([
       { $match: { status: "approved", type: "purchase" } },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
     const totalRevenue = revenueResult.length > 0 ? revenueResult[0].total : 0;
 
-    // Get recent pending profiles
+    
     const recentPending = await Profile.find({ status: "pending_approval" })
       .populate("userId", "name email")
       .sort({ createdAt: -1 })
       .limit(10);
 
-    // Get report statistics using aggregation
+    
     const reportStats = await Report.aggregate([
       {
         $group: {
@@ -65,18 +65,18 @@ router.get("/dashboard", [auth, adminAuth], async (req, res) => {
     const pendingReports =
       reportStats.find((stat) => stat._id === "pending")?.count || 0;
 
-    // Get verification requests count
+    
     const verificationRequests = await User.countDocuments({
       verificationRequest: true,
       alumniVerified: false,
     });
 
-    // Get pending transactions count
+    
     const pendingTransactions = await Transaction.countDocuments({
       status: "pending",
     });
 
-    // Get recent reports
+    
     const recentReports = await Report.find()
       .populate("reportedBy", "name email")
       .populate({
@@ -110,9 +110,9 @@ router.get("/dashboard", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   GET /api/admin/profiles/approved
-// @desc    Get all approved profiles
-// @access  Private (Admin only)
+
+
+
 router.get("/profiles/approved", [auth, adminAuth], async (req, res) => {
   try {
     const { page = 1, limit = 10, search = "" } = req.query;
@@ -120,14 +120,14 @@ router.get("/profiles/approved", [auth, adminAuth], async (req, res) => {
 
     let query = { status: "approved" };
 
-    // Import sanitization utility
+    
     const { sanitizeSearchQuery } = require("../utils/sanitizeQuery");
 
-    // Add search functionality
+    
     if (search) {
       const sanitizedSearch = sanitizeSearchQuery(search);
       if (sanitizedSearch) {
-        // First get user IDs that match the search
+        
         const matchingUsers = await User.find({
           $or: [
             { name: { $regex: sanitizedSearch, $options: "i" } },
@@ -150,20 +150,20 @@ router.get("/profiles/approved", [auth, adminAuth], async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit));
 
-    // Get bookmark counts for these profiles
+    
     const profileIds = profiles.map((p) => p._id);
     const bookmarkCounts = await Bookmark.aggregate([
       { $match: { profileId: { $in: profileIds } } },
       { $group: { _id: "$profileId", count: { $sum: 1 } } },
     ]);
 
-    // Create a map of profileId to bookmark count
+    
     const bookmarkMap = {};
     bookmarkCounts.forEach((item) => {
       bookmarkMap[item._id.toString()] = item.count;
     });
 
-    // Add bookmark count to each profile
+    
     const profilesWithBookmarks = profiles.map((profile) => ({
       ...profile.toObject(),
       bookmarkCount: bookmarkMap[profile._id.toString()] || 0,
@@ -189,9 +189,9 @@ router.get("/profiles/approved", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   GET /api/admin/profiles/pending
-// @desc    Get all pending profiles
-// @access  Private (Admin only)
+
+
+
 router.get("/profiles/pending", [auth, adminAuth], async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
@@ -223,9 +223,9 @@ router.get("/profiles/pending", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   PUT /api/admin/profiles/:profileId/approve
-// @desc    Approve a profile
-// @access  Private (Admin only)
+
+
+
 router.put(
   "/profiles/:profileId/approve",
   [auth, adminAuth],
@@ -253,7 +253,7 @@ router.put(
       profile.isUnderReview = false;
       profile.hasEditPending = false;
 
-      // Ensure biodataId is set
+      
       if (profile.profileId && !profile.biodataId) {
         profile.biodataId = profile.profileId;
       }
@@ -269,7 +269,7 @@ router.put(
         throw saveError;
       }
 
-      // Send approval email notification
+      
       try {
         if (profile.userId && profile.userId.email && profile.userId.name) {
           await sendEmail(
@@ -285,7 +285,7 @@ router.put(
         }
       } catch (emailError) {
         console.error("Failed to send approval email:", emailError);
-        // Don't fail the approval if email fails
+        
       }
 
       res.json({
@@ -303,9 +303,9 @@ router.put(
   }
 );
 
-// @route   PUT /api/admin/profiles/:profileId/reject
-// @desc    Reject a profile
-// @access  Private (Admin only)
+
+
+
 router.put(
   "/profiles/:profileId/reject",
   [auth, adminAuth],
@@ -342,13 +342,13 @@ router.put(
       profile.isUnderReview = false;
       profile.hasEditPending = false;
 
-      // Ensure biodataId is set
+      
       if (profile.profileId && !profile.biodataId) {
         profile.biodataId = profile.profileId;
       }
 
       try {
-        // Use updateOne to bypass validation issues with required fields
+        
         await Profile.updateOne(
           { profileId: req.params.profileId },
           {
@@ -369,7 +369,7 @@ router.put(
         throw saveError;
       }
 
-      // Send rejection email to the user
+      
       try {
         if (profile.userId && profile.userId.email && profile.userId.name) {
           await sendEmail(
@@ -386,7 +386,7 @@ router.put(
         }
       } catch (emailError) {
         console.error("Failed to send rejection email:", emailError);
-        // Don't fail the rejection if email fails
+        
       }
 
       res.json({
@@ -404,12 +404,12 @@ router.put(
   }
 );
 
-// @route   GET /api/admin/profiles/:profileId
-// @desc    Get profile details
-// @access  Private (Admin only)
+
+
+
 router.get("/profiles/:profileId", [auth, adminAuth], async (req, res) => {
   try {
-    // PERFORMANCE: Use .lean() for faster queries
+    
     const profile = await Profile.findOne({
       profileId: req.params.profileId,
     })
@@ -437,9 +437,9 @@ router.get("/profiles/:profileId", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   PUT /api/admin/profiles/:profileId
-// @desc    Update any profile (Admin only)
-// @access  Private (Admin only)
+
+
+
 router.put("/profiles/:profileId", [auth, adminAuth], async (req, res) => {
   try {
     const profile = await Profile.findOne({
@@ -453,21 +453,21 @@ router.put("/profiles/:profileId", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Update profile fields
+    
     Object.keys(req.body).forEach((key) => {
       if (req.body[key] !== undefined) {
         profile[key] = req.body[key];
       }
     });
 
-    // If status is being changed to approved, clear rejection reason and review flags
+    
     if (req.body.status === "approved") {
       profile.rejectionReason = null;
       profile.isUnderReview = false;
       profile.hasEditPending = false;
     }
 
-    // Ensure biodataId is set
+    
     if (profile.profileId && !profile.biodataId) {
       profile.biodataId = profile.profileId;
     }
@@ -488,14 +488,14 @@ router.put("/profiles/:profileId", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   DELETE /api/admin/profiles/:profileId
-// @desc    Delete a profile and associated data
-// @access  Private (Admin only)
+
+
+
 router.delete("/profiles/:profileId", [auth, adminAuth], async (req, res) => {
   try {
     const profileId = req.params.profileId;
 
-    // Find the profile
+    
     const profile = await Profile.findOne({ profileId });
 
     if (!profile) {
@@ -505,17 +505,17 @@ router.delete("/profiles/:profileId", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Delete the profile
+    
     await Profile.deleteOne({ profileId });
 
-    // Clean up related data
-    // Delete all bookmarks for this profile
+    
+    
     await Bookmark.deleteMany({ profileId });
 
-    // Delete all reports for this profile
+    
     await Report.deleteMany({ reportedProfileId: profileId });
 
-    // Update the user's profileId field
+    
     await User.findByIdAndUpdate(profile.userId, { profileId: null });
 
     res.json({
@@ -531,18 +531,18 @@ router.delete("/profiles/:profileId", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   GET /api/admin/users
-// @desc    Get all users
-// @access  Private (Admin only)
+
+
+
 router.get("/users", [auth, adminAuth], async (req, res) => {
   try {
     const { page = 1, limit = 10, search } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Import sanitization utility
+    
     const { sanitizeSearchQuery } = require("../utils/sanitizeQuery");
 
-    // Build search query
+    
     let query = {};
     if (search) {
       const sanitizedSearch = sanitizeSearchQuery(search);
@@ -583,15 +583,15 @@ router.get("/users", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   PUT /api/admin/users/:userId/restrict
-// @desc    Restrict a user (hide their biodata and prevent viewing others)
-// @access  Private (Admin only)
+
+
+
 router.put("/users/:userId/restrict", [auth, adminAuth], async (req, res) => {
   try {
     const { userId } = req.params;
     console.log("Restrict user request for userId:", userId);
 
-    // Validate userId
+    
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,
@@ -599,7 +599,7 @@ router.put("/users/:userId/restrict", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Update user
+    
     const user = await User.findByIdAndUpdate(
       userId,
       { isRestricted: true },
@@ -614,7 +614,7 @@ router.put("/users/:userId/restrict", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Prevent restricting admin users
+    
     if (user.role === "admin") {
       return res.status(400).json({
         success: false,
@@ -622,7 +622,7 @@ router.put("/users/:userId/restrict", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Hide their profile if exists
+    
     if (user.profileId) {
       console.log("Hiding profile for profileId:", user.profileId);
       await Profile.findOneAndUpdate(
@@ -645,15 +645,15 @@ router.put("/users/:userId/restrict", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   PUT /api/admin/users/:userId/ban
-// @desc    Ban a user (remove biodata and prevent login)
-// @access  Private (Admin only)
+
+
+
 router.put("/users/:userId/ban", [auth, adminAuth], async (req, res) => {
   try {
     const { userId } = req.params;
     console.log("Ban user request for userId:", userId);
 
-    // Validate userId
+    
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,
@@ -661,7 +661,7 @@ router.put("/users/:userId/ban", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Update user
+    
     const user = await User.findByIdAndUpdate(
       userId,
       { isBanned: true, isRestricted: false },
@@ -676,7 +676,7 @@ router.put("/users/:userId/ban", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Prevent banning admin users
+    
     if (user.role === "admin") {
       return res.status(400).json({
         success: false,
@@ -684,11 +684,11 @@ router.put("/users/:userId/ban", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Delete their profile if exists
+    
     if (user.profileId) {
       console.log("Deleting profile for profileId:", user.profileId);
       await Profile.findOneAndDelete({ profileId: user.profileId });
-      // Update user to remove profileId
+      
       await User.findByIdAndUpdate(userId, {
         $unset: { profileId: 1 },
         hasProfile: false,
@@ -696,13 +696,13 @@ router.put("/users/:userId/ban", [auth, adminAuth], async (req, res) => {
       console.log("Profile deleted and user updated");
     }
 
-    // Delete their draft if exists
+    
     const draft = await Draft.findOneAndDelete({ userId: userId });
     if (draft) {
       console.log("Draft deleted for userId:", userId);
     }
 
-    // Delete their bookmarks
+    
     const bookmarksDeleted = await Bookmark.deleteMany({ userId: userId });
     if (bookmarksDeleted.deletedCount > 0) {
       console.log(
@@ -725,18 +725,18 @@ router.put("/users/:userId/ban", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   GET /api/admin/users/restricted
-// @desc    Get all restricted users
-// @access  Private (Admin only)
+
+
+
 router.get("/users/restricted", [auth, adminAuth], async (req, res) => {
   try {
     const { page = 1, limit = 10, search } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Import sanitization utility
+    
     const { sanitizeSearchQuery } = require("../utils/sanitizeQuery");
 
-    // Build search query
+    
     let query = { isRestricted: true };
     if (search) {
       const sanitizedSearch = sanitizeSearchQuery(search);
@@ -778,18 +778,18 @@ router.get("/users/restricted", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   GET /api/admin/users/banned
-// @desc    Get all banned users
-// @access  Private (Admin only)
+
+
+
 router.get("/users/banned", [auth, adminAuth], async (req, res) => {
   try {
     const { page = 1, limit = 10, search } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Import sanitization utility
+    
     const { sanitizeSearchQuery } = require("../utils/sanitizeQuery");
 
-    // Build search query
+    
     let query = { isBanned: true };
     if (search) {
       const sanitizedSearch = sanitizeSearchQuery(search);
@@ -831,15 +831,15 @@ router.get("/users/banned", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   PUT /api/admin/users/:userId/unrestrict
-// @desc    Unrestrict a user (restore their biodata visibility and viewing access)
-// @access  Private (Admin only)
+
+
+
 router.put("/users/:userId/unrestrict", [auth, adminAuth], async (req, res) => {
   try {
     const { userId } = req.params;
     console.log("Unrestrict user request for userId:", userId);
 
-    // Validate userId
+    
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,
@@ -847,7 +847,7 @@ router.put("/users/:userId/unrestrict", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Update user
+    
     const user = await User.findByIdAndUpdate(
       userId,
       { isRestricted: false },
@@ -862,7 +862,7 @@ router.put("/users/:userId/unrestrict", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Restore their profile if exists
+    
     if (user.profileId) {
       console.log("Restoring profile for profileId:", user.profileId);
       await Profile.findOneAndUpdate(
@@ -885,15 +885,15 @@ router.put("/users/:userId/unrestrict", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   PUT /api/admin/users/:userId/unban
-// @desc    Unban a user (restore their access)
-// @access  Private (Admin only)
+
+
+
 router.put("/users/:userId/unban", [auth, adminAuth], async (req, res) => {
   try {
     const { userId } = req.params;
     console.log("Unban user request for userId:", userId);
 
-    // Validate userId
+    
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,
@@ -901,7 +901,7 @@ router.put("/users/:userId/unban", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Update user
+    
     const user = await User.findByIdAndUpdate(
       userId,
       { isBanned: false },
@@ -930,15 +930,15 @@ router.put("/users/:userId/unban", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   GET /api/admin/reports
-// @desc    Get all reports
-// @access  Private (Admin only)
+
+
+
 router.get("/reports", [auth, adminAuth], async (req, res) => {
   try {
     const { page = 1, limit = 10, status, priority } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Build query
+    
     let query = {};
     if (status) query.status = status;
     if (priority) query.priority = priority;
@@ -973,9 +973,9 @@ router.get("/reports", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   PUT /api/admin/reports/:reportId/action
-// @desc    Take action on a report
-// @access  Private (Admin only)
+
+
+
 router.put("/reports/:reportId/action", [auth, adminAuth], async (req, res) => {
   try {
     const { action, notes, actionTaken } = req.body;
@@ -989,7 +989,7 @@ router.put("/reports/:reportId/action", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Update report status based on action
+    
     let newStatus = report.status;
     switch (action) {
       case "investigate":
@@ -1025,9 +1025,9 @@ router.put("/reports/:reportId/action", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   POST /api/admin/reports
-// @desc    Create a new report (for testing purposes)
-// @access  Private (Admin only)
+
+
+
 router.post("/reports", [auth, adminAuth], async (req, res) => {
   try {
     const { reportedProfileId, reportedBy, reason, description, priority } =
@@ -1057,9 +1057,9 @@ router.post("/reports", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   GET /api/admin/verification-requests
-// @desc    Get all pending verification requests
-// @access  Private (Admin only)
+
+
+
 router.get("/verification-requests", [auth, adminAuth], async (req, res) => {
   try {
     const { page = 1, limit = 10000 } = req.query;
@@ -1097,9 +1097,9 @@ router.get("/verification-requests", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   PUT /api/admin/verification-requests/:userId/approve
-// @desc    Approve a verification request
-// @access  Private (Admin only)
+
+
+
 router.put(
   "/verification-requests/:userId/approve",
   [auth, adminAuth],
@@ -1114,7 +1114,7 @@ router.put(
         });
       }
 
-      // Validate university
+      
       const { getUniversityConfig } = require("../config/universities");
       const universityConfig = getUniversityConfig(university);
       if (!universityConfig) {
@@ -1140,7 +1140,7 @@ router.put(
         });
       }
 
-      // Generate new profile ID for the selected university
+      
       const newProfileId = await User.generateProfileId(university);
 
       await User.findByIdAndUpdate(
@@ -1168,9 +1168,9 @@ router.put(
   }
 );
 
-// @route   PUT /api/admin/verification-requests/:userId/reject
-// @desc    Reject a verification request
-// @access  Private (Admin only)
+
+
+
 router.put(
   "/verification-requests/:userId/reject",
   [auth, adminAuth],
@@ -1217,7 +1217,7 @@ router.delete("/users/:userId", [auth, adminAuth], async (req, res) => {
     const { userId } = req.params;
     console.log("Delete user request for userId:", userId);
 
-    // Validate userId
+    
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,
@@ -1225,7 +1225,7 @@ router.delete("/users/:userId", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Find user first
+    
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -1234,7 +1234,7 @@ router.delete("/users/:userId", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Prevent deleting admin users
+    
     if (user.role === "admin") {
       return res.status(400).json({
         success: false,
@@ -1242,20 +1242,20 @@ router.delete("/users/:userId", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Delete their profile if exists
+    
     if (user.profileId) {
       console.log("Deleting profile for profileId:", user.profileId);
       await Profile.findOneAndDelete({ profileId: user.profileId });
       console.log("Profile deleted");
     }
 
-    // Delete their draft if exists
+    
     const draft = await Draft.findOneAndDelete({ userId: userId });
     if (draft) {
       console.log("Draft deleted for userId:", userId);
     }
 
-    // Delete their bookmarks
+    
     const bookmarksDeleted = await Bookmark.deleteMany({ userId: userId });
     if (bookmarksDeleted.deletedCount > 0) {
       console.log(
@@ -1264,7 +1264,7 @@ router.delete("/users/:userId", [auth, adminAuth], async (req, res) => {
       );
     }
 
-    // Delete their transactions
+    
     const transactionsDeleted = await Transaction.deleteMany({
       userId: userId,
     });
@@ -1275,7 +1275,7 @@ router.delete("/users/:userId", [auth, adminAuth], async (req, res) => {
       );
     }
 
-    // Delete profile views
+    
     const profileViewsDeleted =
       await require("../models/ProfileView").deleteMany({
         $or: [{ viewerId: userId }, { viewedProfileId: userId }],
@@ -1287,7 +1287,7 @@ router.delete("/users/:userId", [auth, adminAuth], async (req, res) => {
       );
     }
 
-    // Finally, delete the user
+    
     await User.findByIdAndDelete(userId);
     console.log("User deleted successfully:", userId);
 

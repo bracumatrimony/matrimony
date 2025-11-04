@@ -1,19 +1,19 @@
-// Environment Configuration for Client
-// Fetches monetization configuration from server
+
+
 
 class MonetizationConfig {
   constructor() {
-    // Try to load cached config from localStorage first
+    
     const cachedConfig = this.getCachedConfig();
-    this.mode = cachedConfig ? cachedConfig.mode : "off"; // Default to off until server config is loaded
+    this.mode = cachedConfig ? cachedConfig.mode : "off"; 
     this.serverTimestamp = cachedConfig ? cachedConfig.serverTimestamp : null;
-    this.isLoading = true; // Always loading to check for updates
+    this.isLoading = true; 
 
-    // Always load from server to check for updates (server restart, env change)
-    this.loadServerConfig(); // Load config from server
+    
+    this.loadServerConfig(); 
   }
 
-  // Get cached config from localStorage
+  
   getCachedConfig() {
     try {
       const cached = localStorage.getItem("monetizationConfig");
@@ -27,13 +27,13 @@ class MonetizationConfig {
     return null;
   }
 
-  // Check if cache is expired (5 minutes instead of 1 hour for faster updates)
+  
   isCacheExpired() {
     try {
       const cached = localStorage.getItem("monetizationConfig");
       if (cached) {
         const { timestamp } = JSON.parse(cached);
-        const fiveMinutes = 5 * 60 * 1000; // Reduced from 1 hour to 5 minutes
+        const fiveMinutes = 5 * 60 * 1000; 
         return Date.now() - timestamp > fiveMinutes;
       }
     } catch (error) {
@@ -42,7 +42,7 @@ class MonetizationConfig {
     return true;
   }
 
-  // Save config to localStorage
+  
   saveToCache(mode, serverTimestamp) {
     try {
       localStorage.setItem(
@@ -58,11 +58,11 @@ class MonetizationConfig {
     }
   }
 
-  // Force refresh configuration from server
+  
   async forceRefresh() {
     try {
       this.isLoading = true;
-      // Clear cache to force fresh load
+      
       localStorage.removeItem("monetizationConfig");
       this.serverTimestamp = null;
 
@@ -74,16 +74,16 @@ class MonetizationConfig {
     }
   }
 
-  // Fetch configuration from server
+  
   async loadServerConfig() {
     try {
-      // Get API URL from environment variable or use default for development
+      
       const apiUrl =
         import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-      // Add timeout to prevent hanging requests
+      
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 10000); 
 
       const response = await fetch(`${apiUrl}/config/monetization`, {
         signal: controller.signal,
@@ -93,7 +93,7 @@ class MonetizationConfig {
       const data = await response.json();
 
       if (data.success) {
-        // Check if server has newer config (server restarted) or mode changed
+        
         const shouldUpdate =
           !this.serverTimestamp ||
           data.serverTimestamp > this.serverTimestamp ||
@@ -105,10 +105,10 @@ class MonetizationConfig {
           this.serverTimestamp = data.serverTimestamp;
           this.isLoading = false;
 
-          // Save to cache
+          
           this.saveToCache(this.mode, this.serverTimestamp);
 
-          // Trigger re-render for any listening components only if mode changed
+          
           if (typeof window !== "undefined" && oldMode !== this.mode) {
             window.dispatchEvent(
               new CustomEvent("monetizationConfigChanged", {
@@ -129,32 +129,32 @@ class MonetizationConfig {
     }
   }
 
-  // Check if monetization is enabled
+  
   isEnabled() {
     return this.mode === "on";
   }
 
-  // Check if credit system should be active
+  
   isCreditSystemEnabled() {
     return this.isEnabled();
   }
 
-  // Check if config has been loaded at least once
+  
   isLoaded() {
     return this.serverTimestamp !== null;
   }
 
-  // Check if credit UI should be displayed
+  
   shouldShowCreditUI() {
     return this.isEnabled();
   }
 
-  // Get free access message
+  
   getFreeAccessMessage() {
     return this.isEnabled() ? null : "🎉 Launch Period - Everything is FREE!";
   }
 
-  // Get configuration summary
+  
   getConfig() {
     return {
       monetizationEnabled: this.isEnabled(),
@@ -167,10 +167,10 @@ class MonetizationConfig {
   }
 }
 
-// Create and export the monetization config instance
+
 export const monetizationConfig = new MonetizationConfig();
 
-// Legacy support for existing code
+
 export const TEMPORARY_CONFIG = {
   get ENABLE_CREDIT_SYSTEM() {
     return monetizationConfig.isCreditSystemEnabled();

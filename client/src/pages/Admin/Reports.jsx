@@ -57,7 +57,7 @@ export default function Reports({
         }));
         await adminService.takeReportAction(reportId, action, notes);
 
-        // Update report status locally instead of reloading
+        
         setReports((prevReports) => {
           const updatedReports = prevReports.map((report) =>
             report.id === reportId

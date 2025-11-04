@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className="bg-white border-t-2 border-black w-full mt-auto">
       <div className="w-full px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
-          {/* Large Brand Text */}
+          {}
           <div className="flex flex-col items-center md:items-start">
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-light text-gray-900 tracking-tight leading-tight">
               Campus{" "}
@@ -16,7 +16,7 @@ export default function Footer() {
             </h2>
           </div>
 
-          {/* Contact and Social */}
+          {}
           <div className="flex items-center space-x-6">
             <Link
               to="/terms"

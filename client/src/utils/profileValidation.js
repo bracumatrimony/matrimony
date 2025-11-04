@@ -1,9 +1,9 @@
-// Frontend validation utility for new biodata form structure
+
 
 export const validateProfileData = (formData) => {
   const errors = {};
 
-  // Segment 1: Family Background
+  
   if (!formData.fatherAlive) {
     errors.fatherAlive = "Father's status is required";
   }
@@ -44,7 +44,7 @@ export const validateProfileData = (formData) => {
     errors.familyEconomicCondition = "Family economic condition is required";
   }
 
-  // Segment 2: Education & Profession
+  
   if (!formData.educationMedium) {
     errors.educationMedium = "Education medium is required";
   }
@@ -75,7 +75,7 @@ export const validateProfileData = (formData) => {
     errors.monthlyIncome = "Monthly income is required";
   }
 
-  // Segment 3: Lifestyle, Health & Compatibility
+  
   if (!formData.religion) {
     errors.religion = "Religion is required";
   }
@@ -126,7 +126,7 @@ export const validateProfileData = (formData) => {
       "Specific characteristics or qualities expected in partner is required";
   }
 
-  // Segment 4: Expected Life Partner & Declaration
+  
   if (!formData.partnerAgePreference?.trim()) {
     errors.partnerAgePreference = "Partner age preference is required";
   }
@@ -188,12 +188,12 @@ export const validateProfileData = (formData) => {
   return errors;
 };
 
-// Step-by-step validation for better UX
+
 export const validateStep = (step, formData) => {
   const errors = {};
 
   switch (step) {
-    case 1: // Family Background
+    case 1: 
       if (!formData.fatherAlive)
         errors.fatherAlive = "Father's status is required";
       if (
@@ -230,7 +230,7 @@ export const validateStep = (step, formData) => {
       }
       break;
 
-    case 2: // Education & Profession
+    case 2: 
       if (!formData.educationMedium)
         errors.educationMedium = "Education medium is required";
       if (!formData.hscPassingYear) {
@@ -254,7 +254,7 @@ export const validateStep = (step, formData) => {
         errors.monthlyIncome = "Monthly income is required";
       break;
 
-    case 3: // Lifestyle, Health & Compatibility
+    case 3: 
       if (!formData.gender) {
         errors.gender = "Gender is required";
       }
@@ -307,7 +307,7 @@ export const validateStep = (step, formData) => {
       }
       break;
 
-    case 4: // Expected Life Partner & Declaration
+    case 4: 
       if (
         !formData.partnerAgePreferenceMin ||
         !formData.partnerAgePreferenceMax
@@ -363,7 +363,7 @@ export const validateStep = (step, formData) => {
         errors.falseInformationAgreement =
           "You must agree that providing false information will result in permanent account suspension";
       }
-      // Contact Information validation
+      
       if (!formData.contactInformation?.trim()) {
         errors.contactInformation = "Contact information is required";
       } else if (formData.contactInformation.trim().length < 10) {
@@ -374,7 +374,7 @@ export const validateStep = (step, formData) => {
           "Contact information cannot exceed 500 characters";
       }
 
-      // Personal Contact Information validation (required for admins)
+      
       if (!formData.personalContactInfo?.trim()) {
         errors.personalContactInfo = "Personal contact information is required";
       } else if (formData.personalContactInfo.trim().length < 5) {

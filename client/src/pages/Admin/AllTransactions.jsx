@@ -19,11 +19,11 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
-  // Debounce search query
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchQuery(searchInput);
-      setCurrentPage(1); // Reset to first page when searching
+      setCurrentPage(1); 
     }, 500);
 
     return () => clearTimeout(timer);
@@ -40,12 +40,12 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
       if (response.success) {
         let filteredTransactions = response.transactions || [];
 
-        // Filter out internal credit_addition transactions (only show actual purchases)
+        
         filteredTransactions = filteredTransactions.filter(
           (transaction) => transaction.type !== "credit_addition"
         );
 
-        // Filter by search query if provided
+        
         if (searchQuery) {
           filteredTransactions = filteredTransactions.filter(
             (transaction) =>
@@ -111,7 +111,7 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
 
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); // Reset to first page when changing items per page
+    setCurrentPage(1); 
   };
 
   if (loading) {
@@ -129,7 +129,7 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Search Bar */}
+        {}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
           <div className="flex items-center space-x-4">
             <div className="flex-1">
@@ -161,7 +161,7 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
           </div>
         ) : (
           <>
-            {/* Transactions Table - Desktop */}
+            {}
             <div className="hidden md:block bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -288,7 +288,7 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
               </div>
             </div>
 
-            {/* Transactions Cards - Mobile */}
+            {}
             <div className="md:hidden space-y-4">
               {currentTransactions.map((transaction, index) => (
                 <div
@@ -367,10 +367,10 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
               ))}
             </div>
 
-            {/* Pagination Controls */}
+            {}
             {totalPages > 1 && (
               <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                {/* Items per page selector */}
+                {}
                 <div className="flex items-center gap-2">
                   <label className="text-sm text-gray-600">Show:</label>
                   <select
@@ -388,14 +388,14 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
                   <span className="text-sm text-gray-600">per page</span>
                 </div>
 
-                {/* Pagination info */}
+                {}
                 <div className="text-sm text-gray-600">
                   Showing {startIndex + 1}-
                   {Math.min(endIndex, totalTransactions)} of {totalTransactions}{" "}
                   transactions
                 </div>
 
-                {/* Page navigation */}
+                {}
                 <div className="flex items-center gap-2 flex-wrap">
                   <button
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
@@ -409,10 +409,10 @@ export default function AllTransactions({ onViewProfile, showNotification }) {
                     <ChevronLeft className="h-4 w-4" />
                   </button>
 
-                  {/* Page number buttons */}
+                  {}
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                     (num) => {
-                      // Show first, last, current, and neighbors; ellipsis for gaps
+                      
                       if (
                         num === 1 ||
                         num === totalPages ||

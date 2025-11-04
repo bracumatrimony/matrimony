@@ -44,14 +44,14 @@ export default function UserProfile() {
   const [requestingVerification, setRequestingVerification] = useState(false);
   const navigate = useNavigate();
 
-  // Initialize verification requested state based on user data
+  
   useEffect(() => {
     if (user) {
       setVerificationRequested(user.verificationRequest || false);
     }
   }, [user]);
 
-  // Check if user email is from a valid university
+  
   useEffect(() => {
     const checkUniversityEmail = async () => {
       if (user && user.email) {
@@ -74,7 +74,7 @@ export default function UserProfile() {
     loadUserData();
   }, [user, navigate]);
 
-  // Listen for monetization config changes
+  
   useEffect(() => {
     const handleConfigChange = () => {
       setMonetizationEnabled(monetizationConfig.isEnabled());
@@ -82,7 +82,7 @@ export default function UserProfile() {
 
     window.addEventListener("monetizationConfigChanged", handleConfigChange);
 
-    // Initial check in case config loaded before component mounted
+    
     setMonetizationEnabled(monetizationConfig.isEnabled());
 
     return () => {
@@ -97,13 +97,13 @@ export default function UserProfile() {
     try {
       setLoading(true);
 
-      // Check if user is logged in
+      
       if (!user) {
         navigate("/login");
         return;
       }
 
-      // Load profile/draft and stats concurrently
+      
       const [profileResult, statsResult] = await Promise.allSettled([
         user.hasProfile
           ? profileService.getCurrentUserProfile()
@@ -111,7 +111,7 @@ export default function UserProfile() {
         loadStatsData(),
       ]);
 
-      // Handle profile/draft result
+      
       if (profileResult.status === "fulfilled" && profileResult.value.success) {
         if (user.hasProfile) {
           setProfile(profileResult.value.profile);
@@ -120,7 +120,7 @@ export default function UserProfile() {
         }
       }
 
-      // Handle stats result
+      
       if (statsResult.status === "fulfilled") {
         setStats(statsResult.value);
       }
@@ -134,7 +134,7 @@ export default function UserProfile() {
 
   const loadStatsData = async () => {
     try {
-      // Load both stats concurrently
+      
       const [bookmarkStatsResponse, userStatsResponse] =
         await Promise.allSettled([
           bookmarkService.getStats(),
@@ -176,9 +176,9 @@ export default function UserProfile() {
       const response = await profileService.requestVerification();
       if (response.success) {
         setVerificationRequested(true);
-        await refreshUser(); // Refresh user data after successful request
+        await refreshUser(); 
       } else {
-        // If already verified, refresh user data to update UI
+        
         if (response.message && response.message.includes("already verified")) {
           await refreshUser();
           alert("You are already verified as an alumni!");
@@ -204,11 +204,11 @@ export default function UserProfile() {
         setLoading(true);
         await profileService.deleteProfile();
 
-        // Update user context to reflect profile deletion
+        
         const updatedUser = { ...user, hasProfile: false };
         updateUser(updatedUser);
 
-        // Clear local storage as backup
+        
         localStorage.removeItem("userProfile");
         setProfile(null);
 
@@ -222,7 +222,7 @@ export default function UserProfile() {
     }
   };
 
-  // Method to refresh stats - can be called from child components or after actions
+  
   const refreshStats = async () => {
     const newStats = await loadStatsData();
     setStats(newStats);
@@ -238,7 +238,7 @@ export default function UserProfile() {
         setLoading(true);
         await userService.deleteAccount();
 
-        // Use auth context logout which will clear all auth state
+        
         logout();
 
         alert("Account deleted successfully.");
@@ -255,15 +255,15 @@ export default function UserProfile() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
-          {/* Profile Header Skeleton */}
+          {}
           <div className="bg-white rounded-lg shadow-sm border overflow-hidden mb-6 animate-pulse">
             <div className="px-4 sm:px-8 py-6 bg-gray-50 border-b">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-start space-x-4 sm:space-x-6 w-full sm:w-auto">
-                  {/* Profile Picture Skeleton */}
+                  {}
                   <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-full"></div>
 
-                  {/* Basic Info Skeleton */}
+                  {}
                   <div className="flex-1 text-left pt-2 min-w-0">
                     <div className="h-6 bg-gray-200 rounded w-48 mb-2"></div>
                     <div className="h-4 bg-gray-200 rounded w-64 mb-2"></div>
@@ -271,7 +271,7 @@ export default function UserProfile() {
                   </div>
                 </div>
 
-                {/* Credits Badge Skeleton */}
+                {}
                 <div className="text-left sm:text-right w-full sm:w-auto">
                   <div className="bg-gray-200 h-12 rounded-md w-full sm:w-32 mb-2"></div>
                   <div className="bg-gray-200 h-10 rounded-md w-full sm:w-32"></div>
@@ -281,9 +281,9 @@ export default function UserProfile() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Content Skeleton */}
+            {}
             <div className="lg:col-span-2 space-y-6">
-              {/* Profile Status Card Skeleton */}
+              {}
               <div className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse">
                 <div className="px-6 py-4 bg-gray-50 border-b">
                   <div className="h-5 bg-gray-200 rounded w-32"></div>
@@ -295,7 +295,7 @@ export default function UserProfile() {
                 </div>
               </div>
 
-              {/* Stats Card Skeleton */}
+              {}
               <div className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse">
                 <div className="px-6 py-4 bg-gray-50 border-b">
                   <div className="h-5 bg-gray-200 rounded w-24"></div>
@@ -312,7 +312,7 @@ export default function UserProfile() {
                 </div>
               </div>
 
-              {/* Actions Card Skeleton */}
+              {}
               <div className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse">
                 <div className="px-6 py-4 bg-gray-50 border-b">
                   <div className="h-5 bg-gray-200 rounded w-28"></div>
@@ -325,9 +325,9 @@ export default function UserProfile() {
               </div>
             </div>
 
-            {/* Sidebar Skeleton */}
+            {}
             <div className="space-y-6">
-              {/* Quick Actions Card Skeleton */}
+              {}
               <div className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse">
                 <div className="px-6 py-4 bg-gray-50 border-b">
                   <div className="h-5 bg-gray-200 rounded w-32"></div>
@@ -340,7 +340,7 @@ export default function UserProfile() {
                 </div>
               </div>
 
-              {/* Account Settings Card Skeleton */}
+              {}
               <div className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse">
                 <div className="px-6 py-4 bg-gray-50 border-b">
                   <div className="h-5 bg-gray-200 rounded w-36"></div>
@@ -383,13 +383,13 @@ export default function UserProfile() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Profile Header */}
+        {}
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden mb-6">
-          {/* Top Section */}
+          {}
           <div className="px-4 sm:px-8 py-6 bg-gray-50 border-b">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-start space-x-4 sm:space-x-6 w-full sm:w-auto">
-                {/* Profile Picture */}
+                {}
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center flex-shrink-0">
                   {user?.avatar || user?.picture ? (
                     <img
@@ -404,7 +404,7 @@ export default function UserProfile() {
                   )}
                 </div>
 
-                {/* Basic Info */}
+                {}
                 <div className="flex-1 text-left pt-2 min-w-0">
                   <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1 leading-tight text-left">
                     {user.name}
@@ -423,7 +423,7 @@ export default function UserProfile() {
                 </div>
               </div>
 
-              {/* Credits Badge - Show only when monetization is enabled and user is verified */}
+              {}
               {monetizationEnabled &&
                 (isValidUniversityEmail || user.alumniVerified) && (
                   <div className="text-left sm:text-right w-full sm:w-auto">
@@ -448,9 +448,9 @@ export default function UserProfile() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
+          {}
           <div className="lg:col-span-2 space-y-6">
-            {/* Profile Status Card */}
+            {}
             <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
               <div className="px-6 py-4 bg-gray-50 border-b">
                 <h2 className="text-lg font-medium text-gray-900">
@@ -459,7 +459,7 @@ export default function UserProfile() {
               </div>
 
               <div className="p-6">
-                {/* Ban Message - Show regardless of profile status */}
+                {}
                 {user.isBanned && (
                   <div className="bg-red-50 border-4 border-black rounded-lg p-4 mb-6">
                     <div>
@@ -475,12 +475,12 @@ export default function UserProfile() {
                   </div>
                 )}
 
-                {/* Only show profile-related content if user is not banned */}
+                {}
                 {!user.isBanned && (
                   <>
                     {profile ? (
                       <div className="space-y-4">
-                        {/* Status Indicator */}
+                        {}
                         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
                           <div className="flex items-center space-x-3">
                             <div
@@ -507,7 +507,7 @@ export default function UserProfile() {
                             </div>
                           </div>
 
-                          {/* Action Buttons */}
+                          {}
                           <div className="flex space-x-2">
                             <button
                               onClick={() => navigate("/profile/view")}
@@ -526,7 +526,7 @@ export default function UserProfile() {
                           </div>
                         </div>
 
-                        {/* Status Messages */}
+                        {}
                         {profile.status === "pending_approval" && (
                           <div className="bg-yellow-50 border-4 border-black rounded-lg p-4">
                             <div className="flex items-center">
@@ -539,7 +539,7 @@ export default function UserProfile() {
                           </div>
                         )}
 
-                        {/* Restriction Message - Show below under review */}
+                        {}
                         {user.isRestricted && (
                           <div className="bg-yellow-50 border-4 border-black rounded-lg p-4">
                             <div>
@@ -593,14 +593,14 @@ export default function UserProfile() {
                         )}
                       </div>
                     ) : (
-                      /* No Profile State */
+                      
                       <div className="text-center py-12">
-                        {/* Check if user has university email or is verified alumni */}
+                        {}
                         {user &&
                         user.email &&
                         !isValidUniversityEmail &&
                         !user.alumniVerified ? (
-                          /* Non-university user message */
+                          
                           <div className="max-w-lg mx-auto">
                             <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
                               <Shield className="h-8 w-8 text-rose-600" />

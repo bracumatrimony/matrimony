@@ -1,8 +1,4 @@
-/**
- * University Configuration
- * This file contains all university-specific settings for the matrimony platform.
- * To add a new university, simply add a new entry to the universities object.
- */
+
 
 const universities = {
   BRACU: {
@@ -23,28 +19,17 @@ const universities = {
   },
 };
 
-/**
- * Get university configuration by key
- * @param {string} universityKey - The university key (e.g., 'BRACU', 'NSU')
- * @returns {object|null} University configuration or null if not found
- */
+
 const getUniversityConfig = (universityKey) => {
   return universities[universityKey] || null;
 };
 
-/**
- * Get all university configurations
- * @returns {object} All university configurations
- */
+
 const getAllUniversities = () => {
   return universities;
 };
 
-/**
- * Detect university from email domain
- * @param {string} email - User email address
- * @returns {object|null} University configuration or null if not recognized
- */
+
 const detectUniversityFromEmail = (email) => {
   if (!email) return null;
 
@@ -59,11 +44,7 @@ const detectUniversityFromEmail = (email) => {
   return null;
 };
 
-/**
- * Check if email domain is valid for any university
- * @param {string} email - User email address
- * @returns {boolean} True if email domain is recognized
- */
+
 const isValidUniversityEmail = (email) => {
   return detectUniversityFromEmail(email) !== null;
 };

@@ -15,12 +15,12 @@ export default function AllUsers({ onViewProfile, showNotification }) {
   const [banning, setBanning] = useState(null);
   const [deleting, setDeleting] = useState(null);
 
-  // Debounce search query
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchQuery(searchInput);
-      setCurrentPage(1); // Reset to first page when searching
-    }, 800); // 500ms delay
+      setCurrentPage(1); 
+    }, 800); 
 
     return () => clearTimeout(timer);
   }, [searchInput]);
@@ -54,15 +54,15 @@ export default function AllUsers({ onViewProfile, showNotification }) {
       setExporting(true);
       showNotification?.("Exporting emails...", "info");
 
-      // Fetch all users with a high limit to get all emails
+      
       const response = await adminService.getUsers(1, 10000, "");
       if (response.success && response.users) {
         const emails = response.users
           .map((user) => user.email)
-          .filter((email) => email) // Remove any null/undefined emails
+          .filter((email) => email) 
           .join("\n");
 
-        // Create and download the file
+        
         const blob = new Blob([emails], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -92,13 +92,13 @@ export default function AllUsers({ onViewProfile, showNotification }) {
   };
 
   const handleRestrictUser = async (userId, e) => {
-    e.stopPropagation(); // Prevent row click
+    e.stopPropagation(); 
     try {
       setRestricting(userId);
       const response = await adminService.restrictUser(userId);
       if (response.success) {
         showNotification?.("User restricted successfully", "success");
-        loadUsers(); // Reload the users list
+        loadUsers(); 
       } else {
         showNotification?.("Failed to restrict user", "error");
       }
@@ -111,13 +111,13 @@ export default function AllUsers({ onViewProfile, showNotification }) {
   };
 
   const handleBanUser = async (userId, e) => {
-    e.stopPropagation(); // Prevent row click
+    e.stopPropagation(); 
     try {
       setBanning(userId);
       const response = await adminService.banUser(userId);
       if (response.success) {
         showNotification?.("User banned successfully", "success");
-        loadUsers(); // Reload the users list
+        loadUsers(); 
       } else {
         showNotification?.("Failed to ban user", "error");
       }
@@ -130,7 +130,7 @@ export default function AllUsers({ onViewProfile, showNotification }) {
   };
 
   const handleDeleteUser = async (userId, e) => {
-    e.stopPropagation(); // Prevent row click
+    e.stopPropagation(); 
     if (
       !window.confirm(
         "Are you sure you want to permanently delete this user? This action cannot be undone."
@@ -143,7 +143,7 @@ export default function AllUsers({ onViewProfile, showNotification }) {
       const response = await adminService.deleteUser(userId);
       if (response.success) {
         showNotification?.("User deleted successfully", "success");
-        loadUsers(); // Reload the users list
+        loadUsers(); 
       } else {
         showNotification?.("Failed to delete user", "error");
       }
@@ -174,7 +174,7 @@ export default function AllUsers({ onViewProfile, showNotification }) {
     <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
       {users.length > 0 || searchInput ? (
         <div className="space-y-4">
-          {/* Search bar */}
+          {}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div className="relative flex-1 max-w-md">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -190,7 +190,7 @@ export default function AllUsers({ onViewProfile, showNotification }) {
             </div>
           </div>
 
-          {/* Items per page selector */}
+          {}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div className="flex items-center space-x-3">
               <span className="text-sm text-gray-600">Show:</span>
@@ -235,7 +235,7 @@ export default function AllUsers({ onViewProfile, showNotification }) {
             </div>
           </div>
 
-          {/* Compact table */}
+          {}
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -396,7 +396,7 @@ export default function AllUsers({ onViewProfile, showNotification }) {
             </div>
           </div>
 
-          {/* Pagination */}
+          {}
           {totalUsers > itemsPerPage && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-sm text-gray-600">
@@ -411,7 +411,7 @@ export default function AllUsers({ onViewProfile, showNotification }) {
                   Previous
                 </button>
 
-                {/* Page numbers */}
+                {}
                 {[...Array(Math.ceil(totalUsers / itemsPerPage))].map(
                   (_, index) => {
                     const pageNum = index + 1;

@@ -14,7 +14,7 @@ import { monetizationConfig } from "./config/monetization";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react";
 
-// Lazy load all page components for code splitting
+
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Auth/Login"));
 const GoogleCallback = lazy(() => import("./pages/Auth/GoogleCallback"));
@@ -34,12 +34,12 @@ const TransactionsWrapper = lazy(() =>
 const AllOrdersWrapper = lazy(() => import("./components/AllOrdersWrapper"));
 const MyUnlocks = lazy(() => import("./pages/MyUnlocks"));
 
-// Admin Protected Route Component
+
 function AdminProtectedRoute({ children }) {
   const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
-    return null; // Return null instead of spinner to avoid flash
+    return null; 
   }
 
   if (!isAuthenticated) {
@@ -58,7 +58,7 @@ function App() {
     monetizationConfig.isEnabled()
   );
   const [showLogoAnimation, setShowLogoAnimation] = useState(() => {
-    // Check if user has seen the logo animation in the last 4 hours
+    
     const lastSeen = localStorage.getItem("logoAnimationLastSeen");
     if (!lastSeen) return true;
 
@@ -69,13 +69,13 @@ function App() {
     return hoursSinceLastSeen >= 1;
   });
 
-  // Memoize the monetization status to prevent unnecessary re-renders
+  
   const isMonetizationEnabled = useMemo(
     () => monetizationEnabled,
     [monetizationEnabled]
   );
 
-  // Listen for monetization config changes
+  
   useEffect(() => {
     const handleConfigChange = () => {
       const enabled = monetizationConfig.isEnabled();
@@ -133,7 +133,7 @@ function App() {
                 <Layout>
                   <Routes>
                     <Route path="/" element={<Home />} />
-                    {/* Credits route - shows 404 when monetization is disabled */}
+                    {}
                     <Route
                       path="/credits"
                       element={
@@ -173,7 +173,7 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
-                    {/* Transactions route - shows 404 when monetization is disabled */}
+                    {}
                     <Route
                       path="/transactions"
                       element={
@@ -182,7 +182,7 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
-                    {/* Orders route - shows 404 when monetization is disabled */}
+                    {}
                     <Route
                       path="/orders"
                       element={
@@ -232,7 +232,7 @@ function App() {
                         </AdminProtectedRoute>
                       }
                     />
-                    {/* Add more routes as needed */}
+                    {}
                   </Routes>
                 </Layout>
               }

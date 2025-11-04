@@ -66,13 +66,13 @@ export default function Bookmarks() {
       setRemovingBookmark(profileId);
       const response = await bookmarkService.removeBookmark(profileId);
       if (response.success) {
-        // If this was the last item on the current page and we're not on page 1,
-        // go to the previous page
+        
+        
         const remainingItems = bookmarks.length - 1;
         if (remainingItems === 0 && pagination.currentPage > 1) {
           loadBookmarks(pagination.currentPage - 1);
         } else {
-          // Reload current page to update the list
+          
           loadBookmarks(pagination.currentPage);
         }
       }
@@ -84,7 +84,7 @@ export default function Bookmarks() {
   };
 
   const handleViewProfile = (profileId) => {
-    // Open biodata in a new tab
+    
     const url = `/profile/view/${profileId}`;
     window.open(url, "_blank");
   };
@@ -92,7 +92,7 @@ export default function Bookmarks() {
   const pageButtons = useMemo(() => {
     return Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
       .map((num) => {
-        // Show first, last, current, and neighbors; ellipsis for gaps
+        
         if (
           num === 1 ||
           num === pagination.totalPages ||
@@ -135,21 +135,21 @@ export default function Bookmarks() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-6xl mx-auto px-4">
-          {/* Header skeleton */}
+          {}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
               <div className="h-8 bg-gray-200 rounded w-48 animate-pulse"></div>
               <div className="h-4 bg-gray-200 rounded w-64 animate-pulse"></div>
             </div>
           </div>
-          {/* Bookmarks Grid Skeleton */}
+          {}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, index) => (
               <div
                 key={index}
                 className="bg-white rounded-lg shadow-sm border overflow-hidden animate-pulse"
               >
-                {/* Profile Header Skeleton */}
+                {}
                 <div className="p-6 border-b border-gray-100">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
@@ -161,18 +161,18 @@ export default function Bookmarks() {
                     </div>
                     <div className="w-8 h-8 bg-gray-200 rounded-md"></div>
                   </div>
-                  {/* Basic Info Skeleton */}
+                  {}
                   <div className="space-y-2">
                     <div className="h-3 bg-gray-200 rounded w-full"></div>
                     <div className="h-3 bg-gray-200 rounded w-4/5"></div>
                     <div className="h-3 bg-gray-200 rounded w-3/5"></div>
                   </div>
                 </div>
-                {/* Actions Skeleton */}
+                {}
                 <div className="p-4 bg-gray-50">
                   <div className="h-10 bg-gray-200 rounded"></div>
                 </div>
-                {/* Bookmark Date Skeleton */}
+                {}
                 <div className="px-6 py-3 bg-gray-50 border-t">
                   <div className="h-3 bg-gray-200 rounded w-24"></div>
                 </div>
@@ -208,7 +208,7 @@ export default function Bookmarks() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
+        {}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-3">
@@ -229,7 +229,7 @@ export default function Bookmarks() {
               )}
           </div>
         </div>
-        {/* Bookmarks Grid */}
+        {}
         {bookmarks.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">

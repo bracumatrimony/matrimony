@@ -19,7 +19,7 @@ const creditedEmailSchema = new mongoose.Schema(
   }
 );
 
-// Index for faster lookups
+
 creditedEmailSchema.index({ email: 1 });
 
 module.exports = mongoose.model("CreditedEmail", creditedEmailSchema);

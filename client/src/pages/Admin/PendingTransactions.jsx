@@ -43,7 +43,7 @@ export default function PendingTransactions({
       }));
       const result = await adminService.approveTransaction(transactionId);
       if (result.success) {
-        // Remove from list
+        
         setTransactions((prev) => prev.filter((t) => t._id !== transactionId));
         setTotalTransactions((prev) => prev - 1);
         showNotification("Transaction approved successfully!", "success");
@@ -67,7 +67,7 @@ export default function PendingTransactions({
       setProcessing((prev) => ({ ...prev, [`reject_${transactionId}`]: true }));
       const result = await adminService.rejectTransaction(transactionId);
       if (result.success) {
-        // Remove from list
+        
         setTransactions((prev) => prev.filter((t) => t._id !== transactionId));
         setTotalTransactions((prev) => prev - 1);
         showNotification("Transaction rejected successfully!", "success");
@@ -109,7 +109,7 @@ export default function PendingTransactions({
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
       {transactions.length > 0 ? (
         <div className="p-8">
-          {/* Header */}
+          {}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-1">
@@ -137,7 +137,7 @@ export default function PendingTransactions({
             </div>
           </div>
 
-          {/* Transaction Table */}
+          {}
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -174,7 +174,7 @@ export default function PendingTransactions({
                         key={transaction._id}
                         className="hover:bg-gray-50 transition-colors duration-150"
                       >
-                        {/* User Column */}
+                        {}
                         <td className="px-6 py-4">
                           <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
@@ -191,35 +191,35 @@ export default function PendingTransactions({
                           </div>
                         </td>
 
-                        {/* Amount Column */}
+                        {}
                         <td className="px-6 py-4 text-center">
                           <div className="text-lg font-bold text-indigo-600">
                             ৳{transaction.amount}
                           </div>
                         </td>
 
-                        {/* Credits Column */}
+                        {}
                         <td className="px-6 py-4 text-center">
                           <div className="text-lg font-bold text-emerald-600">
                             {transaction.credits || 0}
                           </div>
                         </td>
 
-                        {/* Phone Column */}
+                        {}
                         <td className="px-6 py-4 text-center">
                           <div className="text-sm font-mono text-blue-700 truncate max-w-32">
                             {transaction.phoneNumber || "N/A"}
                           </div>
                         </td>
 
-                        {/* TRX ID Column */}
+                        {}
                         <td className="px-6 py-4 text-center">
                           <div className="text-xs font-mono text-purple-700 truncate max-w-24">
                             {transaction.transactionId || "N/A"}
                           </div>
                         </td>
 
-                        {/* Actions Column */}
+                        {}
                         <td className="px-6 py-4 text-center">
                           <div className="flex items-center justify-center space-x-2">
                             <button
@@ -261,7 +261,7 @@ export default function PendingTransactions({
             </div>
           </div>
 
-          {/* Pagination */}
+          {}
           {totalTransactions > itemsPerPage && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-gray-100">
               <div className="text-sm text-gray-600">
@@ -278,7 +278,7 @@ export default function PendingTransactions({
                   Previous
                 </button>
 
-                {/* Page numbers */}
+                {}
                 {[...Array(Math.ceil(totalTransactions / itemsPerPage))].map(
                   (_, index) => {
                     const pageNum = index + 1;

@@ -50,7 +50,7 @@ export default function PendingBiodata({
       setActionLoading((prev) => ({ ...prev, [`approve_${profileId}`]: true }));
       await adminService.approveProfile(profileId);
 
-      // Remove approved profile from local list instead of reloading
+      
       setPendingProfiles((prev) =>
         prev.filter((p) => p.profileId !== profileId)
       );
@@ -73,7 +73,7 @@ export default function PendingBiodata({
   };
 
   const handleReject = async (profileId) => {
-    // Find the profile to get its name
+    
     const profile = pendingProfiles.find((p) => p.profileId === profileId);
     const profileName =
       profile?.userId?.name || profile?.fullName || profile?.name || profileId;
@@ -95,7 +95,7 @@ export default function PendingBiodata({
       }));
       await adminService.rejectProfile(profileId, reason);
 
-      // Remove rejected profile from local list instead of reloading
+      
       setPendingProfiles((prev) =>
         prev.filter((p) => p.profileId !== profileId)
       );
@@ -134,7 +134,7 @@ export default function PendingBiodata({
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-      {/* Rejection Modal */}
+      {}
       <RejectionModal
         isOpen={rejectionModal.isOpen}
         onClose={() =>
@@ -146,7 +146,7 @@ export default function PendingBiodata({
 
       {pendingProfiles.length > 0 ? (
         <div className="space-y-4">
-          {/* Items per page selector */}
+          {}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div className="flex items-center space-x-3">
               <span className="text-sm text-gray-600">Show:</span>
@@ -171,7 +171,7 @@ export default function PendingBiodata({
             </div>
           </div>
 
-          {/* Compact table */}
+          {}
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full table-fixed">
@@ -291,7 +291,7 @@ export default function PendingBiodata({
             </div>
           </div>
 
-          {/* Pagination */}
+          {}
           {totalPendingProfiles > itemsPerPage && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-sm text-gray-600">
@@ -307,7 +307,7 @@ export default function PendingBiodata({
                   Previous
                 </button>
 
-                {/* Page numbers */}
+                {}
                 {[...Array(Math.ceil(totalPendingProfiles / itemsPerPage))].map(
                   (_, index) => {
                     const pageNum = index + 1;

@@ -11,19 +11,19 @@ const { asyncHandler } = require("../middleware/errorHandler");
 
 const router = express.Router();
 
-// @route   POST /api/bookmarks
-// @desc    Add a profile to bookmarks
-// @access  Private
+
+
+
 router.post(
   "/",
   auth,
   asyncHandler(async (req, res) => {
     const { profileId } = req.body;
 
-    // Import sanitization utility
+    
     const { sanitizeId } = require("../utils/sanitizeQuery");
 
-    // Sanitize profileId
+    
     const sanitizedProfileId = sanitizeId(profileId);
     if (!sanitizedProfileId) {
       return res.status(400).json({
@@ -32,7 +32,7 @@ router.post(
       });
     }
 
-    // Find the profile by profileId
+    
     const profile = await Profile.findOne({
       profileId: sanitizedProfileId,
       status: "approved",
@@ -45,7 +45,7 @@ router.post(
       });
     }
 
-    // Check if user is trying to bookmark their own profile
+    
     if (profile.userId.toString() === req.user.id) {
       return res.status(400).json({
         success: false,
@@ -53,7 +53,7 @@ router.post(
       });
     }
 
-    // Check if bookmark already exists
+    
     const existingBookmark = await Bookmark.findOne({
       userId: req.user.id,
       profileId: sanitizedProfileId,
@@ -66,7 +66,7 @@ router.post(
       });
     }
 
-    // Create bookmark
+    
     const bookmark = new Bookmark({
       userId: req.user.id,
       profileId: sanitizedProfileId,
@@ -83,19 +83,19 @@ router.post(
   })
 );
 
-// @route   DELETE /api/bookmarks/:profileId
-// @desc    Remove a profile from bookmarks
-// @access  Private
+
+
+
 router.delete(
   "/:profileId",
   auth,
   asyncHandler(async (req, res) => {
     const { profileId } = req.params;
 
-    // Import sanitization utility
+    
     const { sanitizeId } = require("../utils/sanitizeQuery");
 
-    // Sanitize profileId
+    
     const sanitizedProfileId = sanitizeId(profileId);
     if (!sanitizedProfileId) {
       return res.status(400).json({
@@ -123,9 +123,9 @@ router.delete(
   })
 );
 
-// @route   GET /api/bookmarks
-// @desc    Get all bookmarks for current user with pagination
-// @access  Private
+
+
+
 router.get(
   "/",
   auth,
@@ -134,7 +134,7 @@ router.get(
     const limit = Math.max(1, parseInt(req.query.limit) || 9);
     const skip = (page - 1) * limit;
 
-    // Get total count for pagination info (only count bookmarks with approved profiles)
+    
     const totalBookmarksResult = await Bookmark.aggregate([
       { $match: { userId: req.user.id } },
       {
@@ -153,7 +153,7 @@ router.get(
     const totalBookmarks =
       totalBookmarksResult.length > 0 ? totalBookmarksResult[0].total : 0;
 
-    // Get paginated bookmarks using aggregation
+    
     const bookmarks = await Bookmark.aggregate([
       { $match: { userId: req.user.id } },
       { $sort: { createdAt: -1 } },
@@ -214,19 +214,19 @@ router.get(
   })
 );
 
-// @route   GET /api/bookmarks/check/:profileId
-// @desc    Check if a profile is bookmarked by current user
-// @access  Private
+
+
+
 router.get(
   "/check/:profileId",
   auth,
   asyncHandler(async (req, res) => {
     const { profileId } = req.params;
 
-    // Import sanitization utility
+    
     const { sanitizeId } = require("../utils/sanitizeQuery");
 
-    // Sanitize profileId
+    
     const sanitizedProfileId = sanitizeId(profileId);
     if (!sanitizedProfileId) {
       return res.status(400).json({
@@ -247,9 +247,9 @@ router.get(
   })
 );
 
-// @route   GET /api/bookmarks/stats
-// @desc    Get bookmark statistics for current user
-// @access  Private
+
+
+
 router.get(
   "/stats",
   auth,
@@ -258,7 +258,7 @@ router.get(
       userId: req.user.id,
     });
 
-    // Count how many users have bookmarked current user's profile
+    
     const userProfile = await Profile.findOne({ userId: req.user.id });
     let bookmarkedByCount = 0;
 

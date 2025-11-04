@@ -21,12 +21,12 @@ export default function VerificationRequests({
   const [selectedUniversity, setSelectedUniversity] = useState("");
   const [universities, setUniversities] = useState({});
 
-  // Debounce search query
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchQuery(searchInput);
-      setCurrentPage(1); // Reset to first page when searching
-    }, 800); // 800ms delay
+      setCurrentPage(1); 
+    }, 800); 
 
     return () => clearTimeout(timer);
   }, [searchInput]);
@@ -41,10 +41,10 @@ export default function VerificationRequests({
       setLoading(true);
       setError(null);
 
-      // Fetch all verification requests by paginating through all pages
+      
       let allRequests = [];
       let page = 1;
-      const pageSize = 100; // Fetch in chunks to avoid large responses
+      const pageSize = 100; 
 
       while (true) {
         const response = await adminService.getVerificationRequests(
@@ -53,7 +53,7 @@ export default function VerificationRequests({
         );
         if (response.success && response.requests.length > 0) {
           allRequests = allRequests.concat(response.requests);
-          if (response.requests.length < pageSize) break; // Last page
+          if (response.requests.length < pageSize) break; 
           page++;
         } else {
           break;
@@ -62,7 +62,7 @@ export default function VerificationRequests({
 
       let filteredRequests = allRequests;
 
-      // Apply search filter
+      
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         filteredRequests = filteredRequests.filter(
@@ -74,7 +74,7 @@ export default function VerificationRequests({
 
       setTotalRequests(filteredRequests.length);
 
-      // Apply pagination
+      
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
       const paginatedRequests = filteredRequests.slice(startIndex, endIndex);
@@ -105,7 +105,7 @@ export default function VerificationRequests({
 
   const handleApprove = (userId) => {
     setSelectedUserForApproval(userId);
-    setSelectedUniversity(""); // Reset selection
+    setSelectedUniversity(""); 
     setShowUniversityModal(true);
   };
 
@@ -127,7 +127,7 @@ export default function VerificationRequests({
           "Verification request approved successfully",
           "success"
         );
-        // Remove approved request from local list instead of reloading
+        
         setRequests((prev) =>
           prev.filter((req) => req._id !== selectedUserForApproval)
         );
@@ -157,7 +157,7 @@ export default function VerificationRequests({
           "Verification request rejected successfully",
           "success"
         );
-        // Remove rejected request from local list instead of reloading
+        
         setRequests((prev) => prev.filter((req) => req._id !== userId));
         setTotalRequests((prev) => Math.max(0, prev - 1));
         onActionComplete();
@@ -215,7 +215,7 @@ export default function VerificationRequests({
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
       <div className="space-y-4">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
@@ -232,7 +232,7 @@ export default function VerificationRequests({
 
         {totalRequests > 0 || searchInput ? (
           <div className="space-y-4">
-            {/* Search bar */}
+            {}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
               <div className="relative flex-1 max-w-md">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -248,7 +248,7 @@ export default function VerificationRequests({
               </div>
             </div>
 
-            {/* Items per page selector */}
+            {}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
               <div className="flex items-center space-x-3">
                 <span className="text-sm text-gray-600">Show:</span>
@@ -268,7 +268,7 @@ export default function VerificationRequests({
               </div>
             </div>
 
-            {/* Table */}
+            {}
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -359,7 +359,7 @@ export default function VerificationRequests({
               </div>
             </div>
 
-            {/* Pagination */}
+            {}
             {totalRequests > itemsPerPage && (
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="text-sm text-gray-600">
@@ -407,7 +407,7 @@ export default function VerificationRequests({
         )}
       </div>
 
-      {/* University Selection Modal */}
+      {}
       {showUniversityModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">

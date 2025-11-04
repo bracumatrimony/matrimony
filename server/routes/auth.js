@@ -12,13 +12,13 @@ const { detectUniversityFromEmail } = require("../config/universities");
 
 const router = express.Router();
 
-// Initialize Google OAuth client
+
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET
 );
 
-// Helper function to set JWT cookie
+
 const setTokenCookie = (res, token) => {
   const isProduction = process.env.NODE_ENV === "production";
   const userAgent = res.req.get("User-Agent") || "";
@@ -28,18 +28,18 @@ const setTokenCookie = (res, token) => {
     httpOnly: true,
     secure: isProduction,
     sameSite: isEmbeddedBrowser ? "lax" : isProduction ? "none" : "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000, 
   });
 };
 
-// Generate JWT token
+
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
-// @route   POST /api/auth/google
-// @desc    Google OAuth login/register (ID Token)
-// @access  Public
+
+
+
 router.post("/google", async (req, res) => {
   try {
     const { credential } = req.body;
@@ -51,7 +51,7 @@ router.post("/google", async (req, res) => {
       });
     }
 
-    // Verify the Google token
+    
     const ticket = await googleClient.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -67,11 +67,11 @@ router.post("/google", async (req, res) => {
       });
     }
 
-    // Check if user exists
+    
     let user = await User.findOne({ email });
 
     if (!user) {
-      // Detect university from email
+      
       const universityInfo = detectUniversityFromEmail(email);
       let universityKey, profileId, alumniVerified, verificationRequest;
 
@@ -86,20 +86,20 @@ router.post("/google", async (req, res) => {
       }
 
       if (universityInfo) {
-        // University student
+        
         universityKey = universityInfo.key;
         profileId = await User.generateProfileId(universityKey);
         alumniVerified = false;
         verificationRequest = false;
       } else {
-        // Alumni or external user - no university or profileId assigned initially
+        
         universityKey = null;
         profileId = null;
         alumniVerified = false;
-        verificationRequest = true; // Request verification
+        verificationRequest = true; 
       }
 
-      // Create new user
+      
       const userData = {
         name,
         email,
@@ -124,7 +124,7 @@ router.post("/google", async (req, res) => {
         await CreditedEmail.create({ email: email.toLowerCase() });
       }
     } else if (!user.isGoogleUser) {
-      // Update existing user to mark as Google user
+      
       await User.findByIdAndUpdate(
         user._id,
         {
@@ -137,11 +137,11 @@ router.post("/google", async (req, res) => {
       );
     }
 
-    // Generate JWT token
+    
     const token = generateToken(user._id);
     setTokenCookie(res, token);
 
-    // Return user data (excluding password)
+    
     const userResponse = {
       id: user._id,
       name: user.name,
@@ -154,7 +154,7 @@ router.post("/google", async (req, res) => {
       alumniVerified: user.alumniVerified,
       profileId: user.profileId,
       university: user.university,
-      token: token, // Include token in response for cross-domain compatibility
+      token: token, 
     };
 
     res.json({
@@ -171,9 +171,9 @@ router.post("/google", async (req, res) => {
   }
 });
 
-// @route   POST /api/auth/google/callback
-// @desc    Google OAuth callback for embedded browsers
-// @access  Public
+
+
+
 router.post("/google/callback", async (req, res) => {
   try {
     const { code } = req.body;
@@ -185,7 +185,7 @@ router.post("/google/callback", async (req, res) => {
       });
     }
 
-    // Exchange code for tokens - auto-detect production URL
+    
     const isProduction = process.env.NODE_ENV === "production";
     const baseUrl =
       process.env.CLIENT_URL ||
@@ -214,7 +214,7 @@ router.post("/google/callback", async (req, res) => {
       throw new Error("Google authentication failed");
     }
 
-    // Verify the ID token
+    
     const ticket = await googleClient.verifyIdToken({
       idToken: tokenData.id_token,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -230,11 +230,11 @@ router.post("/google/callback", async (req, res) => {
       });
     }
 
-    // Check if user exists
+    
     let user = await User.findOne({ email });
 
     if (!user) {
-      // Detect university from email
+      
       const universityInfo = detectUniversityFromEmail(email);
       let universityKey, profileId, alumniVerified, verificationRequest;
 
@@ -249,20 +249,20 @@ router.post("/google/callback", async (req, res) => {
       }
 
       if (universityInfo) {
-        // University student
+        
         universityKey = universityInfo.key;
         profileId = await User.generateProfileId(universityKey);
         alumniVerified = false;
         verificationRequest = false;
       } else {
-        // Alumni or external user - no university or profileId assigned initially
+        
         universityKey = null;
         profileId = null;
         alumniVerified = false;
-        verificationRequest = true; // Request verification
+        verificationRequest = true; 
       }
 
-      // Create new user
+      
       const userData = {
         name,
         email,
@@ -275,7 +275,7 @@ router.post("/google/callback", async (req, res) => {
         credits: initialCredits,
       };
 
-      // Only set profileId if it has a value (for university users)
+      
       if (profileId) {
         userData.profileId = profileId;
       }
@@ -289,7 +289,7 @@ router.post("/google/callback", async (req, res) => {
         await CreditedEmail.create({ email: email.toLowerCase() });
       }
     } else if (!user.isGoogleUser) {
-      // Update existing user to mark as Google user
+      
       await User.findByIdAndUpdate(
         user._id,
         {
@@ -302,11 +302,11 @@ router.post("/google/callback", async (req, res) => {
       );
     }
 
-    // Generate JWT token
+    
     const token = generateToken(user._id);
     setTokenCookie(res, token);
 
-    // Return user data
+    
     const userResponse = {
       id: user._id,
       name: user.name,
@@ -320,7 +320,7 @@ router.post("/google/callback", async (req, res) => {
       verificationRequest: user.verificationRequest,
       profileId: user.profileId,
       university: user.university,
-      token: token, // Include token in response for cross-domain compatibility
+      token: token, 
     };
 
     res.json({
@@ -337,9 +337,9 @@ router.post("/google/callback", async (req, res) => {
   }
 });
 
-// @route   POST /api/auth/logout
-// @desc    Logout user
-// @access  Public
+
+
+
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
@@ -352,14 +352,14 @@ router.post("/logout", (req, res) => {
   });
 });
 
-// @route   POST /api/auth/register
-// @desc    Register user with email/password
-// @access  Public
+
+
+
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validation
+    
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -367,7 +367,7 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    // Check if user already exists
+    
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -376,7 +376,7 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    // Detect university from email
+    
     const universityInfo = detectUniversityFromEmail(email);
 
     let initialCredits = 0;
@@ -392,20 +392,20 @@ router.post("/register", async (req, res) => {
     let universityKey, profileId, alumniVerified, verificationRequest;
 
     if (universityInfo) {
-      // University student
+      
       universityKey = universityInfo.key;
       profileId = await User.generateProfileId(universityKey);
       alumniVerified = false;
       verificationRequest = false;
     } else {
-      // Alumni or external user - no university or profileId assigned initially
+      
       universityKey = null;
       profileId = null;
       alumniVerified = false;
-      verificationRequest = true; // Request verification
+      verificationRequest = true; 
     }
 
-    // Create new user
+    
     const userData = {
       name,
       email,
@@ -417,7 +417,7 @@ router.post("/register", async (req, res) => {
       credits: initialCredits,
     };
 
-    // Only set profileId if it has a value (for university users)
+    
     if (profileId) {
       userData.profileId = profileId;
     }
@@ -431,7 +431,7 @@ router.post("/register", async (req, res) => {
       await CreditedEmail.create({ email: email.toLowerCase() });
     }
 
-    // Generate token and set cookie
+    
     const token = generateToken(user._id);
     setTokenCookie(res, token);
 
@@ -456,14 +456,14 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// @route   POST /api/auth/login
-// @desc    Login user with email/password
-// @access  Public
+
+
+
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validation
+    
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -471,7 +471,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // Find user
+    
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
       return res.status(400).json({
@@ -480,7 +480,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // Check password
+    
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(400).json({
@@ -489,7 +489,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // Check if user is banned
+    
     if (user.isBanned) {
       return res.status(403).json({
         success: false,
@@ -497,10 +497,10 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // Update last login
+    
     await user.updateLastLogin();
 
-    // Generate token and set cookie
+    
     const token = generateToken(user._id);
     setTokenCookie(res, token);
 
@@ -518,9 +518,9 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// @route   GET /api/auth/me
-// @desc    Get current user
-// @access  Private
+
+
+
 router.get("/me", async (req, res) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
@@ -542,7 +542,7 @@ router.get("/me", async (req, res) => {
       });
     }
 
-    // Sync hasProfile with actual profile existence
+    
     const existingProfile = await Profile.findOne({ userId: user._id });
     if (existingProfile && !user.hasProfile) {
       await User.findByIdAndUpdate(
@@ -571,9 +571,9 @@ router.get("/me", async (req, res) => {
   }
 });
 
-// @route   GET /api/auth/verify-token
-// @desc    Verify token and get debug information
-// @access  Public (for debugging)
+
+
+
 router.get("/verify-token", async (req, res) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
@@ -588,7 +588,7 @@ router.get("/verify-token", async (req, res) => {
       });
     }
 
-    // Try to decode without verification first to see the payload
+    
     let decodedPayload;
     try {
       decodedPayload = jwt.decode(token);
@@ -597,7 +597,7 @@ router.get("/verify-token", async (req, res) => {
       console.error("Token decode error:", decodeError);
     }
 
-    // Now verify the token
+    
     let verifiedPayload;
     try {
       verifiedPayload = jwt.verify(token, process.env.JWT_SECRET);
@@ -617,7 +617,7 @@ router.get("/verify-token", async (req, res) => {
       });
     }
 
-    // Look up the user
+    
     const user = await User.findById(verifiedPayload.userId);
 
     res.json({
@@ -651,9 +651,9 @@ router.get("/verify-token", async (req, res) => {
   }
 });
 
-// @route   POST /api/auth/logout
-// @desc    Logout user by clearing cookie
-// @access  Public
+
+
+
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,

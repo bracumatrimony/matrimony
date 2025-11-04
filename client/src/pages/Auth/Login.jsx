@@ -6,7 +6,7 @@ import SEO from "../../components/SEO";
 export default function Login() {
   const [errors, setErrors] = useState({});
 
-  // Check for OAuth errors in URL params
+  
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get("error");
@@ -21,7 +21,7 @@ export default function Login() {
 
       setErrors({ general: errorMessage });
 
-      // Clean URL
+      
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
@@ -34,9 +34,9 @@ export default function Login() {
         keywords="login, sign in, google login, Campus matrimony account, matrimonial login"
       />
       <div className="min-h-screen bg-black flex overflow-hidden auth-page relative">
-        {/* Background Video - Full screen for mobile, left side for desktop */}
+        {}
         <div className="absolute md:relative inset-0 md:flex-1 bg-black flex items-center justify-center p-4 md:p-6 overflow-hidden">
-          {/* Background Image */}
+          {}
           <img
             src="https://res.cloudinary.com/dkir6pztp/image/upload/v1761750392/login_banner_tfrdbr.png"
             alt="wedding background"
@@ -44,10 +44,10 @@ export default function Login() {
             style={{ backgroundColor: "black" }}
           />
 
-          {/* Overlay for text readability (tuned for clarity on mobile) */}
+          {}
           <div className="absolute inset-0 bg-black/20 md:bg-black/30"></div>
 
-          {/* Desktop Quote - Hidden on mobile */}
+          {}
           <div className="hidden md:block text-center relative z-10 auth-brand">
             <div className="mb-8">
               <blockquote className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium text-white leading-relaxed mb-4 tracking-wide drop-shadow-md px-2">
@@ -65,12 +65,12 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Login Form - Overlay on mobile, side panel on desktop */}
+        {}
         <div className="absolute md:relative inset-0 md:inset-auto w-full md:max-w-md lg:max-w-lg flex flex-col items-stretch md:bg-white md:h-screen">
           <div className="w-full flex flex-col h-full justify-center items-center px-4 sm:px-6 md:px-8 py-8 sm:py-10 md:py-12 auth-form relative z-10">
-            {/* Professional Card with Mobile Blur Box */}
+            {}
             <div className="w-full max-w-md bg-white/[0.08] md:bg-transparent backdrop-blur-sm md:backdrop-blur-none border border-white/[0.15] md:border-none rounded-2xl p-6 md:p-8 shadow-lg md:shadow-none text-white md:text-slate-900">
-              {/* Header */}
+              {}
               <div className="text-center mb-6 sm:mb-8">
                 <h2 className="text-2xl sm:text-3xl font-semibold text-white md:text-slate-900 mb-2 sm:mb-3">
                   Campus
@@ -86,7 +86,7 @@ export default function Login() {
 
               <div className="h-px bg-white/20 md:bg-gray-100 my-4" />
 
-              {/* Sign In Content */}
+              {}
               {errors.general && (
                 <div className="bg-red-50 border border-red-200 p-3 sm:p-4 rounded-md mb-6">
                   <div className="flex">
@@ -112,12 +112,12 @@ export default function Login() {
                 </div>
               )}
 
-              {/* Google Sign-In */}
+              {}
               <div className="space-y-4">
                 <GoogleSignIn />
               </div>
 
-              {/* Footer links */}
+              {}
               <div className="text-center text-xs text-white md:text-gray-500 mt-6">
                 <Link
                   to="/terms"

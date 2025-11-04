@@ -1,4 +1,4 @@
-// User service for handling user account operations
+
 import authService from "./authService";
 
 class UserService {
@@ -6,7 +6,7 @@ class UserService {
     this.baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
   }
 
-  // Make API request with authentication
+  
   async makeRequest(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
 
@@ -14,11 +14,11 @@ class UserService {
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include", // Include cookies for backward compatibility
+      credentials: "include", 
       ...options,
     };
 
-    // Add Authorization header if token exists
+    
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -28,7 +28,7 @@ class UserService {
     const data = await response.json();
 
     if (!response.ok) {
-      // Create a custom error object that includes the response data
+      
       const error = new Error(data.message || "Request failed");
       error.response = { data };
       throw error;
@@ -37,7 +37,7 @@ class UserService {
     return data;
   }
 
-  // Get current user profile
+  
   async getUserProfile() {
     try {
       const response = await this.makeRequest("/users/profile");
@@ -48,7 +48,7 @@ class UserService {
     }
   }
 
-  // Update user profile
+  
   async updateUserProfile(userData) {
     try {
       const response = await this.makeRequest("/users/profile", {
@@ -62,7 +62,7 @@ class UserService {
     }
   }
 
-  // Update user credits
+  
   async updateUserCredits(credits, operation = "add") {
     try {
       const response = await this.makeRequest("/users/credits", {
@@ -76,7 +76,7 @@ class UserService {
     }
   }
 
-  // Get user credits
+  
   async getUserCredits() {
     try {
       const response = await this.getUserProfile();
@@ -90,7 +90,7 @@ class UserService {
     }
   }
 
-  // Delete user account
+  
   async deleteAccount() {
     try {
       const response = await this.makeRequest("/users/account", {
@@ -102,7 +102,7 @@ class UserService {
       throw error;
     }
   }
-  // Get user statistics
+  
   async getUserStats() {
     try {
       const response = await this.makeRequest("/users/stats");
@@ -114,5 +114,5 @@ class UserService {
   }
 }
 
-// Export singleton instance
+
 export default new UserService();

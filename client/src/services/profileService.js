@@ -1,4 +1,4 @@
-// Profile service for handling profile operations
+
 import authService from "./authService";
 
 class ProfileService {
@@ -6,7 +6,7 @@ class ProfileService {
     this.baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
   }
 
-  // Make API request with authentication
+  
   async makeRequest(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
 
@@ -14,11 +14,11 @@ class ProfileService {
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include", // Include cookies for backward compatibility
+      credentials: "include", 
       ...options,
     };
 
-    // Add Authorization header if token exists
+    
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -28,7 +28,7 @@ class ProfileService {
     const data = await response.json();
 
     if (!response.ok) {
-      // Create a custom error object that includes the response data
+      
       const error = new Error(data.message || "Request failed");
       error.response = {
         data,
@@ -41,7 +41,7 @@ class ProfileService {
     return data;
   }
 
-  // Make public API request without authentication
+  
   async makePublicRequest(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
 
@@ -49,7 +49,7 @@ class ProfileService {
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include", // Include cookies for all requests
+      credentials: "include", 
       ...options,
     };
 
@@ -57,7 +57,7 @@ class ProfileService {
     const data = await response.json();
 
     if (!response.ok) {
-      // Create a custom error object that includes the response data
+      
       const error = new Error(data.message || "Request failed");
       error.response = {
         data,
@@ -70,7 +70,7 @@ class ProfileService {
     return data;
   }
 
-  // Create a new profile
+  
   async createProfile(profileData) {
     try {
       const response = await this.makeRequest("/profiles", {
@@ -85,7 +85,7 @@ class ProfileService {
     }
   }
 
-  // Get current user's profile
+  
   async getCurrentUserProfile() {
     try {
       const response = await this.makeRequest("/profiles/user/me");
@@ -96,7 +96,7 @@ class ProfileService {
     }
   }
 
-  // Update current user's profile
+  
   async updateProfile(profileData) {
     try {
       const response = await this.makeRequest("/profiles/user/me", {
@@ -111,7 +111,7 @@ class ProfileService {
     }
   }
 
-  // Delete current user's profile
+  
   async deleteProfile() {
     try {
       const response = await this.makeRequest("/profiles", {
@@ -125,7 +125,7 @@ class ProfileService {
     }
   }
 
-  // Search profiles with filters
+  
   async searchProfiles(filters = {}, options = {}) {
     try {
       const queryParams = new URLSearchParams();
@@ -145,11 +145,11 @@ class ProfileService {
         queryString ? `?${queryString}` : ""
       }`;
 
-      // Use authenticated request for search to enable view tracking
+      
       const response = await this.makeRequest(endpoint, options);
       return response;
     } catch (error) {
-      // Don't log AbortError as it's expected when requests are cancelled
+      
       if (error.name !== "AbortError") {
         console.error("Search profiles error:", error);
       }
@@ -157,7 +157,7 @@ class ProfileService {
     }
   }
 
-  // Get a single profile by profile ID
+  
   async getProfile(profileId) {
     try {
       const response = await this.makeRequest(`/profiles/${profileId}`);
@@ -168,7 +168,7 @@ class ProfileService {
     }
   }
 
-  // Unlock contact information for a profile
+  
   async unlockContact(profileId) {
     try {
       const response = await this.makeRequest(
@@ -184,7 +184,7 @@ class ProfileService {
     }
   }
 
-  // Check if contact information is already unlocked for a profile
+  
   async checkContactStatus(profileId) {
     try {
       const response = await this.makeRequest(
@@ -200,7 +200,7 @@ class ProfileService {
     }
   }
 
-  // Get user's transaction history
+  
   async getTransactionHistory() {
     try {
       const response = await this.makeRequest("/users/transactions", {
@@ -213,7 +213,7 @@ class ProfileService {
     }
   }
 
-  // Calculate age from date of birth
+  
   calculateAge(dateOfBirth) {
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
@@ -230,19 +230,19 @@ class ProfileService {
     return age;
   }
 
-  // Format profile data for display
+  
   formatProfileData(profile) {
     if (!profile) return null;
 
     return {
       ...profile,
-      // Age is already calculated and stored in the profile
+      
       age: profile.age || 0,
-      // Add any other formatting logic here
+      
     };
   }
 
-  // Unlock contact information for a profile
+  
   async unlockContactInfo(profileId) {
     try {
       const response = await this.makeRequest(
@@ -258,7 +258,7 @@ class ProfileService {
     }
   }
 
-  // Check if contact information is already unlocked for a profile
+  
   async checkContactStatus(profileId) {
     try {
       const response = await this.makeRequest(
@@ -274,7 +274,7 @@ class ProfileService {
     }
   }
 
-  // Get all unlocked profiles for the current user
+  
   async getUnlockedProfiles() {
     try {
       const response = await this.makeRequest("/profiles/my-unlocks", {
@@ -298,7 +298,7 @@ class ProfileService {
     }
   }
 
-  // Request alumni verification
+  
   async requestVerification() {
     try {
       const response = await this.makeRequest(
@@ -314,7 +314,7 @@ class ProfileService {
     }
   }
 
-  // Fetch user's orders (purchase transactions)
+  
   async getUserOrders() {
     try {
       const response = await this.makeRequest("/transactions/orders", {
@@ -328,5 +328,5 @@ class ProfileService {
   }
 }
 
-// Export singleton instance
+
 export default new ProfileService();

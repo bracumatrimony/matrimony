@@ -7,17 +7,17 @@ const mongoSanitize = require("express-mongo-sanitize");
 const cookieParser = require("cookie-parser");
 const { errorHandler, notFound } = require("./middleware/errorHandler");
 
-// Load environment variables
+
 dotenv.config();
 
-// Server startup timestamp for cache invalidation
+
 global.SERVER_STARTUP_TIME = Date.now();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Security Middleware
-// Helmet for security headers
+
+
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -32,7 +32,7 @@ app.use(
   })
 );
 
-// Middleware
+
 const allowedOrigins = [
   "https://campusmatrimony.vercel.app",
   "https://bracu-matrimony-backend.vercel.app",
@@ -40,34 +40,34 @@ const allowedOrigins = [
   "http://localhost:3000",
 ];
 
-// Add FRONTEND_URL from environment if it exists and not already included
+
 if (process.env.FRONTEND_URL) {
   let frontendUrl = process.env.FRONTEND_URL;
 
-  // Add https:// if no protocol is specified for production URLs
+  
   if (
     !frontendUrl.startsWith("http://") &&
     !frontendUrl.startsWith("https://")
   ) {
-    // For localhost, use http, for everything else use https
+    
     const protocol = frontendUrl.includes("localhost") ? "http://" : "https://";
     frontendUrl = protocol + frontendUrl;
   }
 
-  // Only add if not already included
+  
   if (!allowedOrigins.includes(frontendUrl)) {
     allowedOrigins.push(frontendUrl);
   }
 }
 
-// CORS configuration - strict whitelist enforcement
+
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, Postman, in-app browsers)
+      
       if (!origin) return callback(null, true);
 
-      // In production, strictly enforce whitelist
+      
       if (process.env.NODE_ENV === "production") {
         if (allowedOrigins.includes(origin)) {
           return callback(null, true);
@@ -76,7 +76,7 @@ app.use(
           return callback(new Error("Not allowed by CORS"), false);
         }
       } else {
-        // Development: allow localhost and configured origins
+        
         if (allowedOrigins.includes(origin)) {
           return callback(null, true);
         }
@@ -98,15 +98,15 @@ app.use(
   })
 );
 
-// Body parsing and sanitization middleware
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
-// Sanitize data to prevent MongoDB injection
+
 app.use(mongoSanitize());
 
-// Additional security headers
+
 app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "DENY");
@@ -114,14 +114,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files from client's public directory
+
 const path = require("path");
 app.use(express.static(path.join(__dirname, "../client/public")));
 
-// MongoDB Connection
+
 const connectDB = require("./config/database");
 
-// Database connection middleware - ensures DB is connected before processing requests
+
 const ensureDBConnection = async (req, res, next) => {
   try {
     await connectDB();
@@ -136,12 +136,12 @@ const ensureDBConnection = async (req, res, next) => {
   }
 };
 
-// Apply database connection middleware to all routes
+
 app.use(ensureDBConnection);
 
-// Preflight requests handled by CORS middleware
 
-// Routes
+
+
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/profiles", require("./routes/profiles"));
@@ -151,13 +151,13 @@ app.use("/api/bookmarks", require("./routes/bookmarks"));
 app.use("/api/config", require("./routes/config"));
 app.use("/api/transactions", require("./routes/transactions"));
 
-// Serve sitemap.xml with correct XML headers
+
 app.get("/sitemap.xml", (req, res) => {
   res.setHeader("Content-Type", "application/xml");
   res.sendFile(path.join(__dirname, "../client/public/sitemap.xml"));
 });
 
-// Root route - redirect to frontend or show API info
+
 app.get("/", (req, res) => {
   res.json({
     message: "Campus Matrimony API Server",
@@ -180,7 +180,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// Health check endpoint
+
 app.get("/api/health", (req, res) => {
   res.json({
     message: "Campus Matrimony API Server is running!",
@@ -189,7 +189,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Database status endpoint
+
 app.get("/api/db-status", (req, res) => {
   const mongoose = require("mongoose");
   res.json({
@@ -207,13 +207,13 @@ app.get("/api/db-status", (req, res) => {
   });
 });
 
-// 404 handler - must be before error handler
+
 app.use("*", notFound);
 
-// Global error handling middleware - must be last
+
 app.use(errorHandler);
 
-// For Vercel deployment, export the app instead of listening
+
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
     const monetizationConfig = require("./config/monetization");
@@ -233,5 +233,5 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-// Export the Express app for Vercel
+
 module.exports = app;

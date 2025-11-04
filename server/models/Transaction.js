@@ -10,17 +10,17 @@ const transactionSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ["pending", "approved", "rejected"],
-    default: "approved", // Default to approved for existing transactions
+    default: "approved", 
   },
   amount: { type: Number, required: true },
-  credits: { type: Number }, // Number of credits being purchased (optional for other types)
-  price: { type: Number }, // Price paid (for purchases)
-  transactionId: { type: String }, // bKash transaction ID
-  phoneNumber: { type: String }, // User's phone number for payment
+  credits: { type: Number }, 
+  price: { type: Number }, 
+  transactionId: { type: String }, 
+  phoneNumber: { type: String }, 
   description: { type: String },
   createdAt: { type: Date, default: Date.now },
-  processedAt: { type: Date }, // When admin approved/rejected
-  processedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Admin who processed
+  processedAt: { type: Date }, 
+  processedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, 
 });
 
 module.exports = mongoose.model("Transaction", transactionSchema);

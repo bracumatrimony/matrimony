@@ -3,7 +3,7 @@ import authService from "./authService";
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-// Make API request with authentication
+
 const makeRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
 
@@ -11,11 +11,11 @@ const makeRequest = async (endpoint, options = {}) => {
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include", // Include cookies for backward compatibility
+    credentials: "include", 
     ...options,
   };
 
-  // Add Authorization header if token exists
+  
   const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -34,7 +34,7 @@ const makeRequest = async (endpoint, options = {}) => {
 };
 
 const draftService = {
-  // Save draft to server
+  
   saveDraft: async (currentStep, draftData) => {
     try {
       const response = await makeRequest("/drafts", {
@@ -51,7 +51,7 @@ const draftService = {
     }
   },
 
-  // Get draft from server
+  
   getDraft: async () => {
     try {
       const response = await makeRequest("/drafts", {
@@ -64,7 +64,7 @@ const draftService = {
     }
   },
 
-  // Delete draft from server
+  
   deleteDraft: async () => {
     try {
       const response = await makeRequest("/drafts", {
@@ -77,7 +77,7 @@ const draftService = {
     }
   },
 
-  // Save draft with debouncing to avoid too many server calls
+  
   saveDraftDebounced: (() => {
     let timeoutId;
     return (currentStep, draftData, delay = 2000) => {

@@ -10,7 +10,7 @@ export default function AllOrdersWrapper() {
   );
   const [isLoading, setIsLoading] = useState(monetizationConfig.isLoading);
 
-  // Listen for monetization config changes
+  
   useEffect(() => {
     const handleConfigChange = () => {
       setMonetizationEnabled(monetizationConfig.isEnabled());
@@ -19,7 +19,7 @@ export default function AllOrdersWrapper() {
 
     window.addEventListener("monetizationConfigChanged", handleConfigChange);
 
-    // Initial check
+    
     setMonetizationEnabled(monetizationConfig.isEnabled());
     setIsLoading(monetizationConfig.isLoading);
 
@@ -31,16 +31,16 @@ export default function AllOrdersWrapper() {
     };
   }, []);
 
-  // Show loading while config is being fetched
+  
   if (isLoading) {
     return <PageSpinner text="Loading..." />;
   }
 
-  // Show 404 if monetization is disabled
+  
   if (!monetizationEnabled) {
     return <FeatureNotAvailable featureName="All Orders" />;
   }
 
-  // Show orders page if monetization is enabled
+  
   return <AllOrders />;
 }

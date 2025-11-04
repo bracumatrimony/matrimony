@@ -8,7 +8,7 @@ const bookmarkSchema = new mongoose.Schema(
       required: true,
     },
     profileId: {
-      type: String, // Profile ID string (e.g., "BM1001")
+      type: String, 
       required: true,
     },
     profile: {
@@ -22,10 +22,10 @@ const bookmarkSchema = new mongoose.Schema(
   }
 );
 
-// Compound index to ensure a user can't bookmark the same profile twice
+
 bookmarkSchema.index({ userId: 1, profileId: 1 }, { unique: true });
 
-// Index for faster queries
+
 bookmarkSchema.index({ userId: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Bookmark", bookmarkSchema);

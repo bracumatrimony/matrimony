@@ -23,22 +23,22 @@ export default function MyUnlocks() {
       try {
         const res = await profileService.getUnlockedProfiles();
         setUnlockedProfiles(Array.isArray(res.profiles) ? res.profiles : []);
-        setError(null); // Clear any previous errors on success
+        setError(null); 
       } catch (err) {
-        console.log("Error details:", err); // Debug log
-        // Handle different error types
+        console.log("Error details:", err); 
+        
         if (err.response?.status === 404) {
-          // Route not found or no profiles - treat as empty state
+          
           console.log("404 error - treating as empty state");
           setUnlockedProfiles([]);
           setError(null);
         } else if (err.message && err.message.includes("Profile not found")) {
-          // Server returned "Profile not found" - treat as empty state
+          
           console.log("Profile not found - treating as empty state");
           setUnlockedProfiles([]);
           setError(null);
         } else {
-          // Real error
+          
           setError("Failed to load unlocked profiles");
         }
       } finally {
@@ -49,20 +49,20 @@ export default function MyUnlocks() {
     fetchUnlockedProfiles();
   }, [user, navigate]);
 
-  // Pagination calculations
+  
   const totalPages = Math.ceil(unlockedProfiles.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentProfiles = unlockedProfiles.slice(startIndex, endIndex);
 
-  // Pagination handlers
+  
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); // Reset to first page when changing items per page
+    setCurrentPage(1); 
   };
 
   const formatDate = (dateString) => {
@@ -77,14 +77,14 @@ export default function MyUnlocks() {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
-          {/* Header skeleton */}
+          {}
           <div className="mb-8">
             <div className="bg-gradient-to-r from-gray-800 to-black rounded-lg p-6 text-white shadow-lg animate-pulse">
               <div className="h-8 bg-gray-300 rounded w-32 mb-2"></div>
               <div className="h-4 bg-gray-300 rounded w-64"></div>
             </div>
           </div>
-          {/* Unlocked Profiles Table Skeleton */}
+          {}
           <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -139,7 +139,7 @@ export default function MyUnlocks() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
+        {}
         <div className="mb-8">
           <div className="bg-gradient-to-r from-gray-800 to-black rounded-lg p-6 text-white shadow-lg">
             <h1 className="text-3xl font-bold mb-2">My Unlocks</h1>
@@ -149,7 +149,7 @@ export default function MyUnlocks() {
           </div>
         </div>
 
-        {/* Unlocked Profiles List */}
+        {}
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
           {unlockedProfiles.length === 0 ? (
             <div className="text-center py-12">
@@ -220,10 +220,10 @@ export default function MyUnlocks() {
           )}
         </div>
 
-        {/* Pagination Controls */}
+        {}
         {unlockedProfiles.length > 0 && totalPages > 1 && (
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            {/* Items per page selector */}
+            {}
             <div className="flex items-center gap-2">
               <label className="text-sm text-gray-600">Show:</label>
               <select
@@ -241,14 +241,14 @@ export default function MyUnlocks() {
               <span className="text-sm text-gray-600">per page</span>
             </div>
 
-            {/* Pagination info */}
+            {}
             <div className="text-sm text-gray-600">
               Showing {startIndex + 1}-
               {Math.min(endIndex, unlockedProfiles.length)} of{" "}
               {unlockedProfiles.length} unlocked profiles
             </div>
 
-            {/* Page navigation */}
+            {}
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -262,10 +262,10 @@ export default function MyUnlocks() {
                 <ChevronLeft className="h-4 w-4" />
               </button>
 
-              {/* Page number buttons */}
+              {}
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (num) => {
-                  // Show first, last, current, and neighbors; ellipsis for gaps
+                  
                   if (
                     num === 1 ||
                     num === totalPages ||

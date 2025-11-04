@@ -25,7 +25,7 @@ export default function GoogleSignIn() {
     window.location.href = authUrl;
   };
 
-  // Handle OAuth callback
+  
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
@@ -51,7 +51,7 @@ export default function GoogleSignIn() {
         })
         .finally(() => {
           setIsLoading(false);
-          // Clean URL
+          
           window.history.replaceState(
             {},
             document.title,

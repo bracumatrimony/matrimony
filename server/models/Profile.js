@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const profileSchema = new mongoose.Schema(
   {
-    // Link to User
+    
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -28,7 +28,7 @@ const profileSchema = new mongoose.Schema(
       },
     },
 
-    // Status
+    
     status: {
       type: String,
       enum: {
@@ -43,7 +43,7 @@ const profileSchema = new mongoose.Schema(
       default: null,
     },
 
-    // Edit tracking fields
+    
     isUnderReview: {
       type: Boolean,
       default: false,
@@ -65,7 +65,7 @@ const profileSchema = new mongoose.Schema(
       default: [],
     },
 
-    // Segment 1: Family Background
+    
     fatherAlive: {
       type: String,
       enum: {
@@ -79,7 +79,7 @@ const profileSchema = new mongoose.Schema(
       trim: true,
       validate: {
         validator: function (value) {
-          // Required only if father is alive
+          
           return (
             this.fatherAlive === "No" ||
             (this.fatherAlive === "Yes" && value && value.trim().length > 0)
@@ -102,7 +102,7 @@ const profileSchema = new mongoose.Schema(
       trim: true,
       validate: {
         validator: function (value) {
-          // Required only if mother is alive
+          
           return (
             this.motherAlive === "No" ||
             (this.motherAlive === "Yes" && value && value.trim().length > 0)
@@ -117,19 +117,19 @@ const profileSchema = new mongoose.Schema(
       required: [true, "Number of brothers is required"],
       min: [0, "Number of brothers cannot be negative"],
     },
-    // Dynamic brother occupations - will be saved as brotherXOccupation fields
+    
     sistersCount: {
       type: Number,
       required: [true, "Number of sisters is required"],
       min: [0, "Number of sisters cannot be negative"],
     },
-    // Dynamic sister occupations - will be saved as sisterXOccupation fields
+    
     unclesCount: {
       type: Number,
       min: [0, "Number of uncles cannot be negative"],
       default: 0,
     },
-    // Dynamic uncle occupations - will be saved as uncleXOccupation fields
+    
     familyEconomicCondition: {
       type: String,
       enum: {
@@ -140,7 +140,7 @@ const profileSchema = new mongoose.Schema(
       required: [true, "Family economic condition is required"],
     },
 
-    // Segment 2: Education & Profession
+    
     educationMedium: {
       type: String,
       enum: {
@@ -222,7 +222,7 @@ const profileSchema = new mongoose.Schema(
       required: [true, "Monthly income is required"],
     },
 
-    // Segment 3: Lifestyle, Health & Compatibility
+    
     age: {
       type: Number,
       required: [true, "Age is required"],
@@ -324,7 +324,7 @@ const profileSchema = new mongoose.Schema(
       type: String,
       enum: {
         values: [
-          "", // Allow empty string
+          "", 
           "Strongly Support",
           "Support",
           "Neutral",
@@ -338,7 +338,7 @@ const profileSchema = new mongoose.Schema(
       type: String,
       enum: {
         values: [
-          "", // Allow empty string
+          "", 
           "Strongly Support",
           "Support",
           "Neutral",
@@ -353,7 +353,7 @@ const profileSchema = new mongoose.Schema(
       trim: true,
     },
 
-    // Segment 4: Expected Life Partner & Declaration
+    
     partnerAgePreference: {
       type: String,
       required: [true, "Partner age preference is required"],
@@ -436,16 +436,16 @@ const profileSchema = new mongoose.Schema(
       required: [true, "False information agreement is required"],
     },
 
-    // Contact Information
+    
     contactInformation: {
       type: String,
-      required: false, // Made optional to handle existing profiles
-      default: "", // Default empty string for existing profiles
+      required: false, 
+      default: "", 
       trim: true,
       validate: {
         validator: function (value) {
-          // Only validate if value is provided
-          if (!value || value.trim() === "") return true; // Allow empty
+          
+          if (!value || value.trim() === "") return true; 
           return value.trim().length >= 10 && value.trim().length <= 500;
         },
         message:
@@ -459,8 +459,8 @@ const profileSchema = new mongoose.Schema(
       trim: true,
       validate: {
         validator: function (value) {
-          // Required field - must be provided and valid
-          if (!value || value.trim() === "") return false; // Not empty
+          
+          if (!value || value.trim() === "") return false; 
           return value.trim().length >= 5 && value.trim().length <= 1000;
         },
         message:
@@ -468,7 +468,7 @@ const profileSchema = new mongoose.Schema(
       },
     },
 
-    // Photos
+    
     photos: [
       {
         url: String,
@@ -483,7 +483,7 @@ const profileSchema = new mongoose.Schema(
       },
     ],
 
-    // Privacy Settings
+    
     privacy: {
       showContactInfo: {
         type: Boolean,
@@ -495,7 +495,7 @@ const profileSchema = new mongoose.Schema(
       },
     },
 
-    // Metadata
+    
     viewCount: {
       type: Number,
       default: 0,
@@ -507,7 +507,7 @@ const profileSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    strict: false, // Allow dynamic fields like brother1Occupation, brother2Occupation, etc.
+    strict: false, 
     toJSON: {
       transform: function (doc, ret) {
         delete ret.__v;
@@ -517,24 +517,24 @@ const profileSchema = new mongoose.Schema(
   }
 );
 
-// Indexes for better query performance (only for fields that don't have unique: true)
-// Note: profileId already has unique: true, so no need for separate index
+
+
 profileSchema.index({ userId: 1 });
 profileSchema.index({ status: 1 });
-profileSchema.index({ university: 1 }); // Add index for university filtering
+profileSchema.index({ university: 1 }); 
 profileSchema.index({ familyEconomicCondition: 1, status: 1 });
 profileSchema.index({ partnerEconomicCondition: 1, status: 1 });
-// PERFORMANCE: Compound index for the most common query pattern
-profileSchema.index({ profileId: 1, status: 1 });
-profileSchema.index({ university: 1, status: 1 }); // Add compound index for university filtering
 
-// Pre-save middleware to update lastUpdated and ensure biodataId and university
+profileSchema.index({ profileId: 1, status: 1 });
+profileSchema.index({ university: 1, status: 1 }); 
+
+
 profileSchema.pre("save", function (next) {
   if (this.profileId && !this.biodataId) {
     this.biodataId = this.profileId;
   }
 
-  // Ensure university is set correctly based on profileId prefix
+  
   if (this.profileId && !this.university) {
     const { getAllUniversities } = require("../config/universities");
     const universities = getAllUniversities();
@@ -551,21 +551,21 @@ profileSchema.pre("save", function (next) {
   next();
 });
 
-// Method to increment view count
+
 profileSchema.methods.incrementView = function () {
   this.viewCount += 1;
   return this.save();
 };
 
-// Pre-save middleware to handle empty strings for optional enum fields
+
 profileSchema.pre("save", function (next) {
-  // List of optional enum fields that should not have empty strings
+  
   const optionalEnumFields = [
     "partnerStudyAfterMarriage",
     "partnerJobAfterMarriage",
   ];
 
-  // Convert empty strings to undefined for optional enum fields
+  
   optionalEnumFields.forEach((field) => {
     if (
       this[field] === "" ||
@@ -578,26 +578,26 @@ profileSchema.pre("save", function (next) {
   next();
 });
 
-// Static method to get approved profiles with filters
+
 profileSchema.statics.getApprovedProfiles = function (filters = {}) {
   const query = { status: "approved", ...filters };
   return this.find(query).populate("userId", "name email picture");
 };
 
-// Additional indexes for better query performance
-// Note: status and userId already indexed above, profileId has unique: true
+
+
 profileSchema.index({ gender: 1 });
 profileSchema.index({ age: 1 });
 profileSchema.index({ educationLevel: 1 });
 profileSchema.index({ profession: 1 });
 profileSchema.index({ createdAt: -1 });
-// District indexes for faster location-based searches
+
 profileSchema.index({ presentAddressDistrict: 1 });
 profileSchema.index({ permanentAddressDistrict: 1 });
-// Compound indexes for common search queries
+
 profileSchema.index({ status: 1, gender: 1, age: 1 });
 profileSchema.index({ status: 1, createdAt: -1 });
-// Compound indexes for district searches with status
+
 profileSchema.index({ status: 1, presentAddressDistrict: 1 });
 profileSchema.index({ status: 1, permanentAddressDistrict: 1 });
 

@@ -3,9 +3,9 @@ const router = express.Router();
 const Draft = require("../models/Draft");
 const auth = require("../middleware/auth");
 
-// @route   GET /api/drafts
-// @desc    Get user's draft
-// @access  Private
+
+
+
 router.get("/", auth, async (req, res) => {
   try {
     const draft = await Draft.findOne({ userId: req.user.id });
@@ -31,14 +31,14 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-// @route   POST /api/drafts
-// @desc    Save/Update user's draft
-// @access  Private
+
+
+
 router.post("/", auth, async (req, res) => {
   try {
     const { currentStep, draftData } = req.body;
 
-    // Validate input
+    
     if (!currentStep || !draftData) {
       return res.status(400).json({
         success: false,
@@ -53,10 +53,10 @@ router.post("/", auth, async (req, res) => {
       });
     }
 
-    // Find existing draft
+    
     let draft = await Draft.findOne({ userId: req.user.id });
 
-    // Throttle: don't save if updated within last 5 seconds
+    
     if (draft && draft.lastModified) {
       const timeSinceLastUpdate = Date.now() - draft.lastModified.getTime();
       if (timeSinceLastUpdate < 5000) {
@@ -72,12 +72,12 @@ router.post("/", auth, async (req, res) => {
     }
 
     if (draft) {
-      // Update existing draft
+      
       draft.currentStep = currentStep;
       draft.draftData = draftData;
       await draft.save();
     } else {
-      // Create new draft
+      
       draft = new Draft({
         userId: req.user.id,
         currentStep,
@@ -103,9 +103,9 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
-// @route   DELETE /api/drafts
-// @desc    Delete user's draft
-// @access  Private
+
+
+
 router.delete("/", auth, async (req, res) => {
   try {
     const result = await Draft.findOneAndDelete({ userId: req.user.id });

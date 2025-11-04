@@ -1,15 +1,15 @@
 const nodemailer = require("nodemailer");
 
-// Create transporter for Gmail SMTP
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD, // App password, not regular password
+    pass: process.env.GMAIL_APP_PASSWORD, 
   },
 });
 
-// Email templates
+
 const emailTemplates = {
   biodataApproved: (userName) => ({
     subject: "Your Campus Matrimony Biodata Has Been Approved",
@@ -464,7 +464,7 @@ const emailTemplates = {
   }),
 };
 
-// Send email function
+
 const sendEmail = async (to, templateName, userName, ...additionalParams) => {
   try {
     const template = emailTemplates[templateName];

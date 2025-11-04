@@ -4,9 +4,9 @@ const { getAllUniversities } = require("../config/universities");
 
 const router = express.Router();
 
-// @route   GET /api/config/universities
-// @desc    Get university configuration
-// @access  Public
+
+
+
 router.get("/universities", (req, res) => {
   try {
     const universities = getAllUniversities();
@@ -26,9 +26,9 @@ router.get("/universities", (req, res) => {
   }
 });
 
-// @route   GET /api/config/monetization
-// @desc    Get current monetization configuration status
-// @access  Public
+
+
+
 router.get("/monetization", (req, res) => {
   try {
     const config = monetizationConfig.getConfigSummary();
@@ -46,7 +46,7 @@ router.get("/monetization", (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to get configuration",
-      // Default to safe mode (free access) if there's an error
+      
       monetization: "off",
       creditSystemEnabled: false,
       freeAccess: true,

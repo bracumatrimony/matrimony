@@ -6,7 +6,7 @@ const draftSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true, // One draft per user
+      unique: true, 
     },
     currentStep: {
       type: Number,
@@ -16,7 +16,7 @@ const draftSchema = new mongoose.Schema(
       max: 4,
     },
     draftData: {
-      type: mongoose.Schema.Types.Mixed, // Flexible object to store any form data
+      type: mongoose.Schema.Types.Mixed, 
       required: true,
       default: {},
     },
@@ -30,12 +30,12 @@ const draftSchema = new mongoose.Schema(
   }
 );
 
-// Update lastModified on save
+
 draftSchema.pre("save", function (next) {
   this.lastModified = new Date();
   next();
 });
 
-// Index for efficient queries (userId already has unique: true, so no need for separate index)
+
 
 module.exports = mongoose.model("Draft", draftSchema);

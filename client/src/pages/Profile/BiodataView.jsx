@@ -61,12 +61,12 @@ export default function BiodataView() {
 
   const { user: authUser, updateUser, refreshUser } = useAuth();
 
-  // Check if this is admin view from URL params AND user has admin role
+  
   const currentUser = authService.getCurrentUser();
   const isAdminView =
     searchParams.get("admin") === "true" && currentUser?.role === "admin";
 
-  // Sidebar navigation sections
+  
   const navigationSections = [
     { id: "basic-info", label: "Personal Information", icon: User },
     { id: "family-background", label: "Family Background", icon: Home },
@@ -83,7 +83,7 @@ export default function BiodataView() {
       : []),
   ];
 
-  // Check if current user can view contact information
+  
   useEffect(() => {
     const checkContactViewPermission = async () => {
       if (!currentUser) {
@@ -91,7 +91,7 @@ export default function BiodataView() {
         return;
       }
 
-      // Check if user has any university email dynamically
+      
       try {
         const isValid = await authService.isValidUniversityEmail(
           currentUser.email
@@ -104,7 +104,7 @@ export default function BiodataView() {
         console.error("Error checking university email:", error);
       }
 
-      // Allow if user is alumni verified
+      
       if (currentUser.alumniVerified) {
         setCanViewContactInfo(true);
         return;
@@ -126,7 +126,7 @@ export default function BiodataView() {
     }
   };
 
-  // Listen for monetization config changes
+  
   useEffect(() => {
     const handleConfigChange = () => {
       setMonetizationEnabled(monetizationConfig.isEnabled());
@@ -134,7 +134,7 @@ export default function BiodataView() {
 
     window.addEventListener("monetizationConfigChanged", handleConfigChange);
 
-    // Initial check in case config loaded before component mounted
+    
     setMonetizationEnabled(monetizationConfig.isEnabled());
 
     return () => {
@@ -145,7 +145,7 @@ export default function BiodataView() {
     };
   }, []);
 
-  // Track active section based on scroll position - optimize with throttling
+  
   useEffect(() => {
     let ticking = false;
 
@@ -156,7 +156,7 @@ export default function BiodataView() {
             document.getElementById(section.id)
           );
 
-          // Calculate scroll progress
+          
           const winScroll =
             document.body.scrollTop || document.documentElement.scrollTop;
           const height =
@@ -165,11 +165,11 @@ export default function BiodataView() {
           const scrolled = (winScroll / height) * 100;
           setScrollProgress(scrolled);
 
-          // Check if user has scrolled to the bottom
-          const isAtBottom = winScroll + 10 >= height; // 10px threshold for bottom detection
+          
+          const isAtBottom = winScroll + 10 >= height; 
 
           if (isAtBottom && navigationSections.length > 0) {
-            // Set the last section as active when at the bottom
+            
             setActiveSection(
               navigationSections[navigationSections.length - 1].id
             );
@@ -177,7 +177,7 @@ export default function BiodataView() {
             return;
           }
 
-          // Set active section - find the section with most visibility in viewport
+          
           let newActiveSection = navigationSections[0]?.id || "basic-info";
           let maxVisibility = 0;
 
@@ -191,13 +191,13 @@ export default function BiodataView() {
               const sectionTop = rect.top + window.scrollY;
               const sectionBottom = sectionTop + rect.height;
 
-              // Calculate how much of the section is visible in viewport
+              
               const visibleTop = Math.max(sectionTop, viewportTop);
               const visibleBottom = Math.min(sectionBottom, viewportBottom);
               const visibleHeight = Math.max(0, visibleBottom - visibleTop);
               const visibilityRatio = visibleHeight / rect.height;
 
-              // Also consider sections that are about to come into view (early detection)
+              
               const isNearViewport = sectionTop <= viewportTop + 150;
 
               if (
@@ -219,24 +219,24 @@ export default function BiodataView() {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    // Run once on mount to set initial active section
+    
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [navigationSections.length, profile]); // Include dependencies that affect navigationSections
+  }, [navigationSections.length, profile]); 
 
-  // Memoize profile ID and admin view to prevent unnecessary re-renders
+  
   const memoizedProfileId = useMemo(() => profileId, [profileId]);
   const memoizedIsAdminView = useMemo(() => isAdminView, [isAdminView]);
 
   useEffect(() => {
     const loadData = async () => {
-      // Refresh user data to ensure we have latest verification status
+      
       if (authUser) {
         await refreshUser();
       }
       await loadProfile();
-      // Load user credits
+      
       if (authUser) {
         setUserCredits(authUser.credits || 0);
       }
@@ -249,43 +249,43 @@ export default function BiodataView() {
       setLoading(true);
       const currentUser = authService.getCurrentUser();
 
-      // Allow public viewing of profiles - don't redirect to login
-      // Only redirect if trying to view own profile without being logged in
+      
+      
       if (!profileId && !currentUser) {
         navigate("/login");
         return;
       }
 
-      // Security check: if admin=true in URL but user is not admin, redirect
+      
       if (
         searchParams.get("admin") === "true" &&
         (!currentUser || currentUser.role !== "admin")
       ) {
-        navigate("/search"); // Redirect to search page
+        navigate("/search"); 
         return;
       }
 
-      // Determine if viewing own profile
+      
       const viewingOwnProfile = !profileId;
       setIsOwnProfile(viewingOwnProfile);
 
-      // OPTIMIZATION: Fetch profile and contact status in parallel
+      
       let profilePromise;
       if (profileId) {
-        // Check if this is admin view
+        
         if (isAdminView && currentUser?.role === "admin") {
-          // Use admin service to get profile (including pending ones)
+          
           profilePromise = adminService.getProfileDetails(profileId);
         } else {
-          // Regular user viewing approved profile (public access)
+          
           profilePromise = profileService.getProfile(profileId);
         }
       } else {
-        // Viewing own profile
+        
         profilePromise = profileService.getCurrentUserProfile();
       }
 
-      // Fetch contact status in parallel (only for authenticated users viewing other profiles)
+      
       const shouldCheckContact =
         profileId && !viewingOwnProfile && !isAdminView && currentUser;
       const contactPromise = shouldCheckContact
@@ -295,7 +295,7 @@ export default function BiodataView() {
           })
         : Promise.resolve({ success: false });
 
-      // Wait for both requests to complete in parallel
+      
       const [response, contactStatusResponse] = await Promise.all([
         profilePromise,
         contactPromise,
@@ -304,14 +304,14 @@ export default function BiodataView() {
       if (response.success) {
         setProfile(response.profile);
 
-        // Process contact status if available (only for authenticated users)
+        
         if (contactStatusResponse.success && currentUser) {
           if (contactStatusResponse.isUnlocked) {
             setContactInfo(contactStatusResponse.contactInfo);
           }
-          // Set whether user can unlock contacts
+          
           setCanUnlockContact(contactStatusResponse.canUnlock !== false);
-          // Update user credits if available
+          
           if (contactStatusResponse.remainingCredits !== undefined) {
             setUserCredits(contactStatusResponse.remainingCredits);
           }
@@ -331,12 +331,12 @@ export default function BiodataView() {
     }
   }, [memoizedProfileId, memoizedIsAdminView, authUser, navigate]);
 
-  // Admin functions
+  
   const handleApproveProfile = async (profileId) => {
     try {
       await adminService.approveProfile(profileId);
       showNotification("Biodata approved successfully", "success");
-      // Reload profile to update status
+      
       await loadProfile();
     } catch (error) {
       console.error("Failed to approve profile:", error);
@@ -359,7 +359,7 @@ export default function BiodataView() {
     try {
       await adminService.rejectProfile(profileId, reason);
       showNotification("Biodata rejected successfully!", "success");
-      // Reload profile to update status
+      
       await loadProfile();
     } catch (error) {
       console.error("Failed to reject profile:", error);
@@ -372,7 +372,7 @@ export default function BiodataView() {
     setTimeout(() => setNotification(null), 5000);
   };
 
-  // Handle contact unlock
+  
   const handleUnlockContact = async () => {
     if (userCredits < 1) {
       showNotification(
@@ -390,7 +390,7 @@ export default function BiodataView() {
       return;
     }
 
-    // Additional safety check: ensure we have a profileId from URL (not own profile)
+    
     if (!profileId) {
       showNotification(
         "Cannot unlock contact information for this profile.",
@@ -407,7 +407,7 @@ export default function BiodataView() {
         setContactInfo(response.contactInfo);
         setUserCredits(response.remainingCredits);
 
-        // Update user in auth context
+        
         const updatedUser = { ...authUser, credits: response.remainingCredits };
         updateUser(updatedUser);
       }
@@ -423,7 +423,7 @@ export default function BiodataView() {
     }
   };
 
-  // Handle alumni verification request
+  
   const handleRequestVerification = async () => {
     try {
       const response = await profileService.requestVerification();
@@ -432,7 +432,7 @@ export default function BiodataView() {
           "Verification request submitted successfully. Please send your proof to our Facebook page.",
           "success"
         );
-        // Update user in auth context to reflect verificationRequest: true
+        
         const updatedUser = { ...authUser, verificationRequest: true };
         updateUser(updatedUser);
       }
@@ -446,7 +446,7 @@ export default function BiodataView() {
     }
   };
 
-  // Reusable components
+  
   const SectionHeader = ({ icon: Icon, title, className = "" }) => (
     <div className={`mb-8 ${className}`}>
       <div className="flex items-center gap-3 mb-4">
@@ -459,11 +459,11 @@ export default function BiodataView() {
     </div>
   );
 
-  // Helper function to check if a field has been edited
+  
   const isFieldEdited = (fieldName) => {
     if (!isAdminView || !profile?.editedFields) return false;
 
-    // Handle comma-separated field names (e.g., "brothersCount,sistersCount")
+    
     if (fieldName && fieldName.includes(",")) {
       return fieldName
         .split(",")
@@ -510,14 +510,14 @@ export default function BiodataView() {
     );
   };
 
-  // Removed loading spinner - component renders immediately
-  // Show a lightweight skeleton while profile is loading to avoid
-  // flashing default "not available" placeholders before data arrives.
+  
+  
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-6xl mx-auto px-4 space-y-6">
-          {/* Header skeleton */}
+          {}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-pulse">
             <div className="px-4 py-6 flex gap-4 items-center">
               <div className="w-20 h-20 bg-gray-200 rounded-full flex-shrink-0"></div>
@@ -529,7 +529,7 @@ export default function BiodataView() {
             </div>
           </div>
 
-          {/* A few section skeletons to represent page content */}
+          {}
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
@@ -621,7 +621,7 @@ export default function BiodataView() {
         }
       />
       <div className="min-h-screen bg-gray-50">
-        {/* Rejection Modal */}
+        {}
         <RejectionModal
           isOpen={rejectionModal.isOpen}
           onClose={() =>
@@ -635,7 +635,7 @@ export default function BiodataView() {
           profileName={rejectionModal.profileName}
         />
 
-        {/* Notification */}
+        {}
         {notification && (
           <div
             className={`fixed top-6 right-6 z-50 p-4 rounded-xl shadow-2xl transition-all duration-300 backdrop-blur-sm ${
@@ -665,9 +665,9 @@ export default function BiodataView() {
           </div>
         )}
 
-        {/* Sidebar - Hidden on mobile */}
+        {}
         <aside className="hidden lg:block fixed mt-20 ml-8 top-20 left-6 z-50 w-80 bg-white shadow-xl border border-gray-200 rounded-lg">
-          {/* Progress bar */}
+          {}
           <div
             className="absolute top-0 left-0 h-1 bg-gray-900 rounded-t-lg transition-all duration-150"
             style={{ width: `${scrollProgress}%` }}
@@ -705,10 +705,10 @@ export default function BiodataView() {
           </nav>
         </aside>
 
-        {/* Main content */}
+        {}
         <main className="w-full">
           <div className="py-8 px-4 max-w-6xl mx-auto space-y-6 lg:pl-72">
-            {/* Demo Profile Disclaimer Banner */}
+            {}
             {(profile?.profileId === "BRACU9001" ||
               profile?.profileId === "BRACU9002") && (
               <div className="bg-yellow-400 border-4 border-black rounded-lg p-4">
@@ -724,7 +724,7 @@ export default function BiodataView() {
               </div>
             )}
 
-            {/* Status Banner for Own Profile */}
+            {}
             {isOwnProfile && profile?.status === "pending_approval" && (
               <div className="bg-yellow-400 border-4 border-black rounded-lg p-4">
                 <div className="flex items-center justify-center gap-3">
@@ -744,7 +744,7 @@ export default function BiodataView() {
               </div>
             )}
 
-            {/* Status Banner for Rejected Profile */}
+            {}
             {isOwnProfile && profile?.status === "rejected" && (
               <div className="bg-red-400 border-4 border-black rounded-lg p-4">
                 <div className="text-center">
@@ -769,11 +769,11 @@ export default function BiodataView() {
               </div>
             )}
 
-            {/* Profile Header Banner */}
+            {}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <div className="bg-gradient-to-r from-gray-50 to-stone-50 px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                  {/* Profile Photo */}
+                  {}
                   <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full flex items-center justify-center border-4 border-white shadow-sm flex-shrink-0 mx-auto sm:mx-0 overflow-hidden">
                     {profile?.gender ? (
                       <img
@@ -790,10 +790,10 @@ export default function BiodataView() {
                     )}
                   </div>
 
-                  {/* Profile Information */}
+                  {}
                   <div className="flex-1 w-full">
                     <div className="flex flex-col gap-3 sm:gap-4">
-                      {/* Top Row: Name and Actions */}
+                      {}
                       <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
                         <div className="flex-1 text-center sm:text-left">
                           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 leading-tight">
@@ -813,7 +813,7 @@ export default function BiodataView() {
                           </div>
                         </div>
 
-                        {/* Action Buttons */}
+                        {}
                         <div className="flex items-center justify-center sm:justify-start gap-2 sm:gap-3 flex-wrap">
                           {isOwnProfile && (
                             <button
@@ -872,7 +872,7 @@ export default function BiodataView() {
                         </div>
                       </div>
 
-                      {/* Bottom Row: Additional Info */}
+                      {}
                       <div className="hidden sm:block pt-3 border-t border-gray-200">
                         <div className="flex flex-row flex-wrap items-center gap-3 sm:gap-4 text-sm sm:text-sm text-gray-600">
                           <span className="flex items-center gap-2 text-base sm:text-sm">
@@ -901,7 +901,7 @@ export default function BiodataView() {
               </div>
             </div>
 
-            {/* Personal Information Section */}
+            {}
             <div
               id="basic-info"
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-20"
@@ -956,7 +956,7 @@ export default function BiodataView() {
               </dl>
             </div>
 
-            {/* Family Background Section */}
+            {}
             <div
               id="family-background"
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-20"
@@ -1001,7 +1001,7 @@ export default function BiodataView() {
                 />
               </dl>
 
-              {/* Family Members Occupations */}
+              {}
               {(profile?.brother1Occupation ||
                 profile?.sister1Occupation ||
                 profile?.uncle1Occupation) && (
@@ -1028,7 +1028,7 @@ export default function BiodataView() {
 
                   {showExtendedFamily && (
                     <dl className="divide-y divide-gray-100">
-                      {/* Brothers */}
+                      {}
                       {Array.from(
                         { length: parseInt(profile?.brothersCount) || 0 },
                         (_, index) => {
@@ -1044,7 +1044,7 @@ export default function BiodataView() {
                         }
                       )}
 
-                      {/* Sisters */}
+                      {}
                       {Array.from(
                         { length: parseInt(profile?.sistersCount) || 0 },
                         (_, index) => {
@@ -1060,7 +1060,7 @@ export default function BiodataView() {
                         }
                       )}
 
-                      {/* Uncles */}
+                      {}
                       {Array.from(
                         { length: parseInt(profile?.unclesCount) || 0 },
                         (_, index) => {
@@ -1081,7 +1081,7 @@ export default function BiodataView() {
               )}
             </div>
 
-            {/* Education & Profession Section */}
+            {}
             <div
               id="education-profession"
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-20"
@@ -1159,7 +1159,7 @@ export default function BiodataView() {
               </dl>
             </div>
 
-            {/* Lifestyle & Health Section */}
+            {}
             <div
               id="lifestyle-health"
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-20"
@@ -1191,7 +1191,7 @@ export default function BiodataView() {
                   value={profile?.hobbiesLikesDislikesDreams}
                   fieldName="hobbiesLikesDislikesDreams"
                 />
-                {/* Partner preference fields - Show only for females */}
+                {}
                 {profile?.gender === "Female" && (
                   <>
                     <InfoRow
@@ -1214,7 +1214,7 @@ export default function BiodataView() {
               </dl>
             </div>
 
-            {/* Partner Preferences Section */}
+            {}
             <div
               id="partner-preferences"
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-20"
@@ -1269,7 +1269,7 @@ export default function BiodataView() {
               </dl>
             </div>
 
-            {/* Declaration Section */}
+            {}
             <div
               id="declaration"
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-20"
@@ -1294,7 +1294,7 @@ export default function BiodataView() {
               </dl>
             </div>
 
-            {/* Contact Information Section - Show for approved profiles or admin view */}
+            {}
             {(profile?.status === "approved" || isAdminView) && (
               <div
                 id="contact-info"
@@ -1302,7 +1302,7 @@ export default function BiodataView() {
               >
                 <SectionHeader icon={Contact} title="Contact Information" />
 
-                {/* Own Profile View - Always show contact info with edit option */}
+                {}
                 {isOwnProfile ? (
                   <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
                     <div className="flex items-center justify-between mb-4"></div>
@@ -1324,7 +1324,7 @@ export default function BiodataView() {
                     </div>
                   </div>
                 ) : !canViewContactInfo ? (
-                  /* Restriction for non-BRACU/non-alumni users */
+                  
                   <div className="text-center py-6">
                     <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-lg p-6 border border-rose-200">
                       <Lock className="w-8 h-8 text-rose-500 mx-auto mb-3" />
@@ -1366,7 +1366,7 @@ export default function BiodataView() {
                     </div>
                   </div>
                 ) : monetizationEnabled ? (
-                  /* Credit-based unlock system */
+                  
                   !contactInfo ? (
                     canUnlockContact ? (
                       <div className="text-center py-6">
@@ -1452,7 +1452,7 @@ export default function BiodataView() {
                     </div>
                   )
                 ) : (
-                  /* Free access mode - Show contact information directly */
+                  
                   <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
                     <div>
                       <p className="text-gray-800 whitespace-pre-wrap leading-relaxed text-base">
@@ -1466,7 +1466,7 @@ export default function BiodataView() {
               </div>
             )}
 
-            {/* Admin-only Personal Contact Information */}
+            {}
             {currentUser?.isAdmin && profile?.personalContactInfo && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -1491,7 +1491,7 @@ export default function BiodataView() {
               </div>
             )}
 
-            {/* Show login prompt for contact info when not authenticated */}
+            {}
             {profileId &&
               !isOwnProfile &&
               profile?.status === "approved" &&

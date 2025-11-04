@@ -1,4 +1,4 @@
-// Bangladesh Location Data Structure
+
 import { districtsByDivision } from "./districtsData.js";
 
 export const divisions = [
@@ -22,7 +22,7 @@ export const getCountries = async () => {
   return districtsByDivision.International;
 };
 
-// Group locations by division for easier rendering
+
 export const locationsByDivision = {
   "": [
     { value: "", label: "Select District/Region" },
@@ -39,5 +39,5 @@ export const locationsByDivision = {
   International: districtsByDivision.International,
 };
 
-// Re-export for backward compatibility
+
 export { districtsByDivision };

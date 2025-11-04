@@ -74,7 +74,7 @@ const DROPDOWN_OPTIONS = {
   religion: ["Muslim", "Hindu", "Christian", "Buddhist", "Other"],
 };
 
-// FIXED: Move EditableField outside the component to prevent re-creation
+
 const EditableField = ({
   label,
   name,
@@ -148,7 +148,7 @@ const EditableField = ({
   );
 };
 
-// Location Dropdown Component for handling optgroups
+
 const LocationDropdown = ({
   label,
   name,
@@ -203,7 +203,7 @@ const LocationDropdown = ({
   );
 };
 
-// Division Dropdown Component
+
 const DivisionDropdown = ({
   label,
   name,
@@ -254,7 +254,7 @@ const DivisionDropdown = ({
   );
 };
 
-// District Dropdown Component
+
 const DistrictDropdown = ({
   label,
   name,
@@ -323,7 +323,7 @@ export default function BiodataEdit() {
   const currentUser = authService.getCurrentUser();
   const isAdmin = currentUser?.role === "admin";
 
-  // Sidebar navigation sections
+  
   const navigationSections = [
     { id: "basic-info", label: "Personal Information", icon: User },
     { id: "family-background", label: "Family Background", icon: Home },
@@ -341,11 +341,11 @@ export default function BiodataEdit() {
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      // Update active section immediately on manual navigation
+      
       setActiveSection(sectionId);
 
-      // Calculate the position with a manual offset for the fixed sidebar
-      const offsetTop = element.offsetTop - 80; // Adjust for header and padding
+      
+      const offsetTop = element.offsetTop - 80; 
       window.scrollTo({
         top: offsetTop,
         behavior: "smooth",
@@ -353,12 +353,12 @@ export default function BiodataEdit() {
     }
   };
 
-  // Track active section based on scroll position
+  
   useEffect(() => {
     const handleScroll = () => {
       const sections = navigationSections.map((section) => section.id);
 
-      // Calculate scroll progress
+      
       const scrollTop =
         window.pageYOffset || document.documentElement.scrollTop;
       const scrollHeight =
@@ -366,23 +366,23 @@ export default function BiodataEdit() {
       const progress = (scrollTop / scrollHeight) * 100;
       setScrollProgress(Math.min(progress, 100));
 
-      // Check if user has scrolled to the bottom
-      const isAtBottom = scrollTop + 10 >= scrollHeight; // 10px threshold for bottom detection
+      
+      const isAtBottom = scrollTop + 10 >= scrollHeight; 
 
       if (isAtBottom && sections.length > 0) {
-        // Set the last section as active when at the bottom
+        
         setActiveSection(sections[sections.length - 1]);
         return;
       }
 
       let currentSection = sections[0];
 
-      // Find the currently visible section
+      
       for (const sectionId of sections) {
         const element = document.getElementById(sectionId);
         if (element) {
           const rect = element.getBoundingClientRect();
-          // Consider a section active if it's in the top half of the viewport
+          
           if (rect.top <= window.innerHeight / 2 && rect.bottom >= 0) {
             currentSection = sectionId;
           }
@@ -392,7 +392,7 @@ export default function BiodataEdit() {
       setActiveSection(currentSection);
     };
 
-    // Debounce scroll handler for better performance
+    
     let scrollTimeout;
     const debouncedScrollHandler = () => {
       clearTimeout(scrollTimeout);
@@ -400,7 +400,7 @@ export default function BiodataEdit() {
     };
 
     window.addEventListener("scroll", debouncedScrollHandler);
-    handleScroll(); // Initial call
+    handleScroll(); 
 
     return () => {
       window.removeEventListener("scroll", debouncedScrollHandler);
@@ -426,7 +426,7 @@ export default function BiodataEdit() {
         return;
       }
 
-      // Check if admin mode is valid
+      
       if (isAdminMode && !isAdmin) {
         setError("Unauthorized access");
         navigate("/admin");
@@ -435,20 +435,20 @@ export default function BiodataEdit() {
 
       let response;
       if (isAdminMode && profileId) {
-        // Admin loading any profile
+        
         response = await adminService.getProfileDetails(profileId);
       } else {
-        // Regular user loading their own profile
+        
         response = await profileService.getCurrentUserProfile();
       }
 
       if (response.success) {
         setProfile(response.profile);
 
-        // Process the profile data to extract age preferences
+        
         const processedProfile = { ...response.profile };
 
-        // Extract min/max age preferences from the combined field if it exists
+        
         if (
           processedProfile.partnerAgePreference &&
           !processedProfile.partnerAgePreferenceMin &&
@@ -462,13 +462,13 @@ export default function BiodataEdit() {
           }
         }
 
-        // Extract min/max height preferences from the combined field if it exists
+        
         if (
           processedProfile.partnerHeight &&
           !processedProfile.partnerHeightMin &&
           !processedProfile.partnerHeightMax
         ) {
-          // Match height patterns like "5'6\" - 5'8\"" or "5'6\" - 5'5\" feet"
+          
           const heightMatch = processedProfile.partnerHeight.match(
             /([\d'"]+ ?["']?)\s*-\s*([\d'"]+ ?["']?)/
           );
@@ -504,23 +504,23 @@ export default function BiodataEdit() {
         [name]: value,
       };
 
-      // Clear unused occupation fields when count is reduced
+      
       if (name === "brothersCount") {
         const count = parseInt(value) || 0;
         for (let i = count + 1; i <= 10; i++) {
-          // Clear up to 10 possible fields
+          
           delete newFormData[`brother${i}Occupation`];
         }
       } else if (name === "sistersCount") {
         const count = parseInt(value) || 0;
         for (let i = count + 1; i <= 10; i++) {
-          // Clear up to 10 possible fields
+          
           delete newFormData[`sister${i}Occupation`];
         }
       } else if (name === "unclesCount") {
         const count = parseInt(value) || 0;
         for (let i = count + 1; i <= 10; i++) {
-          // Clear up to 10 possible fields
+          
           delete newFormData[`uncle${i}Occupation`];
         }
       }
@@ -528,7 +528,7 @@ export default function BiodataEdit() {
       return newFormData;
     });
 
-    // Clear validation error when user starts typing
+    
     if (validationErrors[name]) {
       setValidationErrors((prev) => {
         const newErrors = { ...prev };
@@ -538,20 +538,20 @@ export default function BiodataEdit() {
     }
   };
 
-  // Special handlers for division changes to reset corresponding district fields
+  
   const handlePresentDivisionChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       presentAddressDivision: e.target.value,
-      presentAddressDistrict: "", // Reset district when division changes
+      presentAddressDistrict: "", 
     }));
 
-    // Clear validation errors
+    
     if (validationErrors.presentAddressDivision) {
       setValidationErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors.presentAddressDivision;
-        delete newErrors.presentAddressDistrict; // Also clear district error
+        delete newErrors.presentAddressDistrict; 
         return newErrors;
       });
     }
@@ -561,15 +561,15 @@ export default function BiodataEdit() {
     setFormData((prev) => ({
       ...prev,
       permanentAddressDivision: e.target.value,
-      permanentAddressDistrict: "", // Reset district when division changes
+      permanentAddressDistrict: "", 
     }));
 
-    // Clear validation errors
+    
     if (validationErrors.permanentAddressDivision) {
       setValidationErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors.permanentAddressDivision;
-        delete newErrors.permanentAddressDistrict; // Also clear district error
+        delete newErrors.permanentAddressDistrict; 
         return newErrors;
       });
     }
@@ -581,12 +581,12 @@ export default function BiodataEdit() {
       setSaving(true);
       setValidationErrors({});
 
-      // Validate required fields
+      
       const errors = validateProfileData(formData);
       if (Object.keys(errors).length > 0) {
         setValidationErrors(errors);
         setSaving(false);
-        // Scroll to the first error
+        
         const firstErrorField = Object.keys(errors)[0];
         const errorElement = document.querySelector(
           `[name="${firstErrorField}"]`
@@ -598,10 +598,10 @@ export default function BiodataEdit() {
         return;
       }
 
-      // Prepare the data for submission by combining preferences
+      
       const submissionData = { ...formData };
 
-      // Combine partnerAgePreferenceMin and partnerAgePreferenceMax into partnerAgePreference
+      
       if (
         submissionData.partnerAgePreferenceMin &&
         submissionData.partnerAgePreferenceMax
@@ -609,20 +609,20 @@ export default function BiodataEdit() {
         submissionData.partnerAgePreference = `${submissionData.partnerAgePreferenceMin} - ${submissionData.partnerAgePreferenceMax} years`;
       }
 
-      // Combine partnerHeightMin and partnerHeightMax into partnerHeight
+      
       if (submissionData.partnerHeightMin && submissionData.partnerHeightMax) {
         submissionData.partnerHeight = `${submissionData.partnerHeightMin} - ${submissionData.partnerHeightMax}`;
       }
 
       let response;
       if (isAdminMode) {
-        // Admin updating any profile
+        
         response = await adminService.updateProfile(
           profileId || profile.profileId,
           submissionData
         );
       } else {
-        // Regular user updating their own profile
+        
         response = await profileService.updateProfile(submissionData);
       }
 
@@ -665,27 +665,27 @@ export default function BiodataEdit() {
         JSON.stringify(error.response?.data, null, 2)
       );
 
-      // Check if the error contains validation details
+      
       if (error.response && error.response.data && error.response.data.errors) {
         const errors = error.response.data.errors;
         let errorMessages = [];
 
-        // Handle formatted validation errors from server
+        
         if (typeof errors === "object") {
           Object.keys(errors).forEach((field) => {
-            // Check if it's the formatted error structure (direct field-to-message mapping)
+            
             if (typeof errors[field] === "string") {
               errorMessages.push(errors[field]);
             }
-            // Handle Mongoose validation errors (field-to-object mapping)
+            
             else if (errors[field] && errors[field].message) {
               errorMessages.push(errors[field].message);
             }
           });
 
-          // Show all validation errors as a single toast message
+          
           if (errorMessages.length > 0) {
-            setValidationErrors({}); // Clear validation errors state
+            setValidationErrors({}); 
             showNotification(errorMessages.join(". "), "error");
           }
         } else {
@@ -702,7 +702,7 @@ export default function BiodataEdit() {
     }
   };
 
-  // Reusable components
+  
   const SectionHeader = ({ icon: Icon, title, className = "" }) => (
     <div className={`mb-8 ${className}`}>
       <div className="flex items-center gap-3 mb-4">
@@ -736,7 +736,7 @@ export default function BiodataEdit() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        {/* Sidebar Skeleton - Hidden on mobile */}
+        {}
         <aside className="hidden lg:block fixed mt-20 ml-8 top-20 left-6 z-50 w-80 bg-white shadow-xl border border-gray-200 rounded-lg animate-pulse">
           <div className="p-4 border-b border-gray-200">
             <div className="h-4 bg-gray-200 rounded w-1/3"></div>
@@ -748,26 +748,26 @@ export default function BiodataEdit() {
           </div>
         </aside>
 
-        {/* Main content skeleton */}
+        {}
         <main className="w-full">
           <div className="py-4 sm:py-6 md:py-8 px-4 sm:px-6 max-w-6xl mx-auto space-y-4 sm:space-y-6 lg:pl-72">
-            {/* Admin warning skeleton */}
+            {}
             <div className="border-4 border-gray-200 rounded-lg p-4 bg-gray-100 animate-pulse">
               <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto mb-2"></div>
               <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
             </div>
 
-            {/* Profile Header Banner Skeleton */}
+            {}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-pulse">
               <div className="bg-gradient-to-r from-gray-50 to-stone-50 px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                  {/* Profile Photo Skeleton */}
+                  {}
                   <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-full flex-shrink-0 mx-auto sm:mx-0"></div>
 
-                  {/* Profile Information Skeleton */}
+                  {}
                   <div className="flex-1 w-full">
                     <div className="flex flex-col gap-3 sm:gap-4">
-                      {/* Top Row Skeleton */}
+                      {}
                       <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
                         <div className="flex-1 text-center sm:text-left">
                           <div className="h-8 bg-gray-200 rounded w-1/3 mb-3 mx-auto sm:mx-0"></div>
@@ -776,11 +776,11 @@ export default function BiodataEdit() {
                             <div className="h-4 bg-gray-200 rounded w-16"></div>
                           </div>
                         </div>
-                        {/* Cancel Button Skeleton */}
+                        {}
                         <div className="h-10 bg-gray-200 rounded w-20 mx-auto sm:mx-0"></div>
                       </div>
 
-                      {/* Bottom Row Skeleton */}
+                      {}
                       <div className="flex flex-wrap gap-4 text-center sm:text-left">
                         <div className="h-4 bg-gray-200 rounded w-24"></div>
                         <div className="h-4 bg-gray-200 rounded w-32"></div>
@@ -791,7 +791,7 @@ export default function BiodataEdit() {
               </div>
             </div>
 
-            {/* Form sections skeleton */}
+            {}
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
@@ -812,7 +812,7 @@ export default function BiodataEdit() {
               </div>
             ))}
 
-            {/* Submit button skeleton */}
+            {}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
               <div className="flex justify-center">
                 <div className="h-12 bg-gray-200 rounded w-32"></div>
@@ -847,7 +847,7 @@ export default function BiodataEdit() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Notification */}
+      {}
       {notification && (
         <div
           className={`fixed bottom-6 right-6 z-50 p-4 rounded-xl shadow-2xl transition-all duration-300 backdrop-blur-sm ${
@@ -873,9 +873,9 @@ export default function BiodataEdit() {
         </div>
       )}
 
-      {/* Sidebar - Hidden on mobile */}
+      {}
       <aside className="hidden lg:block fixed mt-20 ml-8 top-20 left-6 z-50 w-80 bg-white shadow-xl border border-gray-200 rounded-lg">
-        {/* Progress bar */}
+        {}
         <div
           className="absolute top-0 left-0 h-1 bg-gray-900 rounded-t-lg transition-all duration-150"
           style={{ width: `${scrollProgress}%` }}
@@ -911,13 +911,13 @@ export default function BiodataEdit() {
         </nav>
       </aside>
 
-      {/* Main content */}
+      {}
       <main className="w-full">
         <form
           onSubmit={handleSubmit}
           className="py-4 sm:py-6 md:py-8 px-4 sm:px-6 max-w-6xl mx-auto space-y-4 sm:space-y-6 lg:pl-72"
         >
-          {/* Admin Review Warning or Admin Mode Indicator */}
+          {}
           {profile && (
             <div
               className={`border-4 border-black rounded-lg p-4 ${
@@ -939,11 +939,11 @@ export default function BiodataEdit() {
             </div>
           )}
 
-          {/* Profile Header Banner */}
+          {}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="bg-gradient-to-r from-gray-50 to-stone-50 px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                {/* Profile Photo */}
+                {}
                 <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-full flex items-center justify-center border-4 border-white shadow-sm flex-shrink-0 mx-auto sm:mx-0 overflow-hidden">
                   {formData?.gender ? (
                     <img
@@ -960,10 +960,10 @@ export default function BiodataEdit() {
                   )}
                 </div>
 
-                {/* Profile Information */}
+                {}
                 <div className="flex-1 w-full">
                   <div className="flex flex-col gap-3 sm:gap-4">
-                    {/* Top Row: Name and Cancel Button */}
+                    {}
                     <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
                       <div className="flex-1 text-center sm:text-left">
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 leading-tight">
@@ -986,7 +986,7 @@ export default function BiodataEdit() {
                         </div>
                       </div>
 
-                      {/* Cancel Button */}
+                      {}
                       <button
                         type="button"
                         onClick={() => navigate("/profile")}
@@ -997,7 +997,7 @@ export default function BiodataEdit() {
                       </button>
                     </div>
 
-                    {/* Bottom Row: Additional Info */}
+                    {}
                     <div className="pt-3 border-t border-gray-200">
                       <div className="flex flex-col sm:flex-row sm:flex-wrap items-center sm:items-start gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                         <span className="flex items-center gap-1">
@@ -1026,7 +1026,7 @@ export default function BiodataEdit() {
             </div>
           </div>
 
-          {/* Personal Information Section */}
+          {}
           <div
             id="basic-info"
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
@@ -1120,7 +1120,7 @@ export default function BiodataEdit() {
             </div>
           </div>
 
-          {/* Family Background Section */}
+          {}
           <div
             id="family-background"
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
@@ -1249,7 +1249,7 @@ export default function BiodataEdit() {
             </div>
           </div>
 
-          {/* Education & Profession Section */}
+          {}
           <div
             id="education-profession"
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
@@ -1391,7 +1391,7 @@ export default function BiodataEdit() {
             </div>
           </div>
 
-          {/* Lifestyle & Health Section */}
+          {}
           <div
             id="lifestyle-health"
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
@@ -1451,7 +1451,7 @@ export default function BiodataEdit() {
                 handleChange={handleChange}
                 validationErrors={validationErrors}
               />
-              {/* Partner preference fields - Show only for females */}
+              {}
               {formData.gender === "Female" && (
                 <>
                   <EditableField
@@ -1497,7 +1497,7 @@ export default function BiodataEdit() {
             </div>
           </div>
 
-          {/* Partner Preferences Section */}
+          {}
           <div
             id="partner-preferences"
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
@@ -1615,7 +1615,7 @@ export default function BiodataEdit() {
             </div>
           </div>
 
-          {/* Declaration Section */}
+          {}
           <div
             id="declaration"
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
@@ -1643,7 +1643,7 @@ export default function BiodataEdit() {
             </div>
           </div>
 
-          {/* Contact Information Section */}
+          {}
           <div
             id="contact-info"
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
@@ -1683,7 +1683,7 @@ export default function BiodataEdit() {
             />
           </div>
 
-          {/* Save Button - Fixed at bottom */}
+          {}
           <div className="sticky bottom-0 bg-white border-t border-gray-200 p-3 sm:p-4 rounded-lg shadow-lg">
             <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
               <button

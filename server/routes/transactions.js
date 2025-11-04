@@ -6,9 +6,9 @@ const adminAuth = require("../middleware/adminAuth");
 
 const router = express.Router();
 
-// @route   POST /api/transactions/purchase
-// @desc    Submit credit purchase order for manual verification
-// @access  Private
+
+
+
 router.post("/purchase", auth, async (req, res) => {
   try {
     const { credits, price, transactionId, phoneNumber } = req.body;
@@ -28,7 +28,7 @@ router.post("/purchase", auth, async (req, res) => {
       });
     }
 
-    // Create pending transaction
+    
     const transaction = await Transaction.create({
       user: req.user.id,
       type: "purchase",
@@ -62,9 +62,9 @@ router.post("/purchase", auth, async (req, res) => {
   }
 });
 
-// @route   GET /api/transactions/pending
-// @desc    Get pending transactions for admin
-// @access  Private (Admin only)
+
+
+
 router.get("/pending", [auth, adminAuth], async (req, res) => {
   try {
     const pendingTransactions = await Transaction.find({ status: "pending" })
@@ -84,9 +84,9 @@ router.get("/pending", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   GET /api/transactions/all
-// @desc    Get all transactions (approved and rejected) for admin
-// @access  Private (Admin only)
+
+
+
 router.get("/all", [auth, adminAuth], async (req, res) => {
   try {
     const allTransactions = await Transaction.find({
@@ -108,8 +108,8 @@ router.get("/all", [auth, adminAuth], async (req, res) => {
     });
   }
 });
-// @desc    Approve a pending transaction and add credits to user
-// @access  Private (Admin only)
+
+
 router.put("/:id/approve", [auth, adminAuth], async (req, res) => {
   try {
     const transaction = await Transaction.findById(req.params.id);
@@ -128,18 +128,18 @@ router.put("/:id/approve", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Update transaction status
+    
     transaction.status = "approved";
     transaction.processedAt = new Date();
     transaction.processedBy = req.user.id;
     await transaction.save();
 
-    // Add credits to user
+    
     await User.findByIdAndUpdate(transaction.user, {
       $inc: { credits: transaction.credits },
     });
 
-    // Create credit addition transaction record
+    
     await Transaction.create({
       user: transaction.user,
       type: "credit_addition",
@@ -162,9 +162,9 @@ router.put("/:id/approve", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   PUT /api/transactions/:id/reject
-// @desc    Reject a pending transaction
-// @access  Private (Admin only)
+
+
+
 router.put("/:id/reject", [auth, adminAuth], async (req, res) => {
   try {
     const transaction = await Transaction.findById(req.params.id);
@@ -183,7 +183,7 @@ router.put("/:id/reject", [auth, adminAuth], async (req, res) => {
       });
     }
 
-    // Update transaction status
+    
     transaction.status = "rejected";
     transaction.processedAt = new Date();
     transaction.processedBy = req.user.id;
@@ -202,9 +202,9 @@ router.put("/:id/reject", [auth, adminAuth], async (req, res) => {
   }
 });
 
-// @route   GET /api/transactions/orders
-// @desc    Get user's purchase orders
-// @access  Private
+
+
+
 router.get("/orders", auth, async (req, res) => {
   try {
     const orders = await Transaction.find({
@@ -225,9 +225,9 @@ router.get("/orders", auth, async (req, res) => {
   }
 });
 
-// @route   GET /api/transactions/history
-// @desc    Get user's transaction history (credit additions and deductions)
-// @access  Private
+
+
+
 router.get("/history", auth, async (req, res) => {
   try {
     const transactions = await Transaction.find({

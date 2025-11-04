@@ -67,15 +67,15 @@ export default function AdminDashboard() {
     loadDashboardData();
   }, []);
 
-  // Load reports when reports tab becomes active
+  
   useEffect(() => {
     if (activeTab === "reports" && !reportsLoaded) {
-      // Reports component will handle loading
+      
       setReportsLoaded(true);
     }
   }, [activeTab, reportsLoaded]);
 
-  // Listen for monetization config changes
+  
   useEffect(() => {
     const handleConfigChange = () => {
       setMonetizationStatus(monetizationConfig.isEnabled() ? "ON" : "OFF");
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
   const refreshMonetizationConfig = async () => {
     try {
       await monetizationConfig.forceRefresh();
-      // Reload dashboard data to reflect any changes
+      
       await loadDashboardData();
       showNotification("Monetization config refreshed successfully", "success");
     } catch (error) {
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
       setLoading(true);
       setError(null);
 
-      // Load dashboard stats (includes verification requests count)
+      
       const dashboardData = await adminService.getDashboardStats();
       if (dashboardData.success) {
         setStats({
@@ -131,7 +131,7 @@ export default function AdminDashboard() {
     }
   };
 
-  // Local stat update functions
+  
   const updatePendingApprovals = (change) => {
     setStats((prev) => ({
       ...prev,
@@ -165,7 +165,7 @@ export default function AdminDashboard() {
   };
 
   const handleViewProfile = (profileId) => {
-    // Open biodata in a new tab with admin parameter
+    
     const url = `/profile/view/${profileId}?admin=true`;
     window.open(url, "_blank");
   };
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex admin-dashboard">
-      {/* Mobile Overlay */}
+      {}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-[45] lg:hidden"
@@ -217,7 +217,7 @@ export default function AdminDashboard() {
         ></div>
       )}
 
-      {/* Notification */}
+      {}
       {notification && (
         <div
           className={`fixed top-6 right-6 z-50 p-4 rounded-xl shadow-2xl transition-all duration-300 backdrop-blur-sm ${
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Error Banner */}
+      {}
       {error && (
         <div className="fixed top-0 left-0 right-0 z-40 bg-red-600 text-white p-4 text-center shadow-lg">
           <div className="flex items-center justify-center space-x-2">
@@ -263,7 +263,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Sidebar */}
+      {}
       <div
         className={`${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -271,7 +271,7 @@ export default function AdminDashboard() {
           sidebarOpen ? "w-80" : "lg:w-20 w-80"
         } bg-white shadow-xl flex flex-col border-r border-gray-100`}
       >
-        {/* Sidebar Header */}
+        {}
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div
@@ -292,7 +292,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Navigation */}
+        {}
         <nav className="flex-1 p-4">
           <div className="space-y-1">
             <button
@@ -570,9 +570,9 @@ export default function AdminDashboard() {
         </nav>
       </div>
 
-      {/* Main Content */}
+      {}
       <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
-        {/* Mobile Menu Button */}
+        {}
         <button
           onClick={() => setSidebarOpen(true)}
           className="lg:hidden fixed bottom-6 right-6 z-40 p-4 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-full shadow-2xl hover:shadow-xl transition-all duration-200"
@@ -586,10 +586,10 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <>
-            {/* Content based on active tab */}
+            {}
             {activeTab === "overview" && (
               <>
-                {/* Stats Grid */}
+                {}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
                     <div className="flex items-center">
@@ -656,7 +656,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Content based on active tab */}
+                {}
               </>
             )}
 
@@ -700,7 +700,7 @@ export default function AdminDashboard() {
                 onViewProfile={handleViewProfile}
                 showNotification={showNotification}
                 onTransactionUpdate={() => {
-                  // Refresh dashboard stats when transactions are processed
+                  
                   loadDashboardData();
                 }}
               />

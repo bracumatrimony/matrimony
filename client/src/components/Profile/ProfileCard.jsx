@@ -22,7 +22,7 @@ const ProfileCard = memo(function ProfileCard({
     if (onViewProfile) {
       onViewProfile(profile.profileId);
     } else {
-      // Fallback to direct navigation if no prop provided
+      
       const url = `/profile/view/${profile.profileId}`;
       window.open(url, "_blank");
     }
@@ -30,14 +30,14 @@ const ProfileCard = memo(function ProfileCard({
 
   return (
     <div className="bg-gradient-to-br from-white via-gray-50 to-white rounded-2xl shadow-lg border-2 border-gray-300 overflow-hidden hover:shadow-2xl transition-all duration-300 backdrop-blur-sm hover:border-gray-400 group relative flex flex-col h-full">
-      {/* Watched Badge - Conditionally rendered */}
+      {}
       {profile.isViewed && (
         <div className="bg-gradient-to-r from-green-500 to-green-600 text-white text-center py-2 px-4 shadow-md">
           <span className="font-bold text-sm tracking-wide">WATCHED</span>
         </div>
       )}
 
-      {/* Profile Header */}
+      {}
       <div
         className={`p-6 bg-gradient-to-r from-blue-50/30 to-purple-50/30 ${
           profile.isViewed ? "" : "pt-8"
@@ -144,7 +144,7 @@ const ProfileCard = memo(function ProfileCard({
         </div>
       </div>
 
-      {/* Actions */}
+      {}
       <div className="p-4 bg-gray-50 mt-auto">
         <div className="flex space-x-2">
           <button
@@ -157,7 +157,7 @@ const ProfileCard = memo(function ProfileCard({
         </div>
       </div>
 
-      {/* Bookmark Date */}
+      {}
       {showBookmarkDate && profile.createdAt && (
         <div className="px-6 py-3 bg-gray-50 border-t">
           <p className="text-xs text-gray-500">

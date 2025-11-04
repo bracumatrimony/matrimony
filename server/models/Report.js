@@ -2,21 +2,21 @@ const mongoose = require("mongoose");
 
 const reportSchema = new mongoose.Schema(
   {
-    // The profile being reported
+    
     reportedProfileId: {
       type: String,
       required: true,
       ref: "Profile",
     },
 
-    // The user who made the report
+    
     reportedBy: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
 
-    // Report details
+    
     reason: {
       type: String,
       required: true,
@@ -37,21 +37,21 @@ const reportSchema = new mongoose.Schema(
       maxlength: [500, "Description cannot exceed 500 characters"],
     },
 
-    // Report status
+    
     status: {
       type: String,
       enum: ["pending", "under_review", "resolved", "dismissed"],
       default: "pending",
     },
 
-    // Priority level
+    
     priority: {
       type: String,
       enum: ["low", "medium", "high"],
       default: "medium",
     },
 
-    // Admin actions
+    
     adminNotes: {
       type: String,
       default: null,
@@ -68,7 +68,7 @@ const reportSchema = new mongoose.Schema(
       default: null,
     },
 
-    // Resolution details
+    
     actionTaken: {
       type: String,
       enum: [
@@ -86,7 +86,7 @@ const reportSchema = new mongoose.Schema(
   }
 );
 
-// Index for efficient querying
+
 reportSchema.index({ reportedProfileId: 1 });
 reportSchema.index({ reportedBy: 1 });
 reportSchema.index({ status: 1 });

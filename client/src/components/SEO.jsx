@@ -24,7 +24,7 @@ const SEO = ({
   const metaImage = image || defaultImage;
   const metaUrl = url || defaultUrl;
 
-  // Default structured data for organization
+  
   const defaultStructuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -34,7 +34,7 @@ const SEO = ({
     description:
       "The premier matrimonial platform for BRACU community. Find your perfect life partner with advanced search, verified profiles, and secure communication.",
     sameAs: [
-      // Add social media links if available
+      
     ],
   };
 
@@ -42,13 +42,13 @@ const SEO = ({
 
   return (
     <Helmet>
-      {/* Basic meta tags */}
+      {}
       <title>{fullTitle}</title>
       <meta name="description" content={metaDescription} />
       {keywords && <meta name="keywords" content={keywords} />}
       {author && <meta name="author" content={author} />}
 
-      {/* Open Graph / Facebook */}
+      {}
       <meta property="og:type" content={type} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={metaDescription} />
@@ -56,13 +56,13 @@ const SEO = ({
       <meta property="og:url" content={metaUrl} />
       <meta property="og:site_name" content={siteName} />
 
-      {/* Twitter */}
+      {}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={metaDescription} />
       <meta name="twitter:image" content={metaImage} />
 
-      {/* Article specific (if type is article) */}
+      {}
       {type === "article" && published && (
         <meta property="article:published_time" content={published} />
       )}
@@ -73,11 +73,11 @@ const SEO = ({
         <meta property="article:author" content={author} />
       )}
 
-      {/* Additional SEO meta tags */}
+      {}
       <meta name="robots" content="index, follow" />
       <link rel="canonical" href={metaUrl} />
 
-      {/* Structured Data */}
+      {}
       <script type="application/ld+json">
         {JSON.stringify(finalStructuredData)}
       </script>

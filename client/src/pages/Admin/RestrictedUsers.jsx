@@ -21,12 +21,12 @@ export default function RestrictedUsers({ onViewProfile, showNotification }) {
   const [unrestricting, setUnrestricting] = useState(null);
   const [banning, setBanning] = useState(null);
 
-  // Debounce search query
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchQuery(searchInput);
-      setCurrentPage(1); // Reset to first page when searching
-    }, 800); // 500ms delay
+      setCurrentPage(1); 
+    }, 800); 
 
     return () => clearTimeout(timer);
   }, [searchInput]);
@@ -60,7 +60,7 @@ export default function RestrictedUsers({ onViewProfile, showNotification }) {
       setExporting(true);
       showNotification?.("Exporting emails...", "info");
 
-      // Fetch all restricted users with a high limit
+      
       const response = await adminService.getRestrictedUsers(1, 10000, "");
       if (response.success && response.users) {
         const restrictedUsers = response.users.filter(
@@ -68,10 +68,10 @@ export default function RestrictedUsers({ onViewProfile, showNotification }) {
         );
         const emails = restrictedUsers
           .map((user) => user.email)
-          .filter((email) => email) // Remove any null/undefined emails
+          .filter((email) => email) 
           .join("\n");
 
-        // Create and download the file
+        
         const blob = new Blob([emails], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -101,13 +101,13 @@ export default function RestrictedUsers({ onViewProfile, showNotification }) {
   };
 
   const handleUnrestrictUser = async (userId, e) => {
-    e.stopPropagation(); // Prevent row click
+    e.stopPropagation(); 
     try {
       setUnrestricting(userId);
       const response = await adminService.unrestrictUser(userId);
       if (response.success) {
         showNotification?.("User unrestricted successfully", "success");
-        // Reload the users list
+        
         loadUsers();
       } else {
         showNotification?.("Failed to unrestrict user", "error");
@@ -121,13 +121,13 @@ export default function RestrictedUsers({ onViewProfile, showNotification }) {
   };
 
   const handleBanUser = async (userId, e) => {
-    e.stopPropagation(); // Prevent row click
+    e.stopPropagation(); 
     try {
       setBanning(userId);
       const response = await adminService.banUser(userId);
       if (response.success) {
         showNotification?.("User banned successfully", "success");
-        // Reload the users list to remove the banned user
+        
         loadUsers();
       } else {
         showNotification?.("Failed to ban user", "error");
@@ -159,7 +159,7 @@ export default function RestrictedUsers({ onViewProfile, showNotification }) {
     <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
       {users.length > 0 || searchInput ? (
         <div className="space-y-4">
-          {/* Header */}
+          {}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
@@ -193,7 +193,7 @@ export default function RestrictedUsers({ onViewProfile, showNotification }) {
             </div>
           </div>
 
-          {/* Search bar */}
+          {}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div className="relative flex-1 max-w-md">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -209,7 +209,7 @@ export default function RestrictedUsers({ onViewProfile, showNotification }) {
             </div>
           </div>
 
-          {/* Items per page selector */}
+          {}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div className="flex items-center space-x-3">
               <span className="text-sm text-gray-600">Show:</span>
@@ -235,7 +235,7 @@ export default function RestrictedUsers({ onViewProfile, showNotification }) {
             </div>
           </div>
 
-          {/* Compact table */}
+          {}
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -396,7 +396,7 @@ export default function RestrictedUsers({ onViewProfile, showNotification }) {
             </div>
           </div>
 
-          {/* Pagination */}
+          {}
           {totalUsers > itemsPerPage && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-sm text-gray-600">
@@ -411,7 +411,7 @@ export default function RestrictedUsers({ onViewProfile, showNotification }) {
                   Previous
                 </button>
 
-                {/* Page numbers */}
+                {}
                 {[...Array(Math.ceil(totalUsers / itemsPerPage))].map(
                   (_, index) => {
                     const pageNum = index + 1;

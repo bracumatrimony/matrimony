@@ -1,24 +1,19 @@
-// Utility functions to prevent MongoDB injection attacks
-// by sanitizing user inputs used in MongoDB queries
 
-/**
- * Sanitizes a string value to prevent MongoDB operator injection
- * @param {string} value - The input value to sanitize
- * @param {string[]} allowedValues - Array of allowed exact values (optional)
- * @returns {string|null} - Sanitized value or null if invalid
- */
+
+
+
 const sanitizeStringValue = (value, allowedValues = null) => {
   if (!value || typeof value !== "string") return null;
 
   const trimmed = value.trim();
   if (!trimmed) return null;
 
-  // Check if it's an allowed value
+  
   if (allowedValues && !allowedValues.includes(trimmed)) {
     return null;
   }
 
-  // Check for MongoDB operators
+  
   if (
     trimmed.startsWith("$") ||
     trimmed.includes("{$") ||
@@ -30,13 +25,7 @@ const sanitizeStringValue = (value, allowedValues = null) => {
   return trimmed;
 };
 
-/**
- * Sanitizes a numeric value to prevent MongoDB operator injection
- * @param {string|number} value - The input value to sanitize
- * @param {number} min - Minimum allowed value (optional)
- * @param {number} max - Maximum allowed value (optional)
- * @returns {number|null} - Sanitized number or null if invalid
- */
+
 const sanitizeNumericValue = (value, min = null, max = null) => {
   if (value === null || value === undefined || value === "") return null;
 
@@ -49,25 +38,17 @@ const sanitizeNumericValue = (value, min = null, max = null) => {
   return num;
 };
 
-/**
- * Escapes special regex characters to prevent regex injection
- * @param {string} value - The input string to escape
- * @returns {string} - Escaped string safe for regex
- */
+
 const escapeRegex = (value) => {
   if (!value || typeof value !== "string") return "";
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 };
 
-/**
- * Sanitizes search query parameters for profile filtering
- * @param {object} query - The request query object
- * @returns {object} - Sanitized filters object
- */
+
 const sanitizeProfileSearchQuery = (query) => {
   const filters = { status: "approved" };
 
-  // Text search - escape regex special characters
+  
   if (query.search && typeof query.search === "string") {
     const searchTerm = escapeRegex(query.search.trim());
     if (searchTerm) {
@@ -83,7 +64,7 @@ const sanitizeProfileSearchQuery = (query) => {
     }
   }
 
-  // Gender - exact match from allowed values
+  
   if (query.gender) {
     const sanitizedGender = sanitizeStringValue(query.gender, [
       "Male",
@@ -94,7 +75,7 @@ const sanitizeProfileSearchQuery = (query) => {
     }
   }
 
-  // Age range - numeric validation
+  
   const minAge = sanitizeNumericValue(query.minAge, 18, 100);
   const maxAge = sanitizeNumericValue(query.maxAge, 18, 100);
   if (minAge || maxAge) {
@@ -103,7 +84,7 @@ const sanitizeProfileSearchQuery = (query) => {
     if (maxAge) filters.age.$lte = maxAge;
   }
 
-  // Religion - exact match from allowed values
+  
   if (query.religion) {
     const sanitizedReligion = sanitizeStringValue(query.religion, [
       "Muslim",
@@ -117,7 +98,7 @@ const sanitizeProfileSearchQuery = (query) => {
     }
   }
 
-  // Education - use regex with escaped input
+  
   if (query.education && typeof query.education === "string") {
     const educationTerm = escapeRegex(query.education.trim());
     if (educationTerm) {
@@ -125,7 +106,7 @@ const sanitizeProfileSearchQuery = (query) => {
     }
   }
 
-  // Profession - use regex with escaped input
+  
   if (query.profession && typeof query.profession === "string") {
     const professionTerm = escapeRegex(query.profession.trim());
     if (professionTerm) {
@@ -133,7 +114,7 @@ const sanitizeProfileSearchQuery = (query) => {
     }
   }
 
-  // District - use regex with escaped input
+  
   if (query.district && query.district !== "Any" && query.district.trim()) {
     const districtTerm = escapeRegex(query.district.trim());
     if (districtTerm) {
@@ -146,7 +127,7 @@ const sanitizeProfileSearchQuery = (query) => {
         ],
       };
 
-      // If search is already using $or, combine with $and
+      
       if (filters.$or) {
         filters.$and = [{ $or: filters.$or }, districtFilter];
         delete filters.$or;
@@ -156,7 +137,7 @@ const sanitizeProfileSearchQuery = (query) => {
     }
   }
 
-  // University - exact match from config
+  
   if (query.university) {
     const universities = require("../config/universities").getAllUniversities();
     const allowedUniversities = Object.keys(universities);
@@ -172,18 +153,14 @@ const sanitizeProfileSearchQuery = (query) => {
   return filters;
 };
 
-/**
- * Sanitizes an ID parameter to prevent MongoDB operator injection
- * @param {string} id - The ID parameter to sanitize
- * @returns {string|null} - Sanitized ID or null if invalid
- */
+
 const sanitizeId = (id) => {
   if (!id || typeof id !== "string") return null;
 
   const trimmed = id.trim();
   if (!trimmed) return null;
 
-  // Check for MongoDB operators
+  
   if (
     trimmed.startsWith("$") ||
     trimmed.includes("{$") ||
@@ -192,7 +169,7 @@ const sanitizeId = (id) => {
     return null;
   }
 
-  // Basic validation - should not contain spaces or special chars that could be operators
+  
   if (/[\s\{\}\[\]\$]/.test(trimmed)) {
     return null;
   }
@@ -200,18 +177,14 @@ const sanitizeId = (id) => {
   return trimmed;
 };
 
-/**
- * Sanitizes a general search query for admin use
- * @param {string} search - The search string to sanitize
- * @returns {string|null} - Sanitized search string or null if invalid
- */
+
 const sanitizeSearchQuery = (search) => {
   if (!search || typeof search !== "string") return null;
 
   const trimmed = search.trim();
   if (!trimmed) return null;
 
-  // Check for MongoDB operators
+  
   if (
     trimmed.startsWith("$") ||
     trimmed.includes("{$") ||
@@ -220,7 +193,7 @@ const sanitizeSearchQuery = (search) => {
     return null;
   }
 
-  // For admin searches, we'll escape regex but allow more flexibility
+  
   return escapeRegex(trimmed);
 };
 

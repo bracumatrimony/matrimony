@@ -23,12 +23,12 @@ export default function Credits() {
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const navigate = useNavigate();
 
-  // Handle success animation navigation
+  
   useEffect(() => {
     if (showSuccessAnimation) {
       const timer = setTimeout(() => {
         navigate("/orders");
-      }, 3000); // Navigate after 3 seconds
+      }, 3000); 
 
       return () => clearTimeout(timer);
     }
@@ -41,7 +41,7 @@ export default function Credits() {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
 
-        // Check if user should have access to credits
+        
         if (
           parsedUser.email.endsWith("@gmail.com") &&
           !parsedUser.alumniVerified
@@ -50,7 +50,7 @@ export default function Credits() {
           return;
         }
 
-        // Load user profile to check approval status only if user has a profile
+        
         if (parsedUser?.hasProfile) {
           await loadUserProfile();
         }
@@ -68,7 +68,7 @@ export default function Credits() {
       }
     } catch (error) {
       console.error("Error loading user profile:", error);
-      // Profile doesn't exist or error occurred, set to null
+      
       setUserProfile(null);
     }
   };
@@ -98,7 +98,7 @@ export default function Credits() {
     },
   ];
 
-  // Only give discount if user has an approved profile
+  
   const hasProfileDiscount = userProfile?.status === "approved";
 
   const calculateDiscountedPrice = (price) => {
@@ -120,7 +120,7 @@ export default function Credits() {
 
     setIsLoading(true);
     try {
-      // Submit purchase order for manual verification
+      
       const res = await profileService.makeRequest("/transactions/purchase", {
         method: "POST",
         body: JSON.stringify({
@@ -132,7 +132,7 @@ export default function Credits() {
       });
 
       if (res.success) {
-        // Show success animation before navigating
+        
         setShowSuccessAnimation(true);
         setSelectedPackage(null);
         setTransactionId("");
@@ -152,7 +152,7 @@ export default function Credits() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Create Biodata for Discount Message - Show only if user doesn't have approved profile */}
+        {}
         {!hasProfileDiscount && user && (!user.hasProfile || !userProfile) && (
           <div className="bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg p-4 mb-6 shadow-lg">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -182,7 +182,7 @@ export default function Credits() {
           </div>
         )}
 
-        {/* Pending Approval Message - Show if user has profile but not approved */}
+        {}
         {!hasProfileDiscount &&
           userProfile &&
           userProfile.status === "pending_approval" && (
@@ -217,7 +217,7 @@ export default function Credits() {
             </div>
           )}
 
-        {/* Profile Discount Notice */}
+        {}
         {hasProfileDiscount && (
           <div className="bg-green-500 text-white border-4 border-black rounded-lg p-4 mb-6">
             <div className="relative">
@@ -234,7 +234,7 @@ export default function Credits() {
           </div>
         )}
 
-        {/* Credit Packages */}
+        {}
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden mb-6">
           <div className="px-6 py-4 bg-gray-50 border-b">
             <h2 className="text-lg font-medium text-gray-900">
@@ -339,7 +339,7 @@ export default function Credits() {
           </div>
         </div>
 
-        {/* FAQ Section */}
+        {}
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
           <div className="px-6 py-4 bg-gray-50 border-b">
             <div className="flex items-center gap-2">
@@ -464,7 +464,7 @@ export default function Credits() {
         </div>
       </div>
 
-      {/* Purchase Modal */}
+      {}
       {selectedPackage && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-50">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-4 sm:p-6">
@@ -480,7 +480,7 @@ export default function Credits() {
               </p>
             </div>
 
-            {/* Payment Instructions */}
+            {}
             <div className="mb-3">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 sm:p-3 mb-3">
                 <h4 className="font-semibold text-blue-900 mb-1 sm:mb-2 text-sm sm:text-base">
@@ -504,7 +504,7 @@ export default function Credits() {
               </div>
             </div>
 
-            {/* Order Details */}
+            {}
             <div className="mb-3">
               <div className="bg-gray-50 rounded-lg p-2 sm:p-3 space-y-1 sm:space-y-2">
                 <div className="flex justify-between items-center">
@@ -546,7 +546,7 @@ export default function Credits() {
               </div>
             </div>
 
-            {/* Transaction Details Form */}
+            {}
             <div className="mb-4">
               <div className="space-y-3">
                 <div>
@@ -611,7 +611,7 @@ export default function Credits() {
         </div>
       )}
 
-      {/* Success Animation Overlay */}
+      {}
       {showSuccessAnimation && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -630,7 +630,7 @@ export default function Credits() {
             }}
             className="relative bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 rounded-3xl shadow-2xl p-6 max-w-sm mx-4 text-center overflow-hidden"
           >
-            {/* Success icon with pulse */}
+            {}
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -646,7 +646,7 @@ export default function Credits() {
               </motion.div>
             </motion.div>
 
-            {/* Success message */}
+            {}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}

@@ -17,13 +17,13 @@ const {
 
 const router = express.Router();
 
-// Helper function to check if user can access contact information
+
 const canAccessContactInfo = (user) => {
-  // Allow if user has verified university email
+  
   return isValidUniversityEmail(user.email) || user.alumniVerified;
 };
 
-// Helper function to shuffle an array using Fisher-Yates algorithm
+
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -32,9 +32,9 @@ function shuffleArray(array) {
   return array;
 }
 
-// @route   POST /api/profiles
-// @desc    Create user profile
-// @access  Private
+
+
+
 router.post(
   "/",
   auth,
@@ -48,7 +48,7 @@ router.post(
       });
     }
 
-    // Check if user has verified university email for biodata creation or is verified alumni
+    
     if (!isValidUniversityEmail(user.email) && !user.alumniVerified) {
       return res.status(403).json({
         success: false,
@@ -57,7 +57,7 @@ router.post(
       });
     }
 
-    // Check if user already has a profile
+    
     if (user.hasProfile) {
       return res.status(400).json({
         success: false,
@@ -65,7 +65,7 @@ router.post(
       });
     }
 
-    // Validate required fields for new profiles
+    
     if (
       !req.body.contactInformation ||
       req.body.contactInformation.trim() === ""
@@ -90,7 +90,7 @@ router.post(
       });
     }
 
-    // Validate personalContactInfo (required for admin use)
+    
     if (
       !req.body.personalContactInfo ||
       req.body.personalContactInfo.trim() === ""
@@ -116,13 +116,13 @@ router.post(
       });
     }
 
-    // Debug: Log received data
+    
     console.log("Creating profile for user:", user._id);
     console.log("Profile data received:", JSON.stringify(req.body, null, 2));
 
-    // Generate profileId if not exists
+    
     if (!user.profileId) {
-      // Dynamically detect university from current email to ensure accuracy
+      
       const universityInfo = detectUniversityFromEmail(user.email);
       if (universityInfo) {
         await User.findByIdAndUpdate(
@@ -139,7 +139,7 @@ router.post(
         { runValidators: false }
       );
     } else {
-      // Even if profileId exists, ensure university is correct based on current email
+      
       const universityInfo = detectUniversityFromEmail(user.email);
       if (universityInfo && user.university !== universityInfo.key) {
         await User.findByIdAndUpdate(
@@ -151,7 +151,7 @@ router.post(
       }
     }
 
-    // Create new profile
+    
     const profile = new Profile({
       userId: user._id,
       profileId: user.profileId,
@@ -163,7 +163,7 @@ router.post(
     try {
       await profile.save();
 
-      // Update user hasProfile flag
+      
       await User.findByIdAndUpdate(
         user._id,
         { hasProfile: true },
@@ -177,7 +177,7 @@ router.post(
         profile,
       });
     } catch (validationError) {
-      // Handle validation errors specifically
+      
       if (validationError.name === "ValidationError") {
         const formattedError = formatValidationError(validationError);
         return res.status(400).json({
@@ -187,18 +187,18 @@ router.post(
           details: formattedError.details,
         });
       }
-      // Re-throw other errors to be handled by asyncHandler
+      
       throw validationError;
     }
   })
 );
 
-// @route   GET /api/profiles/search
-// @desc    Search profiles with filters
-// @access  Public (only approved profiles)
+
+
+
 router.get("/search", async (req, res) => {
   try {
-    // Check if user is authenticated and restricted/banned
+    
     let currentUser = null;
     if (req.headers.authorization || req.cookies?.token) {
       try {
@@ -210,11 +210,11 @@ router.get("/search", async (req, res) => {
           "_id isRestricted isBanned"
         );
       } catch (error) {
-        // Invalid token, treat as unauthenticated
+        
       }
     }
 
-    // If user is restricted or banned, return empty results
+    
     if (currentUser && (currentUser.isRestricted || currentUser.isBanned)) {
       return res.json({
         success: true,
@@ -240,27 +240,27 @@ router.get("/search", async (req, res) => {
       limit = 10,
     } = req.query;
 
-    // Import sanitization utility
+    
     const { sanitizeProfileSearchQuery } = require("../utils/sanitizeQuery");
 
-    // Build sanitized search filters
+    
     const filters = sanitizeProfileSearchQuery(req.query);
 
     const allProfiles = await Profile.find(filters)
       .populate({
         path: "userId",
         select: "isRestricted",
-        match: { isRestricted: { $ne: true } }, // Exclude profiles where user is restricted
+        match: { isRestricted: { $ne: true } }, 
       })
       .select("-privacy -contactInformation -personalContactInfo -__v")
       .lean();
 
-    // Filter out profiles where userId is null (due to populate match)
+    
     const filteredProfiles = allProfiles.filter(
       (profile) => profile.userId !== null
     );
 
-    // Add view tracking information for authenticated users
+    
     let viewedProfileIds = new Set();
     if (currentUser) {
       const viewedProfiles = await ProfileView.find({
@@ -272,16 +272,16 @@ router.get("/search", async (req, res) => {
       );
     }
 
-    // Add isViewed flag to each profile
+    
     const profilesWithViewStatus = filteredProfiles.map((profile) => ({
       ...profile,
       isViewed: viewedProfileIds.has(profile._id.toString()),
     }));
 
-    // Shuffle the entire result set to ensure all profiles get equal traffic
+    
     shuffleArray(profilesWithViewStatus);
 
-    // Calculate total and pagination
+    
     const total = profilesWithViewStatus.length;
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const profiles = profilesWithViewStatus.slice(skip, skip + parseInt(limit));
@@ -304,9 +304,9 @@ router.get("/search", async (req, res) => {
   }
 });
 
-// @route   GET /api/profiles/stats
-// @desc    Get biodata statistics
-// @access  Public
+
+
+
 router.get("/stats", async (req, res) => {
   try {
     const stats = await Profile.aggregate([
@@ -340,16 +340,16 @@ router.get("/stats", async (req, res) => {
   }
 });
 
-// @route   GET /api/profiles/my-unlocks
-// @desc    Get all profiles that the current user has unlocked
-// @access  Private
+
+
+
 router.get(
   "/my-unlocks",
   auth,
   asyncHandler(async (req, res) => {
     const userId = req.user.id;
 
-    // Get the user with unlocked contacts
+    
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -358,7 +358,7 @@ router.get(
       });
     }
 
-    // Check if user can access contact information (university email or alumni verified)
+    
     if (!canAccessContactInfo(user)) {
       return res.status(403).json({
         success: false,
@@ -367,7 +367,7 @@ router.get(
       });
     }
 
-    // If no unlocked contacts, return empty array
+    
     if (!user.unlockedContacts || user.unlockedContacts.length === 0) {
       return res.json({
         success: true,
@@ -376,7 +376,7 @@ router.get(
       });
     }
 
-    // Get all unlocked profiles
+    
     const profiles = await Profile.find({
       profileId: { $in: user.unlockedContacts },
       status: "approved",
@@ -384,16 +384,16 @@ router.get(
       .select("profileId biodataId age location contactInformation createdAt")
       .lean();
 
-    // Ensure biodataId is set for profiles that don't have it (backwards compatibility)
+    
     const profilesWithBiodataId = profiles.map((profile) => ({
       ...profile,
       biodataId: profile.biodataId || profile.profileId,
     }));
 
-    // Add unlock timestamp for each profile (simplified approach)
+    
     const profilesWithUnlockTime = profilesWithBiodataId.map((profile) => ({
       ...profile,
-      unlockedAt: new Date(), // Use current date as unlock time
+      unlockedAt: new Date(), 
     }));
 
     res.json({
@@ -403,12 +403,12 @@ router.get(
   })
 );
 
-// @route   GET /api/profiles/:profileId
-// @desc    Get single profile
-// @access  Public for approved profiles, Private for additional features
+
+
+
 router.get("/:profileId", async (req, res) => {
   try {
-    // Check if user is authenticated (optional)
+    
     let currentUser = null;
     try {
       const token =
@@ -425,16 +425,16 @@ router.get("/:profileId", async (req, res) => {
           .lean();
       }
     } catch (authError) {
-      // Authentication failed, but that's okay - continue as public user
+      
       console.log(
         "Profile view: User not authenticated, treating as public view"
       );
     }
 
-    // Import sanitization utility
+    
     const { sanitizeId } = require("../utils/sanitizeQuery");
 
-    // Sanitize profileId parameter
+    
     const profileId = sanitizeId(req.params.profileId);
     if (!profileId) {
       return res.status(400).json({
@@ -443,16 +443,16 @@ router.get("/:profileId", async (req, res) => {
       });
     }
 
-    // PERFORMANCE: Use .lean() for faster queries since we don't need Mongoose document methods
+    
     const profile = await Profile.findOne({
       profileId: profileId,
       status: "approved",
     })
       .populate("userId", "name email isRestricted")
-      .select("-__v"); // Exclude version key
+      .select("-__v"); 
 
     if (!profile) {
-      // Check if profile exists but is pending
+      
       const pendingProfile = await Profile.findOne({
         profileId: profileId,
         status: "pending_approval",
@@ -474,7 +474,7 @@ router.get("/:profileId", async (req, res) => {
       });
     }
 
-    // Check if profile is hidden or user is restricted
+    
     if (profile.status === "hidden" || profile.userId?.isRestricted) {
       return res.status(404).json({
         success: false,
@@ -482,7 +482,7 @@ router.get("/:profileId", async (req, res) => {
       });
     }
 
-    // Check if current user is restricted or banned
+    
     if (currentUser && (currentUser.isRestricted || currentUser.isBanned)) {
       return res.status(404).json({
         success: false,
@@ -490,17 +490,17 @@ router.get("/:profileId", async (req, res) => {
       });
     }
 
-    // Simplified view tracking - only increment if authenticated and not owner
+    
     if (
       currentUser &&
       profile.userId._id.toString() !== currentUser._id.toString()
     ) {
-      // Fire and forget - don't wait for the update
+      
       Profile.findByIdAndUpdate(profile._id, { $inc: { viewCount: 1 } })
         .exec()
         .catch((err) => console.log("View count update failed:", err));
 
-      // Track individual user views
+      
       ProfileView.findOneAndUpdate(
         { userId: currentUser._id, profileId: profile._id },
         { viewedAt: new Date() },
@@ -510,7 +510,7 @@ router.get("/:profileId", async (req, res) => {
         .catch((err) => console.log("User view tracking failed:", err));
     }
 
-    // Filter sensitive information based on user permissions and privacy settings
+    
     const profileResponse = profile.toObject();
     const isOwner =
       currentUser &&
@@ -521,23 +521,23 @@ router.get("/:profileId", async (req, res) => {
       isAdmin ||
       (profile.privacy?.showContactInfo && canAccessContactInfo(currentUser));
 
-    // personalContactInfo is for owner and admin use only
+    
     if (!isOwner && !isAdmin) {
       delete profileResponse.personalContactInfo;
     }
 
-    // contactInformation is shown to owner and admin, or after unlocking via separate endpoint
+    
     if (!isOwner && !isAdmin) {
       delete profileResponse.contactInformation;
     }
 
-    // userId name and email: show to owner and admin only
+    
     if (!isOwner && !isAdmin) {
       delete profileResponse.userId.name;
       delete profileResponse.userId.email;
     }
 
-    // Delete any name or email fields that might exist on the profile itself (defense in depth)
+    
     if (!isOwner && !isAdmin) {
       delete profileResponse.name;
       delete profileResponse.email;
@@ -557,12 +557,12 @@ router.get("/:profileId", async (req, res) => {
   }
 });
 
-// @route   GET /api/profiles/user/me
-// @desc    Get current user's profile
-// @access  Private
+
+
+
 router.get("/user/me", auth, async (req, res) => {
   try {
-    // PERFORMANCE: Use .lean() for faster queries
+    
     const profile = await Profile.findOne({ userId: req.user.id })
       .populate("userId", "name email picture")
       .select("-__v")
@@ -588,9 +588,9 @@ router.get("/user/me", auth, async (req, res) => {
   }
 });
 
-// @route   PUT /api/profiles/user/me
-// @desc    Update current user's profile
-// @access  Private
+
+
+
 router.put(
   "/user/me",
   auth,
@@ -604,7 +604,7 @@ router.put(
       });
     }
 
-    // Validate contactInformation if it's being updated
+    
     if (req.body.contactInformation !== undefined) {
       if (
         !req.body.contactInformation ||
@@ -631,7 +631,7 @@ router.put(
       }
     }
 
-    // Validate personalContactInfo if it's being updated (required for admin use)
+    
     if (req.body.personalContactInfo !== undefined) {
       if (
         !req.body.personalContactInfo ||
@@ -659,19 +659,19 @@ router.put(
       }
     }
 
-    // Check if this is an edit (profile already exists and has been edited before)
+    
     const isEdit = profile.editCount > 0 || profile.status === "approved";
     const wasApproved = profile.status === "approved";
 
-    // Track which fields are being changed
+    
     const changedFields = [];
     Object.keys(req.body).forEach((key) => {
       if (req.body[key] !== undefined) {
-        // Check if the value is actually different from current value
+        
         const currentValue = profile[key];
         const newValue = req.body[key];
 
-        // Compare values (handle different data types)
+        
         if (currentValue !== newValue) {
           changedFields.push(key);
         }
@@ -680,14 +680,14 @@ router.put(
       }
     });
 
-    // If this is an edit to an existing profile, trigger admin review
+    
     if (isEdit) {
       profile.status = "pending_approval";
       profile.isUnderReview = true;
       profile.hasEditPending = true;
-      profile.rejectionReason = null; // Clear any previous rejection reason
+      profile.rejectionReason = null; 
 
-      // Add changed fields to the editedFields array (avoid duplicates)
+      
       changedFields.forEach((field) => {
         if (!profile.editedFields.includes(field)) {
           profile.editedFields.push(field);
@@ -695,7 +695,7 @@ router.put(
       });
     }
 
-    // Update edit tracking fields
+    
     profile.lastEditDate = new Date();
     profile.editCount = (profile.editCount || 0) + 1;
 
@@ -715,9 +715,9 @@ router.put(
   })
 );
 
-// @route   DELETE /api/profiles/user/me
-// @desc    Delete current user's profile
-// @access  Private
+
+
+
 router.delete(
   "/user/me",
   auth,
@@ -731,7 +731,7 @@ router.delete(
       });
     }
 
-    // Check if user is banned
+    
     const user = await User.findById(req.user.id);
     if (user && user.isBanned) {
       return res.status(403).json({
@@ -740,10 +740,10 @@ router.delete(
       });
     }
 
-    // Delete the profile
+    
     await Profile.findByIdAndDelete(profile._id);
 
-    // Update user hasProfile flag
+    
     if (user) {
       await User.findByIdAndUpdate(
         user._id,
@@ -759,9 +759,9 @@ router.delete(
   })
 );
 
-// @route   POST /api/profiles/:profileId/unlock-contact
-// @desc    Unlock contact information of a profile
-// @access  Private
+
+
+
 router.post(
   "/:profileId/unlock-contact",
   auth,
@@ -769,7 +769,7 @@ router.post(
     const { profileId } = req.params;
     const userId = req.user.id;
 
-    // Get the requesting user
+    
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -778,7 +778,7 @@ router.post(
       });
     }
 
-    // Find the profile to unlock
+    
     const profile = await Profile.findOne({
       profileId: profileId,
       status: "approved",
@@ -791,11 +791,11 @@ router.post(
       });
     }
 
-    // Check if user is the owner or admin
+    
     const isOwner = profile.userId._id.toString() === userId;
     const isAdmin = user.role === "admin";
 
-    // For owner, return contact information directly
+    
     if (isOwner) {
       return res.json({
         success: true,
@@ -806,7 +806,7 @@ router.post(
       });
     }
 
-    // For admin, return contact information
+    
     if (isAdmin) {
       return res.json({
         success: true,
@@ -818,7 +818,7 @@ router.post(
       });
     }
 
-    // For non-owner/admin users, check if they can unlock with credits
+    
     const canUnlock = canAccessContactInfo(user);
     if (!canUnlock) {
       return res.status(403).json({
@@ -828,9 +828,9 @@ router.post(
       });
     }
 
-    // Check if monetization is enabled
+    
     if (!monetizationConfig.shouldRequireCreditsForContact()) {
-      // Free access mode - return contact info directly
+      
       return res.json({
         success: true,
         message: "Contact information accessed (free mode)",
@@ -840,7 +840,7 @@ router.post(
       });
     }
 
-    // Check if user has already unlocked this contact
+    
     if (user.unlockedContacts && user.unlockedContacts.includes(profileId)) {
       return res.json({
         success: true,
@@ -851,7 +851,7 @@ router.post(
       });
     }
 
-    // Check if user has enough credits (1 credit required)
+    
     const unlockCost = 1;
     if (user.credits < unlockCost) {
       return res.status(400).json({
@@ -860,7 +860,7 @@ router.post(
       });
     }
 
-    // Deduct credits and add to unlocked contacts
+    
     await User.findByIdAndUpdate(
       userId,
       {
@@ -870,7 +870,7 @@ router.post(
       { new: true, runValidators: false }
     );
 
-    // Record the transaction
+    
     if (monetizationConfig.shouldRecordTransactions()) {
       const Transaction = require("../models/Transaction");
       await Transaction.create({
@@ -891,8 +891,8 @@ router.post(
     });
   })
 );
-// @desc    Check if contact information is already unlocked for a profile
-// @access  Private
+
+
 router.get(
   "/:profileId/contact-status",
   auth,
@@ -900,7 +900,7 @@ router.get(
     const { profileId } = req.params;
     const userId = req.user.id;
 
-    // Find the profile (user data available from auth middleware)
+    
     const profile = await Profile.findOne({
       profileId: profileId,
       status: "approved",
@@ -913,11 +913,11 @@ router.get(
       });
     }
 
-    // Check if user is the owner or admin
+    
     const isOwner = profile.userId._id.toString() === userId;
     const isAdmin = req.user.role === "admin";
 
-    // For owner, always return as unlocked
+    
     if (isOwner) {
       return res.json({
         success: true,
@@ -929,7 +929,7 @@ router.get(
       });
     }
 
-    // For admin, return contact information
+    
     if (isAdmin) {
       return res.json({
         success: true,
@@ -941,7 +941,7 @@ router.get(
       });
     }
 
-    // Check if user has already unlocked this contact
+    
     const user = await User.findById(userId);
     const isAlreadyUnlocked =
       user.unlockedContacts && user.unlockedContacts.includes(profileId);
@@ -956,7 +956,7 @@ router.get(
       });
     }
 
-    // Check if user can unlock this contact (verified alumni or university email)
+    
     const canUnlock = canAccessContactInfo(user);
     if (!canUnlock) {
       return res.status(403).json({
@@ -968,7 +968,7 @@ router.get(
       });
     }
 
-    // User can unlock but hasn't yet
+    
     return res.json({
       success: true,
       isUnlocked: false,
@@ -978,9 +978,9 @@ router.get(
   })
 );
 
-// @route   DELETE /api/profiles
-// @desc    Delete user profile
-// @access  Private
+
+
+
 router.delete(
   "/",
   auth,
@@ -994,7 +994,7 @@ router.delete(
       });
     }
 
-    // Find and delete the user's profile
+    
     const profile = await Profile.findOneAndDelete({ userId: user._id });
 
     if (!profile) {
@@ -1004,7 +1004,7 @@ router.delete(
       });
     }
 
-    // Update user's hasProfile status
+    
     await User.findByIdAndUpdate(
       user._id,
       { hasProfile: false },
@@ -1018,9 +1018,9 @@ router.delete(
   })
 );
 
-// @route   POST /api/profiles/request-verification
-// @desc    Request alumni verification
-// @access  Private
+
+
+
 router.post(
   "/request-verification",
   auth,
@@ -1034,7 +1034,7 @@ router.post(
       });
     }
 
-    // Check if user already has a valid university email
+    
     const universityConfig = detectUniversityFromEmail(user.email);
     if (universityConfig) {
       return res.status(400).json({
@@ -1043,7 +1043,7 @@ router.post(
       });
     }
 
-    // Check if already verified
+    
     if (user.alumniVerified) {
       return res.status(400).json({
         success: false,
@@ -1051,7 +1051,7 @@ router.post(
       });
     }
 
-    // Check if request already pending
+    
     if (user.verificationRequest) {
       return res.status(400).json({
         success: false,
@@ -1060,7 +1060,7 @@ router.post(
       });
     }
 
-    // Set verification request flag
+    
     await User.findByIdAndUpdate(
       user._id,
       { verificationRequest: true },
@@ -1075,9 +1075,9 @@ router.post(
   })
 );
 
-// @route   POST /api/profiles/migrate-universities
-// @desc    Migrate existing profiles to have correct university field
-// @access  Public (temporary - should be admin only)
+
+
+
 router.post(
   "/migrate-universities",
   asyncHandler(async (req, res) => {

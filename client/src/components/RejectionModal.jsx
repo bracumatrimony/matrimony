@@ -30,15 +30,15 @@ export default function RejectionModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+      {}
       <div
         className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
         onClick={handleClose}
       ></div>
 
-      {/* Modal */}
+      {}
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
-        {/* Header */}
+        {}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
@@ -59,7 +59,7 @@ export default function RejectionModal({
           </button>
         </div>
 
-        {/* Content */}
+        {}
         <div className="mb-6">
           <label
             htmlFor="rejection-reason"
@@ -86,7 +86,7 @@ export default function RejectionModal({
           )}
         </div>
 
-        {/* Footer */}
+        {}
         <div className="flex items-center justify-end space-x-3">
           <button
             onClick={handleClose}

@@ -22,17 +22,17 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in on app start
+    
     const initializeAuth = async () => {
       const currentUser = authService.getCurrentUser();
       const isValidSession = authService.isSessionValid();
 
       if (currentUser && isValidSession) {
-        // Immediately set user from localStorage to prevent flicker
+        
         setUser(currentUser);
         setLoading(false);
 
-        // Try to refresh user data from server in background for latest info
+        
         try {
           const freshUser = await authService.getCurrentUserFromServer();
           if (freshUser) {
@@ -40,10 +40,10 @@ export const AuthProvider = ({ children }) => {
           }
         } catch (error) {
           console.error("Failed to refresh user on init:", error);
-          // Keep the localStorage user data if server refresh fails
+          
         }
       } else if (currentUser && !isValidSession) {
-        // Session expired (24+ hours old), logout
+        
         console.warn("Session expired, logging out");
         authService.logout();
         setUser(null);

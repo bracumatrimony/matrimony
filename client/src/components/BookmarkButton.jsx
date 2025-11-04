@@ -57,7 +57,7 @@ export default function BookmarkButton({
     return null;
   }
 
-  // Size configurations
+  
   const sizeConfig = {
     sm: {
       padding: "px-2 py-1",

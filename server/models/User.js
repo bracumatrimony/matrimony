@@ -7,7 +7,7 @@ const {
 
 const userSchema = new mongoose.Schema(
   {
-    // Basic Info
+    
     name: {
       type: String,
       required: [true, "Name is required"],
@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       validate: {
         validator: function (email) {
-          // Allow any valid email for account creation
+          
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         },
         message: "Please enter a valid email address",
@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       validate: {
         validator: function (phone) {
-          // Optional phone validation - allow empty or valid format
+          
           return (
             !phone ||
             /^[\+]?[1-9][\d]{0,15}$/.test(phone.replace(/[\s\-\(\)]/g, ""))
@@ -46,11 +46,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       minLength: [6, "Password must be at least 6 characters long"],
       required: function () {
-        return !this.isGoogleUser; // Password not required for Google users
+        return !this.isGoogleUser; 
       },
     },
 
-    // Profile Info
+    
     profileId: {
       type: String,
       unique: true,
@@ -73,7 +73,7 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
-    // Authentication
+    
     authProvider: {
       type: String,
       enum: ["email", "google"],
@@ -88,7 +88,7 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    // App-specific
+    
     credits: {
       type: Number,
       default: 0,
@@ -99,20 +99,20 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    // Unlocked contact info (array of profileIds)
+    
     unlockedContacts: {
       type: [String],
       default: [],
     },
 
-    // Profile view tracking (to prevent spam views)
+    
     lastProfileViews: {
       type: Map,
       of: Date,
       default: new Map(),
     },
 
-    // Status
+    
     isActive: {
       type: Boolean,
       default: true,
@@ -131,7 +131,7 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
 
-    // Alumni verification
+    
     alumniVerified: {
       type: Boolean,
       default: false,
@@ -141,14 +141,14 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    // Timestamps
+    
     lastLoginAt: {
       type: Date,
       default: null,
     },
   },
   {
-    timestamps: true, // This adds createdAt and updatedAt automatically
+    timestamps: true, 
     toJSON: {
       transform: function (doc, ret) {
         delete ret.password;
@@ -159,15 +159,15 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Pre-save middleware to hash password
+
 userSchema.pre("save", async function (next) {
-  // Only hash the password if it has been modified (or is new)
+  
   if (!this.isModified("password")) {
     return next();
   }
 
   try {
-    // Hash password with cost of 10 (good balance of security and performance)
+    
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
@@ -176,7 +176,7 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// Instance method to check password
+
 userSchema.methods.comparePassword = async function (candidatePassword) {
   if (!this.password) {
     return false;
@@ -184,7 +184,7 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Static method to generate unique profile ID based on university
+
 userSchema.statics.generateProfileId = async function (universityKey) {
   const universityConfig = getUniversityConfig(universityKey);
   if (!universityConfig) {
@@ -193,7 +193,7 @@ userSchema.statics.generateProfileId = async function (universityKey) {
 
   const { idPrefix, startingID } = universityConfig;
 
-  // Find the highest existing ID for this university
+  
   const highestProfile = await this.findOne(
     { university: universityKey, profileId: new RegExp(`^${idPrefix}\\d+$`) },
     { profileId: 1 }
@@ -202,31 +202,31 @@ userSchema.statics.generateProfileId = async function (universityKey) {
   let nextId = startingID;
 
   if (highestProfile && highestProfile.profileId) {
-    // Extract the numeric part and increment
+    
     const currentId = parseInt(highestProfile.profileId.replace(idPrefix, ""));
     nextId = Math.max(currentId + 1, startingID);
   }
 
   const profileId = `${idPrefix}${nextId}`;
 
-  // Ensure uniqueness (in case of concurrent requests)
+  
   const exists = await this.findOne({ profileId });
   if (exists) {
-    // If it exists, try the next number
+    
     return this.generateProfileId(universityKey);
   }
 
   return profileId;
 };
 
-// Instance method to update last login
+
 userSchema.methods.updateLastLogin = function () {
   this.lastLoginAt = new Date();
   return this.save();
 };
 
-// Create indexes for better performance (excluding fields with unique: true)
-// Note: email and profileId already have unique: true, so no need for separate indexes
+
+
 userSchema.index({ isActive: 1 });
 userSchema.index({ role: 1 });
 

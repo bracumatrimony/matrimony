@@ -25,34 +25,34 @@ const Transaction = () => {
     fetchTransactions();
   }, []);
 
-  // Pagination calculations
+  
   const totalPages = Math.ceil(transactions.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentTransactions = transactions.slice(startIndex, endIndex);
 
-  // Pagination handlers
+  
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); // Reset to first page when changing items per page
+    setCurrentPage(1); 
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
-          {/* Header skeleton */}
+          {}
           <div className="mb-8">
             <div className="bg-gradient-to-r from-gray-800 to-black rounded-lg p-6 text-white shadow-lg animate-pulse">
               <div className="h-8 bg-gray-300 rounded w-40 mb-2"></div>
               <div className="h-4 bg-gray-300 rounded w-64"></div>
             </div>
           </div>
-          {/* Transactions Table Skeleton */}
+          {}
           <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -113,7 +113,7 @@ const Transaction = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
+        {}
         <div className="mb-8">
           <div className="bg-gradient-to-r from-gray-800 to-black rounded-lg p-6 text-white shadow-lg">
             <h1 className="text-3xl font-bold mb-2">Transaction History</h1>
@@ -123,7 +123,7 @@ const Transaction = () => {
           </div>
         </div>
 
-        {/* Transaction Table - Desktop */}
+        {}
         <div className="hidden md:block bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -164,7 +164,7 @@ const Transaction = () => {
                     ? currentTransactions
                     : []
                   ).map((tx, index) => {
-                    // Skip purchase transactions (only show actual credit additions/deductions)
+                    
                     if (tx.type === "purchase") {
                       return null;
                     }
@@ -175,7 +175,7 @@ const Transaction = () => {
                       index % 2 === 0 ? "bg-white" : "bg-gray-50";
                     let amountColor = "text-gray-900";
 
-                    // Credits Purchased
+                    
                     if (
                       tx.type === "credit_addition" ||
                       tx.type === "credit_purchase"
@@ -185,7 +185,7 @@ const Transaction = () => {
                         "Your purchase was successful. Thank you for using our service.";
                       amountColor = "text-green-600";
                     }
-                    // Contact Unlock
+                    
                     if (
                       tx.type === "contact_unlock" ||
                       tx.type === "credit_deduction"
@@ -194,7 +194,7 @@ const Transaction = () => {
                       displayDescription =
                         tx.description ||
                         "Contact information unlocked for a biodata profile.";
-                      // For free unlocks (credits = 0), show as neutral, for paid unlocks show as deduction
+                      
                       amountColor =
                         tx.credits === 0 ? "text-blue-600" : "text-red-600";
                     }
@@ -256,7 +256,7 @@ const Transaction = () => {
           </div>
         </div>
 
-        {/* Transaction Cards - Mobile */}
+        {}
         <div className="md:hidden space-y-4">
           {Array.isArray(currentTransactions) &&
           currentTransactions.length === 0 ? (
@@ -277,7 +277,7 @@ const Transaction = () => {
                 let displayDescription = tx.description;
                 let amountColor = "text-gray-900";
 
-                // Credits Purchased
+                
                 if (
                   tx.type === "credit_addition" ||
                   tx.type === "credit_purchase"
@@ -287,7 +287,7 @@ const Transaction = () => {
                     "Your purchase was successful. Thank you for using our service.";
                   amountColor = "text-green-600";
                 }
-                // Contact Unlock
+                
                 if (
                   tx.type === "contact_unlock" ||
                   tx.type === "credit_deduction"
@@ -348,10 +348,10 @@ const Transaction = () => {
           )}
         </div>
 
-        {/* Pagination Controls */}
+        {}
         {transactions.length > 0 && totalPages > 1 && (
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            {/* Items per page selector */}
+            {}
             <div className="flex items-center gap-2">
               <label className="text-sm text-gray-600">Show:</label>
               <select
@@ -369,13 +369,13 @@ const Transaction = () => {
               <span className="text-sm text-gray-600">per page</span>
             </div>
 
-            {/* Pagination info */}
+            {}
             <div className="text-sm text-gray-600">
               Showing {startIndex + 1}-{Math.min(endIndex, transactions.length)}{" "}
               of {transactions.length} transactions
             </div>
 
-            {/* Page navigation */}
+            {}
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -389,10 +389,10 @@ const Transaction = () => {
                 <ChevronLeft className="h-4 w-4" />
               </button>
 
-              {/* Page number buttons */}
+              {}
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (num) => {
-                  // Show first, last, current, and neighbors; ellipsis for gaps
+                  
                   if (
                     num === 1 ||
                     num === totalPages ||

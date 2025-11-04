@@ -24,7 +24,7 @@ export default function SearchProfiles() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(12); // Show 12 per page
+  const [limit, setLimit] = useState(12); 
   const [totalPages, setTotalPages] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [universities, setUniversities] = useState({});
@@ -50,25 +50,25 @@ export default function SearchProfiles() {
   };
 
   useEffect(() => {
-    // Get current user
+    
     const user = authService.getCurrentUser();
     if (user) {
       setCurrentUser(user);
-      // Redirect restricted or banned users away from search
+      
       if (user.isRestricted || user.isBanned) {
         navigate("/");
         return;
       }
     }
 
-    // Load universities and profiles
+    
     loadUniversities();
     if (!urlUniversity) {
       loadProfiles();
     }
   }, []);
 
-  // Update selectedUniversity when URL university parameter changes
+  
   useEffect(() => {
     setSelectedUniversity(urlUniversity || null);
     if (urlUniversity) {
@@ -81,7 +81,7 @@ export default function SearchProfiles() {
     }
   }, [urlUniversity]);
 
-  // Optimize search with useMemo for filters
+  
   const memoizedFilters = useMemo(
     () => ({
       ...filters,
@@ -97,9 +97,9 @@ export default function SearchProfiles() {
     ]
   );
 
-  // Auto-reload when search query or filters change - optimized debounce
+  
   useEffect(() => {
-    // Skip for initial load
+    
     if (isInitialLoadRef.current) {
       isInitialLoadRef.current = false;
       return;
@@ -112,18 +112,18 @@ export default function SearchProfiles() {
         1,
         limit
       );
-    }, 800); // Increased to 800ms for better debouncing
+    }, 800); 
 
     return () => clearTimeout(timeoutId);
   }, [memoizedFilters, limit]);
   const loadProfiles = useCallback(
     async (searchFilters = {}, pageNum = page, lim = limit) => {
-      // Cancel previous request
+      
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
 
-      // Create new abort controller
+      
       abortControllerRef.current = new AbortController();
       const signal = abortControllerRef.current.signal;
 
@@ -131,7 +131,7 @@ export default function SearchProfiles() {
         setLoading(true);
         setError(null);
 
-        // Prepare filters for backend
+        
         const backendFilters = {
           page: pageNum,
           limit: lim,
@@ -147,11 +147,11 @@ export default function SearchProfiles() {
         }
         if (searchFilters.religion)
           backendFilters.religion = searchFilters.religion;
-        // Always include university filter if selectedUniversity exists
+        
         if (selectedUniversity) {
           backendFilters.university = selectedUniversity;
         }
-        // Override with searchFilters university if specified
+        
         if (searchFilters.university) {
           backendFilters.university = searchFilters.university;
         }
@@ -161,7 +161,7 @@ export default function SearchProfiles() {
         });
 
         if (response.success) {
-          // Profiles are already formatted by the service
+          
           setProfiles(response.profiles || []);
           setTotalPages(response.pagination?.pages || 1);
         } else {
@@ -169,7 +169,7 @@ export default function SearchProfiles() {
         }
       } catch (error) {
         if (error.name === "AbortError") {
-          // Request was cancelled, ignore
+          
           return;
         }
         console.error("Error loading profiles:", error);
@@ -204,17 +204,17 @@ export default function SearchProfiles() {
   };
 
   const handleUnlockProfile = (profileId) => {
-    // Implement unlock logic
+    
     console.log("Unlocking profile:", profileId);
   };
 
   const handleViewProfile = (profileId) => {
-    // Open biodata in a new tab
+    
     const url = `/profile/view/${profileId}`;
     window.open(url, "_blank");
   };
 
-  // Pagination handlers
+  
   const handlePrevPage = async () => {
     if (page > 1) {
       const newPage = page - 1;
@@ -246,7 +246,7 @@ export default function SearchProfiles() {
         keywords="search profiles, find matches, Campus matrimony search, biodata search"
       />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col">
-        {/* Mobile Filter Bar - Only show when university is selected */}
+        {}
         {selectedUniversity && (
           <div className="block md:hidden bg-white border-b border-slate-200 shadow-sm">
             <div className="px-4 py-3">
@@ -261,10 +261,10 @@ export default function SearchProfiles() {
           </div>
         )}
         <div className="flex flex-1 min-h-0">
-          {/* Sidebar - Search and Filters (Desktop) - Only show when university is selected */}
+          {}
           {selectedUniversity && (
             <div className="hidden md:flex w-80 bg-white border-r border-slate-200 min-h-full flex-col shadow-lg">
-              {/* Filters */}
+              {}
               <div className="p-6 flex-1 bg-white">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-medium text-slate-800">
@@ -279,7 +279,7 @@ export default function SearchProfiles() {
                 </div>
 
                 <div className="space-y-6">
-                  {/* Gender Filter */}
+                  {}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-3">
                       Looking for
@@ -297,7 +297,7 @@ export default function SearchProfiles() {
                     </select>
                   </div>
 
-                  {/* Age Filter */}
+                  {}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-3">
                       Age Range
@@ -324,7 +324,7 @@ export default function SearchProfiles() {
                     </div>
                   </div>
 
-                  {/* Location Filter */}
+                  {}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-3">
                       Preferred Location
@@ -358,7 +358,7 @@ export default function SearchProfiles() {
                     </select>
                   </div>
 
-                  {/* Religion Filter */}
+                  {}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-3">
                       Religion
@@ -379,7 +379,7 @@ export default function SearchProfiles() {
                     </select>
                   </div>
 
-                  {/* Apply Filter Button */}
+                  {}
                   <div className="pt-6">
                     <button
                       onClick={() => {
@@ -404,18 +404,18 @@ export default function SearchProfiles() {
             </div>
           )}
 
-          {/* Mobile Filter Drawer - Only show when university is selected */}
+          {}
           {selectedUniversity && isFilterOpen && (
             <>
-              {/* Backdrop */}
+              {}
               <div
                 className="fixed inset-0 bg-black/50 z-40 lg:hidden"
                 onClick={() => setIsFilterOpen(false)}
               />
 
-              {/* Drawer */}
+              {}
               <div className="fixed inset-y-0 left-0 w-80 bg-white z-50 lg:hidden flex flex-col shadow-2xl border-r border-slate-200">
-                {/* Drawer Header */}
+                {}
                 <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-slate-50">
                   <h2 className="text-xl font-medium text-slate-800">
                     Refine Your Search
@@ -428,9 +428,9 @@ export default function SearchProfiles() {
                   </button>
                 </div>
 
-                {/* Drawer Content */}
+                {}
                 <div className="flex-1 overflow-y-auto">
-                  {/* Filters */}
+                  {}
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-lg font-medium text-slate-800">
@@ -445,7 +445,7 @@ export default function SearchProfiles() {
                     </div>
 
                     <div className="space-y-6">
-                      {/* Gender Filter */}
+                      {}
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-3">
                           Looking for
@@ -463,7 +463,7 @@ export default function SearchProfiles() {
                         </select>
                       </div>
 
-                      {/* Age Filter */}
+                      {}
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-3">
                           Age Range
@@ -490,7 +490,7 @@ export default function SearchProfiles() {
                         </div>
                       </div>
 
-                      {/* Location Filter */}
+                      {}
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-3">
                           Preferred Location
@@ -527,7 +527,7 @@ export default function SearchProfiles() {
                         </select>
                       </div>
 
-                      {/* Religion Filter */}
+                      {}
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-3">
                           Religion
@@ -551,7 +551,7 @@ export default function SearchProfiles() {
                   </div>
                 </div>
 
-                {/* Drawer Footer */}
+                {}
                 <div className="p-6 border-t border-slate-200 bg-slate-50">
                   <button
                     onClick={() => {
@@ -576,23 +576,23 @@ export default function SearchProfiles() {
             </>
           )}
 
-          {/* Main Content */}
+          {}
           <div className="flex-1">
-            {/* University Selection or Profile Grid */}
+            {}
             <div className="px-6 sm:px-8 py-8">
               <div className="max-w-7xl mx-auto">
                 {selectedUniversity ? (
-                  /* Show profiles for selected university */
+                  
                   <>
                     {loading ? (
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
-                        {/* Skeleton loading cards */}
+                        {}
                         {Array.from({ length: 12 }).map((_, index) => (
                           <div
                             key={index}
                             className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden animate-pulse"
                           >
-                            {/* Profile image skeleton */}
+                            {}
                             <div className="p-6 bg-gradient-to-r from-blue-50/30 to-purple-50/30 pt-8">
                               <div className="flex items-center space-x-4 mb-4">
                                 <div className="w-14 h-14 bg-gray-200 rounded-full"></div>
@@ -607,7 +607,7 @@ export default function SearchProfiles() {
                                 <div className="h-4 bg-gray-200 rounded w-2/3"></div>
                               </div>
                             </div>
-                            {/* Action button skeleton */}
+                            {}
                             <div className="p-4 bg-gray-50">
                               <div className="h-10 bg-gray-200 rounded"></div>
                             </div>
@@ -652,7 +652,7 @@ export default function SearchProfiles() {
                             </div>
                           ))}
                         </div>
-                        {/* Pagination Controls */}
+                        {}
                         <div className="flex flex-wrap justify-center items-center mt-12 gap-2 sm:gap-3">
                           <button
                             onClick={handlePrevPage}
@@ -668,14 +668,14 @@ export default function SearchProfiles() {
                             </span>
                             <span className="sm:hidden">&larr;</span>
                           </button>
-                          {/* Page number buttons */}
+                          {}
                           <div className="flex items-center gap-1 sm:gap-2">
                             {(() => {
                               const pages = [];
                               const showEllipsis = totalPages > 5;
 
                               if (!showEllipsis) {
-                                // Show all pages if 5 or fewer
+                                
                                 for (let i = 1; i <= totalPages; i++) {
                                   pages.push(
                                     <button
@@ -702,11 +702,11 @@ export default function SearchProfiles() {
                                   );
                                 }
                               } else {
-                                // Show limited pages with ellipsis for larger page counts
+                                
                                 const startPage = Math.max(1, page - 1);
                                 const endPage = Math.min(totalPages, page + 1);
 
-                                // Always show first page
+                                
                                 if (startPage > 1) {
                                   pages.push(
                                     <button
@@ -741,7 +741,7 @@ export default function SearchProfiles() {
                                   }
                                 }
 
-                                // Show current page range
+                                
                                 for (let i = startPage; i <= endPage; i++) {
                                   pages.push(
                                     <button
@@ -768,7 +768,7 @@ export default function SearchProfiles() {
                                   );
                                 }
 
-                                // Always show last page
+                                
                                 if (endPage < totalPages) {
                                   if (endPage < totalPages - 1) {
                                     pages.push(

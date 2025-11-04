@@ -10,12 +10,12 @@ const auth = require("../middleware/auth");
 
 const router = express.Router();
 
-// @route   GET /api/users/profile
-// @desc    Get user profile
-// @access  Private
+
+
+
 router.get("/profile", auth, async (req, res) => {
   try {
-    // User data already available from auth middleware
+    
     if (!req.user) {
       return res.status(404).json({
         success: false,
@@ -36,9 +36,9 @@ router.get("/profile", auth, async (req, res) => {
   }
 });
 
-// @route   PUT /api/users/profile
-// @desc    Update user profile
-// @access  Private
+
+
+
 router.put("/profile", auth, async (req, res) => {
   try {
     const { name, picture } = req.body;
@@ -52,7 +52,7 @@ router.put("/profile", auth, async (req, res) => {
       });
     }
 
-    // Update fields
+    
     const updateFields = {};
     if (name) updateFields.name = name;
     if (picture) updateFields.picture = picture;
@@ -77,9 +77,9 @@ router.put("/profile", auth, async (req, res) => {
   }
 });
 
-// @route   PUT /api/users/credits
-// @desc    Update user credits
-// @access  Private
+
+
+
 router.put("/credits", auth, async (req, res) => {
   try {
     const { credits, operation = "add" } = req.body;
@@ -100,7 +100,7 @@ router.put("/credits", auth, async (req, res) => {
       transactionType = "credit_addition";
       transactionDesc = `Added ${credits} credits`;
     } else if (operation === "subtract") {
-      // Check current credits first to prevent negative values
+      
       if (req.user.credits < credits) {
         return res.status(400).json({
           success: false,
@@ -112,14 +112,14 @@ router.put("/credits", auth, async (req, res) => {
       transactionDesc = `Deducted ${credits} credits`;
     }
 
-    // Update user credits atomically
+    
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       updateOperation,
       { new: true, select: "credits" }
     );
 
-    // Record transaction
+    
     if (transactionType) {
       await Transaction.create({
         user: req.user.id,
@@ -144,9 +144,9 @@ router.put("/credits", auth, async (req, res) => {
   }
 });
 
-// @route   DELETE /api/users/account
-// @desc    Delete user account and all associated data except transactions
-// @access  Private
+
+
+
 router.delete("/account", auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -158,7 +158,7 @@ router.delete("/account", auth, async (req, res) => {
       });
     }
 
-    // Check if user is banned
+    
     if (user.isBanned) {
       return res.status(403).json({
         success: false,
@@ -166,25 +166,25 @@ router.delete("/account", auth, async (req, res) => {
       });
     }
 
-    // Get user's profile to get profileId for cleaning up related data
+    
     const profile = await Profile.findOne({ userId: req.user.id });
 
-    // Delete associated data (except transactions)
+    
     await Draft.deleteMany({ userId: req.user.id });
     await Report.deleteMany({ reportedBy: req.user.id });
     await Bookmark.deleteMany({ userId: req.user.id });
     await ProfileView.deleteMany({ userId: req.user.id });
 
-    // If profile exists, delete related bookmarks and views by others
+    
     if (profile) {
       await Bookmark.deleteMany({ profileId: profile.profileId });
       await ProfileView.deleteMany({ profileId: profile._id });
     }
 
-    // Delete user's profile if it exists
+    
     await Profile.findOneAndDelete({ userId: req.user.id });
 
-    // Delete the user account
+    
     await User.findByIdAndDelete(req.user.id);
 
     res.json({
@@ -202,9 +202,9 @@ router.delete("/account", auth, async (req, res) => {
 
 module.exports = router;
 
-// @route   GET /api/users/transactions
-// @desc    Get user's transaction history
-// @access  Private
+
+
+
 router.get("/transactions", auth, async (req, res) => {
   try {
     const transactions = await Transaction.find({ user: req.user.id }).sort({
@@ -219,9 +219,9 @@ router.get("/transactions", auth, async (req, res) => {
   }
 });
 
-// @route   GET /api/users/stats
-// @desc    Get user statistics
-// @access  Private
+
+
+
 router.get("/stats", auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -233,11 +233,11 @@ router.get("/stats", auth, async (req, res) => {
       });
     }
 
-    // Get user's profile for view count
+    
     const userProfile = await Profile.findOne({ userId: req.user.id });
     const profileViews = userProfile ? userProfile.viewCount : 0;
 
-    // Count unlocked contacts
+    
     const unlockedContactsCount = user.unlockedContacts
       ? user.unlockedContacts.length
       : 0;

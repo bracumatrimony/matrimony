@@ -21,7 +21,7 @@ export default function GoogleCallback() {
 
       if (code) {
         try {
-          // Exchange code for token on the backend
+          
           const response = await authService.makeRequest(
             "/auth/google/callback",
             {

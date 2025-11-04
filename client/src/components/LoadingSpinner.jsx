@@ -5,7 +5,7 @@ const LoadingSpinner = ({
   text = "",
   fullScreen = false,
 }) => {
-  // Size configurations
+  
   const sizeConfig = {
     xs: "h-3 w-3 border",
     sm: "h-4 w-4 border-2",
@@ -14,7 +14,7 @@ const LoadingSpinner = ({
     xl: "h-32 w-32 border-4",
   };
 
-  // Color configurations
+  
   const colorConfig = {
     rose: {
       border: "border-rose-200",
@@ -38,7 +38,7 @@ const LoadingSpinner = ({
     },
   };
 
-  // For simple border-b style (used in some components)
+  
   const simpleBorderConfig = {
     rose: "border-b-2 border-rose-600",
     indigo: "border-b-2 border-indigo-600",
@@ -84,7 +84,7 @@ const LoadingSpinner = ({
   return content;
 };
 
-// Additional utility components for specific use cases
+
 export const ButtonSpinner = ({ color = "white", className = "" }) => (
   <LoadingSpinner size="xs" color={color} className={className} />
 );

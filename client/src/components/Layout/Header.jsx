@@ -23,13 +23,13 @@ export default function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  // Memoize monetization status
+  
   const isMonetizationEnabled = useMemo(
     () => monetizationEnabled,
     [monetizationEnabled]
   );
 
-  // Listen for monetization config changes
+  
   useEffect(() => {
     const handleConfigChange = () => {
       const enabled = monetizationConfig.isEnabled();
@@ -57,7 +57,7 @@ export default function Header() {
     <header className="bg-white sticky top-0 z-50 border-b-2 border-black shadow-sm w-full">
       <div className="w-full px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          {/* Large Brand Text with Icon */}
+          {}
           <Link to="/" className="flex items-center space-x-3">
             <img
               src="https://res.cloudinary.com/dkir6pztp/image/upload/v1761749569/logo_xwcdnr.jpg"
@@ -72,7 +72,7 @@ export default function Header() {
             </h1>
           </Link>
 
-          {/* Desktop Navigation */}
+          {}
           <nav className="hidden md:flex items-center space-x-6">
             <Link
               to="/search"
@@ -238,7 +238,7 @@ export default function Header() {
                     <User className="h-4 w-4" />
                     <span>My Profile</span>
                   </Link>
-                  {/* Conditionally show credits in mobile menu based on monetization config and user verification */}
+                  {}
                   {isMonetizationEnabled &&
                     (!user.email.endsWith("@gmail.com") ||
                       user.alumniVerified) && (
@@ -259,7 +259,7 @@ export default function Header() {
                     <Bookmark className="h-4 w-4" />
                     <span>Bookmarks</span>
                   </Link>
-                  {/* Conditionally show transactions and orders links based on monetization config and user verification */}
+                  {}
                   {isMonetizationEnabled &&
                     (!user.email.endsWith("@gmail.com") ||
                       user.alumniVerified) && (

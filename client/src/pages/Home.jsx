@@ -13,7 +13,7 @@ export default function Home() {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        // Fetch fresh data
+        
         const response = await profileService.getStats();
         if (response.success) {
           setStats(response.data);
@@ -58,9 +58,9 @@ export default function Home() {
         keywords="Campus matrimony, marriage, wedding, life partner, matrimonial, Bangladesh, campus"
       />
       <div className="min-h-screen bg-white">
-        {/* Hero Section */}
+        {}
         <section className="relative overflow-hidden min-h-screen">
-          {/* Background Video */}
+          {}
           <video
             autoPlay
             loop
@@ -78,14 +78,14 @@ export default function Home() {
             />
           </video>
 
-          {/* Overlay for text readability */}
+          {}
           <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
 
-          {/* Subtle background gradient (light, mostly-transparent so video remains visible) */}
+          {}
           <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-rose-50/10 pointer-events-none"></div>
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24 min-h-screen flex items-center">
             <div className="text-center w-full">
-              {/* Main heading */}
+              {}
               <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight leading-tight drop-shadow-2xl">
                 <span>Campus </span>
                 <span className="bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
@@ -93,12 +93,12 @@ export default function Home() {
                 </span>
               </h1>
 
-              {/* Subtitle */}
+              {}
               <p className="text-3xl text-gray-100 mb-12 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-md">
                 Find your marriage partner from your own campus.
               </p>
 
-              {/* CTA Buttons */}
+              {}
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
                 <Link
                   to="/search"
@@ -117,7 +117,7 @@ export default function Home() {
             </div>
           </div>
         </section>
-        {/* Biodata Statistics Section */}
+        {}
         <motion.section
           className="py-16 bg-white"
           initial={{ opacity: 0 }}
@@ -142,7 +142,7 @@ export default function Home() {
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Total Biodatas */}
+              {}
               <motion.div
                 className="bg-white rounded-lg shadow-sm border overflow-hidden text-center p-8 hover:shadow-md transition-shadow duration-300"
                 initial={{ opacity: 0, y: 50 }}
@@ -158,7 +158,7 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* Male Biodatas */}
+              {}
               <motion.div
                 className="bg-white rounded-lg shadow-sm border overflow-hidden text-center p-8 hover:shadow-md transition-shadow duration-300"
                 initial={{ opacity: 0, y: 50 }}
@@ -174,7 +174,7 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* Female Biodatas */}
+              {}
               <motion.div
                 className="bg-white rounded-lg shadow-sm border overflow-hidden text-center p-8 hover:shadow-md transition-shadow duration-300"
                 initial={{ opacity: 0, y: 50 }}
@@ -192,7 +192,7 @@ export default function Home() {
             </div>
           </div>
         </motion.section>
-        {/* Islamic Quote Section */}
+        {}
         <motion.section
           className="py-24 bg-white relative"
           initial={{ opacity: 0 }}
@@ -203,7 +203,7 @@ export default function Home() {
           <div className="w-full px-6 lg:px-8">
             <div className="max-w-5xl mx-auto">
               <div className="text-center">
-                {/* Quote container with minimal styling */}
+                {}
                 <motion.div
                   className="max-w-4xl mx-auto"
                   initial={{ opacity: 0, y: 40 }}
@@ -222,7 +222,7 @@ export default function Home() {
                     let him fear God regarding the remaining half
                   </motion.blockquote>
 
-                  {/* Simple attribution */}
+                  {}
                   <motion.div
                     className="flex justify-center"
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -242,7 +242,7 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* Our Mission Section */}
+        {}
         <motion.section
           className="py-24 bg-white"
           initial={{ opacity: 0 }}
@@ -285,7 +285,7 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* How It Works Section */}
+        {}
         <motion.section
           className="py-24 bg-white"
           initial={{ opacity: 0 }}
@@ -336,7 +336,7 @@ export default function Home() {
                   }}
                 >
                   <div className="text-center">
-                    {/* Step number */}
+                    {}
                     <motion.div
                       className="mb-6"
                       initial={{ scale: 0 }}
@@ -354,7 +354,7 @@ export default function Home() {
                       </div>
                     </motion.div>
 
-                    {/* Content */}
+                    {}
                     <motion.h3
                       className="text-xl font-medium text-gray-900 mb-3"
                       initial={{ opacity: 0, x: -20 }}

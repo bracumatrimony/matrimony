@@ -1,4 +1,4 @@
-// Bangladesh Districts Data
+
 export const districtsByDivision = {
   "": [],
   Dhaka: [
@@ -92,11 +92,11 @@ export const districtsByDivision = {
   International: [
     { value: "", label: "Select Country" },
     { value: "Any International", label: "Any International" },
-    // North America
+    
     { value: "USA", label: "United States" },
     { value: "Canada", label: "Canada" },
     { value: "Mexico", label: "Mexico" },
-    // Europe
+    
     { value: "UK", label: "United Kingdom" },
     { value: "Germany", label: "Germany" },
     { value: "France", label: "France" },
@@ -113,10 +113,10 @@ export const districtsByDivision = {
     { value: "Poland", label: "Poland" },
     { value: "Russia", label: "Russia" },
     { value: "Turkey", label: "Turkey" },
-    // Oceania
+    
     { value: "Australia", label: "Australia" },
     { value: "New Zealand", label: "New Zealand" },
-    // Asia
+    
     { value: "Japan", label: "Japan" },
     { value: "South Korea", label: "South Korea" },
     { value: "China", label: "China" },
@@ -134,14 +134,14 @@ export const districtsByDivision = {
     { value: "Malaysia", label: "Malaysia" },
     { value: "Hong Kong", label: "Hong Kong" },
     { value: "Taiwan", label: "Taiwan" },
-    // South Asia
+    
     { value: "India", label: "India" },
     { value: "Pakistan", label: "Pakistan" },
     { value: "Sri Lanka", label: "Sri Lanka" },
     { value: "Nepal", label: "Nepal" },
     { value: "Bhutan", label: "Bhutan" },
     { value: "Maldives", label: "Maldives" },
-    // Africa
+    
     { value: "South Africa", label: "South Africa" },
     { value: "Egypt", label: "Egypt" },
     { value: "Nigeria", label: "Nigeria" },
@@ -150,7 +150,7 @@ export const districtsByDivision = {
     { value: "Ethiopia", label: "Ethiopia" },
     { value: "Morocco", label: "Morocco" },
     { value: "Tunisia", label: "Tunisia" },
-    // South America
+    
     { value: "Brazil", label: "Brazil" },
     { value: "Argentina", label: "Argentina" },
     { value: "Chile", label: "Chile" },

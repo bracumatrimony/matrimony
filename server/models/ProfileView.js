@@ -22,10 +22,10 @@ const profileViewSchema = new mongoose.Schema(
   }
 );
 
-// Compound index to ensure a user can only have one view record per profile
+
 profileViewSchema.index({ userId: 1, profileId: 1 }, { unique: true });
 
-// Index for efficient queries
+
 profileViewSchema.index({ userId: 1, viewedAt: -1 });
 
 module.exports = mongoose.model("ProfileView", profileViewSchema);

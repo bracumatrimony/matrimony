@@ -3,7 +3,7 @@ const User = require("../models/User");
 
 const auth = async (req, res, next) => {
   try {
-    // Get token from cookie or Authorization header (fallback for compatibility)
+    
     let token = req.cookies?.token;
 
     if (!token) {
@@ -23,7 +23,7 @@ const auth = async (req, res, next) => {
 
     console.log("Auth middleware: Token received, verifying...");
 
-    // Verify token
+    
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -38,7 +38,7 @@ const auth = async (req, res, next) => {
       throw verifyError;
     }
 
-    // Get user from database with only essential fields
+    
     const user = await User.findById(decoded.userId)
       .select(
         "name email profileId isActive role credits alumniVerified verificationRequest unlockedContacts"
@@ -71,7 +71,7 @@ const auth = async (req, res, next) => {
       });
     }
 
-    // Add user to request object with id field for consistency
+    
     req.user = { ...user, id: user._id };
     console.log(
       "Auth middleware: Authentication successful, proceeding to next middleware"

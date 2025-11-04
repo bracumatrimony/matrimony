@@ -12,7 +12,7 @@ export default function TransactionsWrapper() {
   const [isLoading, setIsLoading] = useState(monetizationConfig.isLoading);
   const navigate = useNavigate();
 
-  // Listen for monetization config changes
+  
   useEffect(() => {
     const handleConfigChange = () => {
       setMonetizationEnabled(monetizationConfig.isEnabled());
@@ -21,7 +21,7 @@ export default function TransactionsWrapper() {
 
     window.addEventListener("monetizationConfigChanged", handleConfigChange);
 
-    // Initial check
+    
     setMonetizationEnabled(monetizationConfig.isEnabled());
     setIsLoading(monetizationConfig.isLoading);
 
@@ -33,7 +33,7 @@ export default function TransactionsWrapper() {
     };
   }, []);
 
-  // Check user access
+  
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
@@ -44,16 +44,16 @@ export default function TransactionsWrapper() {
     }
   }, [navigate]);
 
-  // Show loading while config is being fetched
+  
   if (isLoading) {
     return <PageSpinner text="Loading..." />;
   }
 
-  // Show 404 if monetization is disabled
+  
   if (!monetizationEnabled) {
     return <FeatureNotAvailable featureName="Transactions" />;
   }
 
-  // Show transactions page if monetization is enabled
+  
   return <Transaction />;
 }

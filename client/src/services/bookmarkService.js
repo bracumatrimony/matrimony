@@ -1,4 +1,4 @@
-// Bookmark service for handling bookmark operations
+
 import authService from "./authService";
 
 class BookmarkService {
@@ -6,7 +6,7 @@ class BookmarkService {
     this.baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
   }
 
-  // Make API request with authentication
+  
   async makeRequest(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
 
@@ -14,11 +14,11 @@ class BookmarkService {
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include", // Include cookies for backward compatibility
+      credentials: "include", 
       ...options,
     };
 
-    // Add Authorization header if token exists
+    
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -28,7 +28,7 @@ class BookmarkService {
     const data = await response.json();
 
     if (!response.ok) {
-      // Create a custom error object that includes the response data
+      
       const error = new Error(data.message || "Request failed");
       error.response = {
         data,
@@ -41,7 +41,7 @@ class BookmarkService {
     return data;
   }
 
-  // Add a profile to bookmarks
+  
   async addBookmark(profileId) {
     try {
       const response = await this.makeRequest("/bookmarks", {
@@ -55,7 +55,7 @@ class BookmarkService {
     }
   }
 
-  // Remove a profile from bookmarks
+  
   async removeBookmark(profileId) {
     try {
       const response = await this.makeRequest(`/bookmarks/${profileId}`, {
@@ -68,7 +68,7 @@ class BookmarkService {
     }
   }
 
-  // Get all bookmarks for current user with pagination
+  
   async getBookmarks(page = 1, limit = 9) {
     try {
       const response = await this.makeRequest(
@@ -81,7 +81,7 @@ class BookmarkService {
     }
   }
 
-  // Check if a profile is bookmarked
+  
   async isBookmarked(profileId) {
     try {
       const response = await this.makeRequest(`/bookmarks/check/${profileId}`);
@@ -92,7 +92,7 @@ class BookmarkService {
     }
   }
 
-  // Toggle bookmark status for a profile
+  
   async toggleBookmark(profileId) {
     try {
       const checkResponse = await this.isBookmarked(profileId);
@@ -108,7 +108,7 @@ class BookmarkService {
     }
   }
 
-  // Get bookmark statistics for current user
+  
   async getStats() {
     try {
       const response = await this.makeRequest("/bookmarks/stats");
@@ -120,5 +120,5 @@ class BookmarkService {
   }
 }
 
-// Export singleton instance
+
 export default new BookmarkService();

@@ -14,12 +14,12 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
   const [restricting, setRestricting] = useState(null);
   const [deleting, setDeleting] = useState(null);
 
-  // Debounce search query
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchQuery(searchInput);
-      setCurrentPage(1); // Reset to first page when searching
-    }, 800); // 500ms delay
+      setCurrentPage(1); 
+    }, 800); 
 
     return () => clearTimeout(timer);
   }, [searchInput]);
@@ -59,15 +59,15 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
       setExporting(true);
       showNotification?.("Exporting emails...", "info");
 
-      // Fetch all profiles with a high limit to get all emails
+      
       const response = await adminService.getApprovedProfiles(1, 10000, "");
       if (response.success && response.profiles) {
         const emails = response.profiles
           .map((profile) => profile.userId?.email)
-          .filter((email) => email) // Remove any null/undefined emails
+          .filter((email) => email) 
           .join("\n");
 
-        // Create and download the file
+        
         const blob = new Blob([emails], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -98,7 +98,7 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
       const response = await adminService.restrictUser(userId);
       if (response.success) {
         showNotification?.("User restricted successfully", "success");
-        loadProfiles(); // Reload the profiles list
+        loadProfiles(); 
       } else {
         showNotification?.("Failed to restrict user", "error");
       }
@@ -124,7 +124,7 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
       const response = await adminService.deleteProfile(profileId);
       if (response.success) {
         showNotification?.("Biodata deleted successfully", "success");
-        loadProfiles(); // Reload the profiles list
+        loadProfiles(); 
       } else {
         showNotification?.("Failed to delete biodata", "error");
       }
@@ -140,7 +140,7 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">All Biodata</h1>
@@ -164,7 +164,7 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
         </div>
       </div>
 
-      {/* Search and Filters */}
+      {}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
@@ -200,7 +200,7 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
         </div>
       </div>
 
-      {/* Profiles Table */}
+      {}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12">
@@ -311,7 +311,7 @@ export default function AllBiodata({ onViewProfile, showNotification }) {
               </table>
             </div>
 
-            {/* Pagination */}
+            {}
             {totalPages > 1 && (
               <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
                 <div className="flex-1 flex justify-between sm:hidden">

@@ -21,7 +21,7 @@ export default function AllOrders() {
 
     const fetchOrders = async () => {
       try {
-        // Refresh user data to ensure latest credits are shown in header
+        
         await refreshUser();
         const res = await profileService.getUserOrders();
         setOrders(Array.isArray(res.orders) ? res.orders : []);
@@ -60,34 +60,34 @@ export default function AllOrders() {
     }
   };
 
-  // Pagination calculations
+  
   const totalPages = Math.ceil(orders.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentOrders = orders.slice(startIndex, endIndex);
 
-  // Pagination handlers
+  
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); // Reset to first page when changing items per page
+    setCurrentPage(1); 
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4">
-          {/* Header skeleton */}
+          {}
           <div className="mb-8">
             <div className="bg-gradient-to-r from-gray-800 to-black rounded-lg p-6 text-white shadow-lg animate-pulse">
               <div className="h-8 bg-gray-300 rounded w-32 mb-2"></div>
               <div className="h-4 bg-gray-300 rounded w-64"></div>
             </div>
           </div>
-          {/* Orders Table Skeleton */}
+          {}
           <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -155,7 +155,7 @@ export default function AllOrders() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
+        {}
         <div className="mb-8">
           <div className="bg-gradient-to-r from-gray-800 to-black rounded-lg p-6 text-white shadow-lg">
             <h1 className="text-3xl font-bold mb-2">All Orders</h1>
@@ -165,7 +165,7 @@ export default function AllOrders() {
           </div>
         </div>
 
-        {/* Orders List - Desktop */}
+        {}
         <div className="hidden md:block bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
           {orders.length === 0 ? (
             <div className="text-center py-12">
@@ -375,10 +375,10 @@ export default function AllOrders() {
           )}
         </div>
 
-        {/* Pagination Controls */}
+        {}
         {orders.length > 0 && totalPages > 1 && (
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            {/* Items per page selector */}
+            {}
             <div className="flex items-center gap-2">
               <label className="text-sm text-gray-600">Show:</label>
               <select
@@ -396,13 +396,13 @@ export default function AllOrders() {
               <span className="text-sm text-gray-600">per page</span>
             </div>
 
-            {/* Pagination info */}
+            {}
             <div className="text-sm text-gray-600">
               Showing {startIndex + 1}-{Math.min(endIndex, orders.length)} of{" "}
               {orders.length} orders
             </div>
 
-            {/* Page navigation */}
+            {}
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -416,10 +416,10 @@ export default function AllOrders() {
                 <ChevronLeft className="h-4 w-4" />
               </button>
 
-              {/* Page number buttons */}
+              {}
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (num) => {
-                  // Show first, last, current, and neighbors; ellipsis for gaps
+                  
                   if (
                     num === 1 ||
                     num === totalPages ||

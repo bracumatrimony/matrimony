@@ -6,11 +6,11 @@ const PublicRoute = ({ children }) => {
   const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
-    return null; // Return null instead of spinner to avoid flash
+    return null; 
   }
 
   if (isAuthenticated) {
-    // Always redirect authenticated users to their profile page
+    
     return <Navigate to="/profile" replace />;
   }
 

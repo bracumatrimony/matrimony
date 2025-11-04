@@ -37,7 +37,7 @@ export default function BiodataCreate() {
   const [componentLoading, setComponentLoading] = useState(true);
   const shouldReduceMotion = useReducedMotion();
   const [formData, setFormData] = useState({
-    // Segment 1: Family Background
+    
     fatherAlive: "",
     fatherOccupation: "",
     motherAlive: "",
@@ -56,7 +56,7 @@ export default function BiodataCreate() {
     uncle3Occupation: "",
     familyEconomicCondition: "",
 
-    // Segment 2: Education & Profession
+    
     educationMedium: "",
     sscPassingYear: "",
     sscGroup: "",
@@ -72,7 +72,7 @@ export default function BiodataCreate() {
     professionDescription: "",
     monthlyIncome: "",
 
-    // Segment 3: Lifestyle, Health & Compatibility
+    
     age: "",
     height: "",
     weight: "",
@@ -90,7 +90,7 @@ export default function BiodataCreate() {
     partnerJobAfterMarriage: "",
     preferredLivingLocation: "",
 
-    // Segment 4: Expected Life Partner & Declaration
+    
     partnerAgePreferenceMin: "",
     partnerAgePreferenceMax: "",
     partnerSkinTone: "",
@@ -106,11 +106,11 @@ export default function BiodataCreate() {
     informationTruthfulness: "",
     falseInformationAgreement: "",
 
-    // Contact Information
+    
     contactInformation: "",
     personalContactInfo: "",
 
-    // Gender (added for modal selection)
+    
     gender: "",
     religion: "",
   });
@@ -130,7 +130,7 @@ export default function BiodataCreate() {
       try {
         setComponentLoading(true);
 
-        // Wait for auth loading to complete
+        
         if (authLoading) {
           return;
         }
@@ -140,11 +140,11 @@ export default function BiodataCreate() {
           return;
         }
 
-        // Check if user wants to start fresh
+        
         const startFresh = searchParams.get("new") === "true";
 
         if (startFresh) {
-          // Clear any existing drafts and start with empty form
+          
           try {
             await draftService.deleteDraft();
           } catch (error) {
@@ -157,7 +157,7 @@ export default function BiodataCreate() {
         }
 
         try {
-          // Load saved draft from server
+          
           const response = await draftService.getDraft();
 
           if (response.success && response.draft) {
@@ -166,7 +166,7 @@ export default function BiodataCreate() {
           }
         } catch (error) {
           console.error("Error loading draft from server:", error);
-          // Fallback to localStorage if server fails
+          
           const savedFormData = localStorage.getItem("createProfile_formData");
           const savedStep = localStorage.getItem("createProfile_currentStep");
 
@@ -195,13 +195,13 @@ export default function BiodataCreate() {
   }, [authLoading, user, navigate, searchParams, totalSteps]);
 
   useEffect(() => {
-    // Save progress when user navigates away or closes browser
+    
     const handleBeforeUnload = async (event) => {
-      // Only save if there are significant changes (not on every keystroke)
+      
       try {
         await draftService.saveDraft(currentStep, formData);
       } catch (error) {
-        // Fallback to localStorage if server fails
+        
         localStorage.setItem(
           "createProfile_formData",
           JSON.stringify(formData)
@@ -215,11 +215,11 @@ export default function BiodataCreate() {
 
     window.addEventListener("beforeunload", handleBeforeUnload);
 
-    // Cleanup event listener
+    
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, []); // Remove currentStep and formData dependencies to avoid frequent saves
+  }, []); 
 
   const showNotification = (message, type = "error") => {
     setNotification({ message, type });
@@ -236,16 +236,16 @@ export default function BiodataCreate() {
 
       setFormData(updatedFormData);
 
-      // Auto-save to server with debouncing (saves after 3 seconds of no changes)
+      
       draftService.saveDraftDebounced(currentStep, updatedFormData, 3000);
 
-      // Also save to localStorage as backup
+      
       localStorage.setItem(
         "createProfile_formData",
         JSON.stringify(updatedFormData)
       );
 
-      // Clear error when user starts typing
+      
       if (errors[name]) {
         setErrors((prev) => ({
           ...prev,
@@ -261,7 +261,7 @@ export default function BiodataCreate() {
     setErrors(stepErrors);
 
     if (Object.keys(stepErrors).length > 0) {
-      // Show toast notification for the first error
+      
       const firstError = Object.values(stepErrors)[0];
       const stepName = getStepName(step);
       showNotification(`${stepName}: ${firstError}`, "error");
@@ -276,11 +276,11 @@ export default function BiodataCreate() {
       const nextStep = Math.min(currentStep + 1, totalSteps);
       setCurrentStep(nextStep);
 
-      // Save current step to localStorage as backup
+      
       localStorage.setItem("createProfile_currentStep", nextStep.toString());
 
-      // Trigger debounced save with updated step
-      draftService.saveDraftDebounced(nextStep, formData, 1000); // Shorter delay for step changes
+      
+      draftService.saveDraftDebounced(nextStep, formData, 1000); 
     }
   }, [currentStep, formData, totalSteps]);
 
@@ -288,15 +288,15 @@ export default function BiodataCreate() {
     const prevStep = Math.max(currentStep - 1, 1);
     setCurrentStep(prevStep);
 
-    // Save current step to localStorage as backup
+    
     localStorage.setItem("createProfile_currentStep", prevStep.toString());
 
-    // Trigger debounced save with updated step
-    draftService.saveDraftDebounced(prevStep, formData, 1000); // Shorter delay for step changes
+    
+    draftService.saveDraftDebounced(prevStep, formData, 1000); 
   }, [currentStep, formData]);
 
   const handleCreateBiodataClick = async () => {
-    // Validate all steps before allowing submission
+    
     let allStepsValid = true;
     const allErrors = {};
 
@@ -310,7 +310,7 @@ export default function BiodataCreate() {
 
     if (!allStepsValid) {
       setErrors(allErrors);
-      // Scroll to the first error to help user see what's missing
+      
       setTimeout(() => {
         const firstErrorElement = document.querySelector(".text-red-600");
         if (firstErrorElement) {
@@ -323,10 +323,10 @@ export default function BiodataCreate() {
       return;
     }
 
-    // Check if gender is selected
+    
     if (!formData.gender) {
       setErrors({ gender: "Please select your gender" });
-      // Scroll to gender field
+      
       setTimeout(() => {
         const genderField = document.querySelector('select[name="gender"]');
         if (genderField) {
@@ -339,24 +339,24 @@ export default function BiodataCreate() {
       return;
     }
 
-    // Directly submit with selected gender
+    
     handleSubmit(formData.gender);
   };
 
   const handleSubmit = async (selectedGender) => {
     setIsLoading(true);
 
-    // Validate the complete form data before submission
-    // Prepare the form data with combined fields for validation
+    
+    
     const completeFormData = {
       ...formData,
       gender: selectedGender || formData.gender,
-      // Combine age preference fields for validation
+      
       partnerAgePreference:
         formData.partnerAgePreferenceMin && formData.partnerAgePreferenceMax
           ? `${formData.partnerAgePreferenceMin} - ${formData.partnerAgePreferenceMax} years`
           : "",
-      // Combine height preference fields for validation
+      
       partnerHeight:
         formData.partnerHeightMin && formData.partnerHeightMax
           ? `${formData.partnerHeightMin} - ${formData.partnerHeightMax} feet`
@@ -368,7 +368,7 @@ export default function BiodataCreate() {
       console.error("Form validation errors:", validationErrors);
       setErrors(validationErrors);
 
-      // Show toast notification for the first validation error
+      
       const firstError = Object.values(validationErrors)[0];
       showNotification(`Please fix the following: ${firstError}`, "error");
 
@@ -377,25 +377,25 @@ export default function BiodataCreate() {
     }
 
     try {
-      // Prepare profile data
-      // Prepare dynamic sibling occupation data
+      
+      
       const dynamicSiblingData = {};
 
-      // Add brother occupations dynamically
+      
       const brothersCount = parseInt(formData.brothersCount) || 0;
       for (let i = 1; i <= brothersCount; i++) {
         const fieldName = `brother${i}Occupation`;
         dynamicSiblingData[fieldName] = formData[fieldName]?.trim() || "";
       }
 
-      // Add sister occupations dynamically
+      
       const sistersCount = parseInt(formData.sistersCount) || 0;
       for (let i = 1; i <= sistersCount; i++) {
         const fieldName = `sister${i}Occupation`;
         dynamicSiblingData[fieldName] = formData[fieldName]?.trim() || "";
       }
 
-      // Add uncle occupations dynamically
+      
       const unclesCount = parseInt(formData.unclesCount) || 0;
       for (let i = 1; i <= unclesCount; i++) {
         const fieldName = `uncle${i}Occupation`;
@@ -403,7 +403,7 @@ export default function BiodataCreate() {
       }
 
       const profileData = {
-        // Family Background
+        
         fatherAlive: formData.fatherAlive,
         fatherOccupation: formData.fatherOccupation?.trim() || "",
         motherAlive: formData.motherAlive,
@@ -411,10 +411,10 @@ export default function BiodataCreate() {
         brothersCount: brothersCount,
         sistersCount: sistersCount,
         unclesCount: unclesCount,
-        ...dynamicSiblingData, // Include all dynamic sibling occupation data
+        ...dynamicSiblingData, 
         familyEconomicCondition: formData.familyEconomicCondition,
 
-        // Education & Profession
+        
         educationMedium: formData.educationMedium,
         sscPassingYear: formData.sscPassingYear,
         sscGroup: formData.sscGroup?.trim() || "",
@@ -431,7 +431,7 @@ export default function BiodataCreate() {
         professionDescription: formData.professionDescription?.trim() || "",
         monthlyIncome: formData.monthlyIncome,
 
-        // Lifestyle, Health & Compatibility
+        
         age: formData.age || "",
         height: formData.height || "",
         weight: formData.weight || "",
@@ -452,7 +452,7 @@ export default function BiodataCreate() {
         partnerJobAfterMarriage: formData.partnerJobAfterMarriage || "",
         preferredLivingLocation: formData.preferredLivingLocation?.trim() || "",
 
-        // Expected Life Partner & Declaration
+        
         partnerAgePreference:
           formData.partnerAgePreferenceMin && formData.partnerAgePreferenceMax
             ? `${formData.partnerAgePreferenceMin} - ${formData.partnerAgePreferenceMax} years`
@@ -472,11 +472,11 @@ export default function BiodataCreate() {
         informationTruthfulness: formData.informationTruthfulness,
         falseInformationAgreement: formData.falseInformationAgreement,
 
-        // Contact Information
+        
         contactInformation: formData.contactInformation?.trim() || "",
         personalContactInfo: formData.personalContactInfo?.trim() || "",
 
-        // Gender - use the selectedGender parameter to avoid state timing issues
+        
         gender: selectedGender || formData.gender || "",
         religion: formData.religion || "",
       };
@@ -484,22 +484,22 @@ export default function BiodataCreate() {
       const response = await profileService.createProfile(profileData);
 
       if (response.success) {
-        // Refresh user data from server to get updated hasProfile status
+        
         await refreshUser();
 
-        // Small delay to ensure database consistency
+        
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // Clear saved form data from both server and localStorage since profile was successfully created
+        
         await draftService.deleteDraft();
         localStorage.removeItem("createProfile_formData");
         localStorage.removeItem("createProfile_currentStep");
 
-        // Show success animation before navigating
+        
         setIsLoading(false);
         setShowSuccessAnimation(true);
 
-        // Navigate after animation completes
+        
         setTimeout(() => {
           setAnimationComplete(true);
           setTimeout(() => {
@@ -514,7 +514,7 @@ export default function BiodataCreate() {
       console.error("Error response data:", error.response?.data);
       console.error("Error response status:", error.response?.status);
 
-      // Handle backend validation errors
+      
       if (error.response?.data?.errors) {
         console.log(
           "Setting field-specific errors:",
@@ -522,7 +522,7 @@ export default function BiodataCreate() {
         );
         setErrors(error.response.data.errors);
 
-        // Show toast for the first backend validation error
+        
         const firstError = Object.values(error.response.data.errors)[0];
         showNotification(`${firstError}`, "error");
       } else if (error.response?.data?.details) {
@@ -533,7 +533,7 @@ export default function BiodataCreate() {
         });
         setErrors(backendErrors);
 
-        // Show toast for the first detail error
+        
         const firstDetail = error.response.data.details[0];
         showNotification(`Error: ${firstDetail}`, "error");
       } else {
@@ -571,7 +571,7 @@ export default function BiodataCreate() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Father Status */}
+              {}
               <div className="md:col-span-2">
                 <label className="flex items-center text-sm font-semibold text-gray-800 mb-3">
                   Is your father alive? *
@@ -777,7 +777,7 @@ export default function BiodataCreate() {
                 )
               )}
 
-              {/* Sisters Occupations */}
+              {}
               {Array.from(
                 { length: parseInt(formData.sistersCount) || 0 },
                 (_, index) => (
@@ -832,7 +832,7 @@ export default function BiodataCreate() {
                 )
               )}
 
-              {/* Family Economic Condition */}
+              {}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   What is your family's economic condition? *
@@ -1347,7 +1347,7 @@ export default function BiodataCreate() {
                   )}
                 </div>
 
-                {/* Weight */}
+                {}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Weight: *
@@ -1375,9 +1375,9 @@ export default function BiodataCreate() {
                 </div>
               </div>
 
-              {/* Skin Tone and Marital Status - Third Row */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Skin Tone */}
+                {}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Skin Tone: *
@@ -1404,7 +1404,7 @@ export default function BiodataCreate() {
                   )}
                 </div>
 
-                {/* Marital Status */}
+                {}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Marital Status: *
@@ -1432,14 +1432,14 @@ export default function BiodataCreate() {
                 </div>
               </div>
 
-              {/* Address Information */}
+              {}
               <div>
                 <h4 className="text-md font-medium text-gray-800 mb-4">
                   Address Information
                 </h4>
               </div>
 
-              {/* Present Address */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1450,7 +1450,7 @@ export default function BiodataCreate() {
                     value={formData.presentAddressDivision}
                     onChange={(e) => {
                       handleChange(e);
-                      // Reset district when division changes
+                      
                       setFormData((prev) => ({
                         ...prev,
                         presentAddressDistrict: "",
@@ -1512,7 +1512,7 @@ export default function BiodataCreate() {
                 </div>
               </div>
 
-              {/* Permanent Address */}
+              {}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1523,7 +1523,7 @@ export default function BiodataCreate() {
                     value={formData.permanentAddressDivision}
                     onChange={(e) => {
                       handleChange(e);
-                      // Reset district when division changes
+                      
                       setFormData((prev) => ({
                         ...prev,
                         permanentAddressDistrict: "",
@@ -1585,7 +1585,7 @@ export default function BiodataCreate() {
                 </div>
               </div>
 
-              {/* Religious Practices */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   What are your regular spiritual or religious practices? *
@@ -1609,7 +1609,7 @@ export default function BiodataCreate() {
                 )}
               </div>
 
-              {/* Practice Frequency */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   How often do you practice your beliefs? *
@@ -1638,7 +1638,7 @@ export default function BiodataCreate() {
                 )}
               </div>
 
-              {/* Mental/Physical Illness */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Do you have any mental or physical illness? Please specify. *
@@ -1662,7 +1662,7 @@ export default function BiodataCreate() {
                 )}
               </div>
 
-              {/* Hobbies, Likes, Dislikes, Dreams */}
+              {}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tell us about yourself: *
@@ -1693,7 +1693,7 @@ export default function BiodataCreate() {
                 </div>
               </div>
 
-              {/* Marriage Compatibility Views (Female only) */}
+              {}
               {formData.gender === "Female" && (
                 <>
                   <div>
@@ -1702,7 +1702,7 @@ export default function BiodataCreate() {
                     </h4>
                   </div>
 
-                  {/* Partner Study After Marriage */}
+                  {}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       What is your view on continuing your studies after
