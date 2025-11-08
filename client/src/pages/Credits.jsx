@@ -23,12 +23,11 @@ export default function Credits() {
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const navigate = useNavigate();
 
-  
   useEffect(() => {
     if (showSuccessAnimation) {
       const timer = setTimeout(() => {
         navigate("/orders");
-      }, 3000); 
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
@@ -41,7 +40,6 @@ export default function Credits() {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
 
-        
         if (
           parsedUser.email.endsWith("@gmail.com") &&
           !parsedUser.alumniVerified
@@ -50,7 +48,6 @@ export default function Credits() {
           return;
         }
 
-        
         if (parsedUser?.hasProfile) {
           await loadUserProfile();
         }
@@ -68,7 +65,7 @@ export default function Credits() {
       }
     } catch (error) {
       console.error("Error loading user profile:", error);
-      
+
       setUserProfile(null);
     }
   };
@@ -77,28 +74,26 @@ export default function Credits() {
     {
       id: 1,
       credits: 1,
-      price: 30,
+      price: 50,
       popular: false,
     },
     {
       id: 2,
       credits: 5,
-      price: 99,
-      originalPrice: 150,
-      discount: 33,
+      price: 199,
+      originalPrice: 250,
+      discount: 20,
       popular: true,
     },
     {
       id: 3,
       credits: 10,
-      price: 149,
-      originalPrice: 300,
-      discount: 50,
+      price: 349,
+      originalPrice: 500,
+      discount: 30,
       popular: false,
     },
   ];
-
-  
   const hasProfileDiscount = userProfile?.status === "approved";
 
   const calculateDiscountedPrice = (price) => {
@@ -120,7 +115,6 @@ export default function Credits() {
 
     setIsLoading(true);
     try {
-      
       const res = await profileService.makeRequest("/transactions/purchase", {
         method: "POST",
         body: JSON.stringify({
@@ -132,7 +126,6 @@ export default function Credits() {
       });
 
       if (res.success) {
-        
         setShowSuccessAnimation(true);
         setSelectedPackage(null);
         setTransactionId("");
