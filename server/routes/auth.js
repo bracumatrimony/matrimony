@@ -12,12 +12,10 @@ const { detectUniversityFromEmail } = require("../config/universities");
 
 const router = express.Router();
 
-
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET
 );
-
 
 const setTokenCookie = (res, token) => {
   const isProduction = process.env.NODE_ENV === "production";
@@ -28,17 +26,13 @@ const setTokenCookie = (res, token) => {
     httpOnly: true,
     secure: isProduction,
     sameSite: isEmbeddedBrowser ? "lax" : isProduction ? "none" : "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000, 
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
-
 
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
-
-
-
 
 router.post("/google", async (req, res) => {
   try {
@@ -51,7 +45,6 @@ router.post("/google", async (req, res) => {
       });
     }
 
-    
     const ticket = await googleClient.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -67,11 +60,9 @@ router.post("/google", async (req, res) => {
       });
     }
 
-    
     let user = await User.findOne({ email });
 
     if (!user) {
-      
       const universityInfo = detectUniversityFromEmail(email);
       let universityKey, profileId, alumniVerified, verificationRequest;
 
@@ -86,20 +77,17 @@ router.post("/google", async (req, res) => {
       }
 
       if (universityInfo) {
-        
         universityKey = universityInfo.key;
         profileId = await User.generateProfileId(universityKey);
         alumniVerified = false;
         verificationRequest = false;
       } else {
-        
         universityKey = null;
         profileId = null;
         alumniVerified = false;
-        verificationRequest = true; 
+        verificationRequest = true;
       }
 
-      
       const userData = {
         name,
         email,
@@ -124,7 +112,6 @@ router.post("/google", async (req, res) => {
         await CreditedEmail.create({ email: email.toLowerCase() });
       }
     } else if (!user.isGoogleUser) {
-      
       await User.findByIdAndUpdate(
         user._id,
         {
@@ -137,11 +124,9 @@ router.post("/google", async (req, res) => {
       );
     }
 
-    
     const token = generateToken(user._id);
     setTokenCookie(res, token);
 
-    
     const userResponse = {
       id: user._id,
       name: user.name,
@@ -154,7 +139,7 @@ router.post("/google", async (req, res) => {
       alumniVerified: user.alumniVerified,
       profileId: user.profileId,
       university: user.university,
-      token: token, 
+      token: token,
     };
 
     res.json({
@@ -171,12 +156,9 @@ router.post("/google", async (req, res) => {
   }
 });
 
-
-
-
 router.post("/google/callback", async (req, res) => {
   try {
-    const { code } = req.body;
+    const { code, redirectUri } = req.body;
 
     if (!code) {
       return res.status(400).json({
@@ -185,14 +167,14 @@ router.post("/google/callback", async (req, res) => {
       });
     }
 
-    
     const isProduction = process.env.NODE_ENV === "production";
     const baseUrl =
       process.env.CLIENT_URL ||
       (isProduction
         ? "https://campusmatrimony.vercel.app"
         : "http://localhost:5173");
-    const redirectUri = `${baseUrl}/auth/google/callback`;
+
+    const finalRedirectUri = redirectUri || `${baseUrl}/auth/google/callback`;
 
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
@@ -204,7 +186,7 @@ router.post("/google/callback", async (req, res) => {
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         code,
         grant_type: "authorization_code",
-        redirect_uri: redirectUri,
+        redirect_uri: finalRedirectUri,
       }),
     });
 
@@ -214,7 +196,6 @@ router.post("/google/callback", async (req, res) => {
       throw new Error("Google authentication failed");
     }
 
-    
     const ticket = await googleClient.verifyIdToken({
       idToken: tokenData.id_token,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -230,11 +211,9 @@ router.post("/google/callback", async (req, res) => {
       });
     }
 
-    
     let user = await User.findOne({ email });
 
     if (!user) {
-      
       const universityInfo = detectUniversityFromEmail(email);
       let universityKey, profileId, alumniVerified, verificationRequest;
 
@@ -249,20 +228,17 @@ router.post("/google/callback", async (req, res) => {
       }
 
       if (universityInfo) {
-        
         universityKey = universityInfo.key;
         profileId = await User.generateProfileId(universityKey);
         alumniVerified = false;
         verificationRequest = false;
       } else {
-        
         universityKey = null;
         profileId = null;
         alumniVerified = false;
-        verificationRequest = true; 
+        verificationRequest = true;
       }
 
-      
       const userData = {
         name,
         email,
@@ -275,7 +251,6 @@ router.post("/google/callback", async (req, res) => {
         credits: initialCredits,
       };
 
-      
       if (profileId) {
         userData.profileId = profileId;
       }
@@ -289,7 +264,6 @@ router.post("/google/callback", async (req, res) => {
         await CreditedEmail.create({ email: email.toLowerCase() });
       }
     } else if (!user.isGoogleUser) {
-      
       await User.findByIdAndUpdate(
         user._id,
         {
@@ -302,11 +276,9 @@ router.post("/google/callback", async (req, res) => {
       );
     }
 
-    
     const token = generateToken(user._id);
     setTokenCookie(res, token);
 
-    
     const userResponse = {
       id: user._id,
       name: user.name,
@@ -320,7 +292,7 @@ router.post("/google/callback", async (req, res) => {
       verificationRequest: user.verificationRequest,
       profileId: user.profileId,
       university: user.university,
-      token: token, 
+      token: token,
     };
 
     res.json({
@@ -337,9 +309,6 @@ router.post("/google/callback", async (req, res) => {
   }
 });
 
-
-
-
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
@@ -352,14 +321,10 @@ router.post("/logout", (req, res) => {
   });
 });
 
-
-
-
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -367,7 +332,6 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -376,7 +340,6 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    
     const universityInfo = detectUniversityFromEmail(email);
 
     let initialCredits = 0;
@@ -392,20 +355,17 @@ router.post("/register", async (req, res) => {
     let universityKey, profileId, alumniVerified, verificationRequest;
 
     if (universityInfo) {
-      
       universityKey = universityInfo.key;
       profileId = await User.generateProfileId(universityKey);
       alumniVerified = false;
       verificationRequest = false;
     } else {
-      
       universityKey = null;
       profileId = null;
       alumniVerified = false;
-      verificationRequest = true; 
+      verificationRequest = true;
     }
 
-    
     const userData = {
       name,
       email,
@@ -417,7 +377,6 @@ router.post("/register", async (req, res) => {
       credits: initialCredits,
     };
 
-    
     if (profileId) {
       userData.profileId = profileId;
     }
@@ -431,7 +390,6 @@ router.post("/register", async (req, res) => {
       await CreditedEmail.create({ email: email.toLowerCase() });
     }
 
-    
     const token = generateToken(user._id);
     setTokenCookie(res, token);
 
@@ -456,14 +414,10 @@ router.post("/register", async (req, res) => {
   }
 });
 
-
-
-
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -471,7 +425,6 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
       return res.status(400).json({
@@ -480,7 +433,6 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(400).json({
@@ -489,7 +441,6 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    
     if (user.isBanned) {
       return res.status(403).json({
         success: false,
@@ -497,10 +448,8 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    
     await user.updateLastLogin();
 
-    
     const token = generateToken(user._id);
     setTokenCookie(res, token);
 
@@ -517,9 +466,6 @@ router.post("/login", async (req, res) => {
     });
   }
 });
-
-
-
 
 router.get("/me", async (req, res) => {
   try {
@@ -542,7 +488,6 @@ router.get("/me", async (req, res) => {
       });
     }
 
-    
     const existingProfile = await Profile.findOne({ userId: user._id });
     if (existingProfile && !user.hasProfile) {
       await User.findByIdAndUpdate(
@@ -571,9 +516,6 @@ router.get("/me", async (req, res) => {
   }
 });
 
-
-
-
 router.get("/verify-token", async (req, res) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
@@ -588,7 +530,6 @@ router.get("/verify-token", async (req, res) => {
       });
     }
 
-    
     let decodedPayload;
     try {
       decodedPayload = jwt.decode(token);
@@ -597,7 +538,6 @@ router.get("/verify-token", async (req, res) => {
       console.error("Token decode error:", decodeError);
     }
 
-    
     let verifiedPayload;
     try {
       verifiedPayload = jwt.verify(token, process.env.JWT_SECRET);
@@ -617,7 +557,6 @@ router.get("/verify-token", async (req, res) => {
       });
     }
 
-    
     const user = await User.findById(verifiedPayload.userId);
 
     res.json({
@@ -650,9 +589,6 @@ router.get("/verify-token", async (req, res) => {
     });
   }
 });
-
-
-
 
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {

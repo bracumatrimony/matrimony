@@ -21,12 +21,14 @@ export default function GoogleCallback() {
 
       if (code) {
         try {
-          
           const response = await authService.makeRequest(
             "/auth/google/callback",
             {
               method: "POST",
-              body: JSON.stringify({ code }),
+              body: JSON.stringify({
+                code,
+                redirectUri: window.location.origin + "/auth/google/callback",
+              }),
             }
           );
 

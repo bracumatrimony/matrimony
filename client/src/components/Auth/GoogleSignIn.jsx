@@ -25,7 +25,6 @@ export default function GoogleSignIn() {
     window.location.href = authUrl;
   };
 
-  
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
@@ -36,7 +35,10 @@ export default function GoogleSignIn() {
       authService
         .makeRequest("/auth/google/callback", {
           method: "POST",
-          body: JSON.stringify({ code }),
+          body: JSON.stringify({
+            code,
+            redirectUri: window.location.origin + "/auth/google/callback",
+          }),
         })
         .then((response) => {
           if (response.success) {
@@ -51,7 +53,7 @@ export default function GoogleSignIn() {
         })
         .finally(() => {
           setIsLoading(false);
-          
+
           window.history.replaceState(
             {},
             document.title,
