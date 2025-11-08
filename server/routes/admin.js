@@ -834,6 +834,51 @@ router.put("/users/:userId/unban", [auth, adminAuth], async (req, res) => {
   }
 });
 
+router.put("/users/:userId/make-admin", [auth, adminAuth], async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("Make admin request for userId:", userId);
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { role: "admin" },
+      { new: true }
+    );
+    console.log("User found and updated:", user ? "yes" : "no");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "User promoted to admin successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Make admin error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to promote user to admin",
+    });
+  }
+});
+
 router.get("/reports", [auth, adminAuth], async (req, res) => {
   try {
     const { page = 1, limit = 10, status, priority } = req.query;

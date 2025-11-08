@@ -50,7 +50,5 @@ export default function GoogleCallback() {
     handleCallback();
   }, [searchParams, navigate, login]);
 
-  return (
-    <div className="min-h-screen bg-white flex items-center justify-center"></div>
-  );
+  return null;
 }
