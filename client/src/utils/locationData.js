@@ -1,10 +1,9 @@
-
 import { districtsByDivision } from "./districtsData.js";
 
 export const divisions = [
   { value: "", label: "Select Division" },
   { value: "Dhaka", label: "Dhaka Division" },
-  { value: "Chittagong", label: "Chittagong Division" },
+  { value: "Chittagong", label: "Chittagong Division " },
   { value: "Rajshahi", label: "Rajshahi Division" },
   { value: "Khulna", label: "Khulna Division" },
   { value: "Barisal", label: "Barisal Division" },
@@ -22,7 +21,6 @@ export const getCountries = async () => {
   return districtsByDivision.International;
 };
 
-
 export const locationsByDivision = {
   "": [
     { value: "", label: "Select District/Region" },
@@ -38,6 +36,5 @@ export const locationsByDivision = {
   Mymensingh: districtsByDivision.Mymensingh,
   International: districtsByDivision.International,
 };
-
 
 export { districtsByDivision };
