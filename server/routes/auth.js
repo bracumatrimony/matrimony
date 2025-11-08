@@ -160,6 +160,8 @@ router.post("/google/callback", async (req, res) => {
   try {
     const { code, redirectUri } = req.body;
 
+    console.log("Google callback received:", { hasCode: !!code, redirectUri });
+
     if (!code) {
       return res.status(400).json({
         success: false,
@@ -176,6 +178,7 @@ router.post("/google/callback", async (req, res) => {
 
     const finalRedirectUri = redirectUri || `${baseUrl}/auth/google/callback`;
 
+    console.log("Exchanging code for token...");
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: {
@@ -193,9 +196,11 @@ router.post("/google/callback", async (req, res) => {
     const tokenData = await tokenResponse.json();
 
     if (!tokenData.id_token) {
+      console.error("Failed to get id_token from Google:", tokenData);
       throw new Error("Google authentication failed");
     }
 
+    console.log("Verifying ID token...");
     const ticket = await googleClient.verifyIdToken({
       idToken: tokenData.id_token,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -203,6 +208,8 @@ router.post("/google/callback", async (req, res) => {
 
     const payload = ticket.getPayload();
     const { email, name, picture, email_verified } = payload;
+
+    console.log("Token verified for email:", email);
 
     if (!email_verified) {
       return res.status(400).json({
@@ -214,6 +221,7 @@ router.post("/google/callback", async (req, res) => {
     let user = await User.findOne({ email });
 
     if (!user) {
+      console.log("Creating new user for:", email);
       const universityInfo = detectUniversityFromEmail(email);
       let universityKey, profileId, alumniVerified, verificationRequest;
 
@@ -229,7 +237,9 @@ router.post("/google/callback", async (req, res) => {
 
       if (universityInfo) {
         universityKey = universityInfo.key;
+        console.log(`Generating profile ID for ${universityKey}...`);
         profileId = await User.generateProfileId(universityKey);
+        console.log(`Generated profile ID: ${profileId}`);
         alumniVerified = false;
         verificationRequest = false;
       } else {
@@ -259,21 +269,25 @@ router.post("/google/callback", async (req, res) => {
 
       user = new User(userData);
       await user.save();
+      console.log(`User created successfully: ${email}`);
 
       if (initialCredits > 0) {
         await CreditedEmail.create({ email: email.toLowerCase() });
       }
-    } else if (!user.isGoogleUser) {
-      await User.findByIdAndUpdate(
-        user._id,
-        {
-          isGoogleUser: true,
-          emailVerified: true,
-          authProvider: "google",
-          ...(picture && !user.avatar && { avatar: picture }),
-        },
-        { runValidators: false }
-      );
+    } else {
+      console.log("Existing user found:", email);
+      if (!user.isGoogleUser) {
+        await User.findByIdAndUpdate(
+          user._id,
+          {
+            isGoogleUser: true,
+            emailVerified: true,
+            authProvider: "google",
+            ...(picture && !user.avatar && { avatar: picture }),
+          },
+          { runValidators: false }
+        );
+      }
     }
 
     const token = generateToken(user._id);
@@ -295,6 +309,7 @@ router.post("/google/callback", async (req, res) => {
       token: token,
     };
 
+    console.log("Sending success response for:", email);
     res.json({
       success: true,
       message: "Google authentication successful",

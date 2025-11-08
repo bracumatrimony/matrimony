@@ -7,7 +7,6 @@ const {
 
 const userSchema = new mongoose.Schema(
   {
-    
     name: {
       type: String,
       required: [true, "Name is required"],
@@ -22,7 +21,6 @@ const userSchema = new mongoose.Schema(
       trim: true,
       validate: {
         validator: function (email) {
-          
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         },
         message: "Please enter a valid email address",
@@ -33,7 +31,6 @@ const userSchema = new mongoose.Schema(
       trim: true,
       validate: {
         validator: function (phone) {
-          
           return (
             !phone ||
             /^[\+]?[1-9][\d]{0,15}$/.test(phone.replace(/[\s\-\(\)]/g, ""))
@@ -46,11 +43,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       minLength: [6, "Password must be at least 6 characters long"],
       required: function () {
-        return !this.isGoogleUser; 
+        return !this.isGoogleUser;
       },
     },
 
-    
     profileId: {
       type: String,
       unique: true,
@@ -73,7 +69,6 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
-    
     authProvider: {
       type: String,
       enum: ["email", "google"],
@@ -88,7 +83,6 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    
     credits: {
       type: Number,
       default: 0,
@@ -99,20 +93,17 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    
     unlockedContacts: {
       type: [String],
       default: [],
     },
 
-    
     lastProfileViews: {
       type: Map,
       of: Date,
       default: new Map(),
     },
 
-    
     isActive: {
       type: Boolean,
       default: true,
@@ -131,7 +122,6 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
 
-    
     alumniVerified: {
       type: Boolean,
       default: false,
@@ -141,14 +131,13 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    
     lastLoginAt: {
       type: Date,
       default: null,
     },
   },
   {
-    timestamps: true, 
+    timestamps: true,
     toJSON: {
       transform: function (doc, ret) {
         delete ret.password;
@@ -159,15 +148,12 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-
 userSchema.pre("save", async function (next) {
-  
   if (!this.isModified("password")) {
     return next();
   }
 
   try {
-    
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
@@ -176,14 +162,12 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-
 userSchema.methods.comparePassword = async function (candidatePassword) {
   if (!this.password) {
     return false;
   }
   return await bcrypt.compare(candidatePassword, this.password);
 };
-
 
 userSchema.statics.generateProfileId = async function (universityKey) {
   const universityConfig = getUniversityConfig(universityKey);
@@ -193,39 +177,53 @@ userSchema.statics.generateProfileId = async function (universityKey) {
 
   const { idPrefix, startingID } = universityConfig;
 
-  
-  const highestProfile = await this.findOne(
+  // Get all profiles for this university
+  const allProfiles = await this.find(
     { university: universityKey, profileId: new RegExp(`^${idPrefix}\\d+$`) },
     { profileId: 1 }
-  ).sort({ profileId: -1 });
+  ).lean();
 
   let nextId = startingID;
 
-  if (highestProfile && highestProfile.profileId) {
-    
-    const currentId = parseInt(highestProfile.profileId.replace(idPrefix, ""));
-    nextId = Math.max(currentId + 1, startingID);
+  if (allProfiles && allProfiles.length > 0) {
+    // Extract numeric IDs and find the highest one
+    const numericIds = allProfiles
+      .map((profile) => {
+        const numPart = profile.profileId.replace(idPrefix, "");
+        return parseInt(numPart, 10);
+      })
+      .filter((num) => !isNaN(num));
+
+    if (numericIds.length > 0) {
+      const maxId = Math.max(...numericIds);
+      nextId = Math.max(maxId + 1, startingID);
+    }
   }
 
   const profileId = `${idPrefix}${nextId}`;
 
-  
+  // Double-check it doesn't exist (safety check)
   const exists = await this.findOne({ profileId });
   if (exists) {
-    
-    return this.generateProfileId(universityKey);
+    // If somehow it exists, increment and try again (max 10 attempts to prevent infinite loop)
+    for (let i = 0; i < 10; i++) {
+      nextId++;
+      const newProfileId = `${idPrefix}${nextId}`;
+      const stillExists = await this.findOne({ profileId: newProfileId });
+      if (!stillExists) {
+        return newProfileId;
+      }
+    }
+    throw new Error("Unable to generate unique profile ID after 10 attempts");
   }
 
   return profileId;
 };
 
-
 userSchema.methods.updateLastLogin = function () {
   this.lastLoginAt = new Date();
   return this.save();
 };
-
-
 
 userSchema.index({ isActive: 1 });
 userSchema.index({ role: 1 });
