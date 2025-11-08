@@ -29,7 +29,8 @@ app.use(
 );
 
 const allowedOrigins = [
-  "https://campusmatrimony.vercel.app",
+  "https://www.campusmatrimony.com",
+  "https://campusmatrimony-server.vercel.app",
   "http://localhost:5173",
 ];
 
